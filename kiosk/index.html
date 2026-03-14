@@ -1551,7 +1551,7 @@
             let textLines = [];
 
             // Header
-            textLines.push({ text: 'DÉLICES DE L'INDE', align: 'center', bold: true, size: 2 });
+            textLines.push({ text: "DÉLICES DE L'INDE", align: 'center', bold: true, size: 2 });
             textLines.push({ text: '9 Pl. de la Bascule', align: 'center', size: 1 });
             textLines.push({ text: '31770 Colomiers', align: 'center', size: 1 });
             textLines.push({ text: '', size: 1 });
@@ -3278,7 +3278,7 @@
 
             // Header
             client += '<div class="header">';
-            client += '<div class="logo">DÉLICES DE L'INDE</div>';
+            client += '<div class="logo">DÉLICES DE L\'INDE</div>';
             client += '<div class="address">9 Pl. de la Bascule<br>31770 Colomiers<br>09 56 31 83 94</div>';
             client += '</div>';
 
@@ -3360,7 +3360,7 @@
             // Ticket test CLIENT
             let clientTest = '<div class="ticket">';
             clientTest += '<div class="header">';
-            clientTest += '<div class="logo">DÉLICES DE L'INDE</div>';
+            clientTest += '<div class="logo">DÉLICES DE L\'INDE</div>';
             clientTest += '<div class="address">9 Pl. de la Bascule<br>31770 Colomiers</div>';
             clientTest += '</div>';
             clientTest += '<div class="black-band"><div class="client-name">TEST</div><div class="order-type">TEST</div></div>';
@@ -3512,7 +3512,7 @@
             // ========== TICKET CLIENT TEST ==========
             let client = '<div class="ticket">';
             client += '<div class="header">';
-            client += '<div class="logo">DÉLICES DE L'INDE</div>';
+            client += '<div class="logo">DÉLICES DE L\'INDE</div>';
             client += '<div class="address">TEST IMPRESSION</div>';
             client += '</div>';
 
@@ -3644,20 +3644,40 @@
         }
 
         // ============ INIT ============
-        document.addEventListener('DOMContentLoaded', () => {
+        // Initialisation immédiate (le script est en fin de body, le DOM est prêt)
+        (function init() {
+            // Attendre que le DOM soit prêt (double sécurité)
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+                return;
+            }
+
+            console.log('Initialisation de la borne...');
+
+            // Initialiser le clavier
             initKeyboard();
+            console.log('Clavier initialisé');
+
+            // Timers
             resetIdleTimer();
             resetScreensaverTimer();
 
-            // Ajouter le listener sur tous les logos
+            // Ajouter le listener sur tous les logos (click ET touch pour écran tactile)
             document.querySelectorAll('.logo-big, .sidebar-header img').forEach(logo => {
                 logo.addEventListener('click', handleSecretClick);
+                logo.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    handleSecretClick();
+                });
             });
+            console.log('Listeners logos ajoutés');
 
             // Relancer le timer du screensaver à chaque interaction sur l'écran prénom
             document.getElementById('screen-prenom').addEventListener('click', resetScreensaverTimer);
             document.getElementById('screen-prenom').addEventListener('touchstart', resetScreensaverTimer);
-        });
+
+            console.log('Borne prête !');
+        })();
     </script>
 </body>
 
