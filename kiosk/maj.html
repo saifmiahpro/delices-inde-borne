@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mise à jour - Délices de l'Inde</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+        h1 {
+            font-size: 3em;
+            color: #FFC000;
+            margin-bottom: 30px;
+        }
+        p {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.8);
+        }
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255,192,0,0.2);
+            border-top: 8px solid #FFC000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .countdown {
+            font-size: 4em;
+            color: #FFC000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔄 MISE À JOUR</h1>
+    <div class="spinner"></div>
+    <p>Fermeture de la borne...</p>
+    <p>Redémarrage automatique dans</p>
+    <div class="countdown" id="countdown">5</div>
+    <p style="margin-top: 40px; font-size: 1em; color: rgba(255,255,255,0.5);">
+        Le batch va télécharger les mises à jour et relancer la borne.
+    </p>
+
+    <script>
+        let count = 5;
+        const countdownEl = document.getElementById('countdown');
+
+        const interval = setInterval(() => {
+            count--;
+            countdownEl.textContent = count;
+
+            if (count <= 0) {
+                clearInterval(interval);
+                // Fermer la fenêtre - le batch devra être relancé
+                window.close();
+                // Si window.close ne marche pas, rediriger vers blank
+                setTimeout(() => {
+                    window.location.href = 'about:blank';
+                }, 500);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
