@@ -3577,11 +3577,16 @@
         function adminUpdateRestart() {
             if (confirm('Mettre à jour et redémarrer ?')) {
                 closeAdminModal();
-                showToast('Fermeture pour mise à jour...');
-                setTimeout(() => {
-                    window.close();
-                    window.location.href = 'about:blank';
-                }, 1500);
+                showToast('Mise à jour en cours...');
+                // Appeler le serveur pour git pull et relancer
+                fetch('/api/update')
+                    .then(() => {
+                        showToast('Redémarrage...');
+                    })
+                    .catch(() => {
+                        // Fallback: fermer la fenêtre
+                        window.close();
+                    });
             }
         }
 
