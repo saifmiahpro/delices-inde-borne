@@ -3,9 +3,9 @@ REM ============================================
 REM   LANCEMENT BORNE - LES DELICES DE L'INDE
 REM ============================================
 
-REM Fermer Chrome et Python
+REM Fermer Chrome et ancien serveur
 taskkill /IM chrome.exe /F >nul 2>&1
-taskkill /IM python.exe /F >nul 2>&1
+taskkill /IM powershell.exe /F >nul 2>&1
 timeout /t 1 /nobreak >nul
 
 REM Mise a jour depuis GitHub
@@ -18,11 +18,10 @@ cd /d "%~dp0.."
 git pull origin main
 timeout /t 2 /nobreak >nul
 
-REM Lancer le serveur Python
+REM Lancer serveur PowerShell
 echo Lancement du serveur...
-cd /d "%~dp0.."
-start /B python -m http.server 8080
-timeout /t 2 /nobreak >nul
+start /B powershell -ExecutionPolicy Bypass -File "%~dp0serveur.ps1"
+timeout /t 3 /nobreak >nul
 
 REM Lancer Chrome en mode kiosk
 echo Lancement de la borne...
