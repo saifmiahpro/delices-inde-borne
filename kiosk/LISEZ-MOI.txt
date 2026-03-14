@@ -1,0 +1,40 @@
+========================================
+    BORNE CHICKENZZ - MODE D'EMPLOI
+========================================
+
+ICONES SUR LE BUREAU :
+
+1. "Lancer_Borne"
+   → Double-clic pour démarrer la borne le matin
+
+2. "Mise_a_jour"
+   → Double-clic pour télécharger les dernières
+     modifications (prix, menu, etc.)
+   → IMPORTANT: Fermez d'abord la borne avant
+     de faire une mise à jour !
+
+
+PROCEDURE QUOTIDIENNE :
+
+OUVERTURE:
+   1. Double-clic sur "Lancer_Borne"
+   2. C'est prêt !
+
+FERMETURE:
+   1. Appuyer sur ESC ou Alt+F4
+   2. Ou fermer Chrome
+
+
+EN CAS DE MISE A JOUR:
+
+   1. Fermez la borne (ESC ou Alt+F4)
+   2. Double-clic sur "Mise_a_jour"
+   3. Attendez le message "MISE A JOUR REUSSIE"
+   4. Relancez la borne avec "Lancer_Borne"
+
+
+EN CAS DE PROBLEME:
+
+   Contactez Saif !
+
+========================================
