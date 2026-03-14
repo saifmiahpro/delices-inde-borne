@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Délices de l'Inde - Borne de Commande</title>
+    <title>Les Délices de l'Inde - Borne de Commande</title>
     <!-- Impression: 2 tickets sur Star (imprimante par défaut) -->
     <link
         href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700&display=swap"
@@ -1050,7 +1050,7 @@
             <source src="videos/screensaver.mp4" type="video/mp4">
         </video>
         <div class="screensaver-content">
-            <img src="videos/delices_inde_logo.png" alt="Délices de l'Inde" class="screensaver-logo">
+            <img src="videos/delices_inde_logo.png" alt="Chickenzz" class="screensaver-logo">
             <div class="screensaver-cta">COMMANDEZ ICI</div>
             <div class="screensaver-touch">Touchez l'écran pour commander</div>
         </div>
@@ -1058,7 +1058,7 @@
 
     <!-- ============ ÉCRAN 1: PRÉNOM ============ -->
     <div id="screen-prenom" class="intro-screen active">
-        <img src="videos/delices_inde_logo.png" alt="Délices de l'Inde" class="logo-big">
+        <img src="videos/delices_inde_logo.png" alt="Chickenzz" class="logo-big">
         <h1>ENTREZ VOTRE PRÉNOM</h1>
         <input type="text" class="prenom-input" id="prenom-input" readonly placeholder="VOTRE PRÉNOM">
         <div class="keyboard" id="keyboard"></div>
@@ -1067,7 +1067,7 @@
 
     <!-- ============ ÉCRAN 2: MODE ============ -->
     <div id="screen-mode" class="intro-screen">
-        <img src="videos/delices_inde_logo.png" alt="Délices de l'Inde" class="logo-big">
+        <img src="videos/delices_inde_logo.png" alt="Chickenzz" class="logo-big">
         <h1>BONJOUR <span id="display-prenom"></span> !</h1>
         <h2>Où souhaitez-vous manger ?</h2>
         <div class="mode-cards">
@@ -1087,7 +1087,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="../AssetsTv3/delices_inde_logo.jpg" alt="Délices de l'Inde">
+                <img src="../AssetsTv3/delices_inde_logo.jpg" alt="Chickenzz">
             </div>
             <div class="sidebar-mode">
                 <div class="client-name" id="sidebar-name">SAIF</div>
@@ -1227,7 +1227,15 @@
                     style="background: rgba(0,150,255,0.15); border: 2px solid #0096ff; border-radius: 15px; padding: 20px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2.5vw, 24px); color: #0096ff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
                     VOIR IMPRIMANTES QZ
                 </button>
-                <button onclick="adminUpdateAndRestart()"
+                <button onclick="installQZv2()"
+                    style="background: rgba(255,150,0,0.15); border: 2px solid #ff9600; border-radius: 15px; padding: 20px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2.5vw, 24px); color: #ff9600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    INSTALLER QZ v2.0
+                </button>
+                <button onclick="togglePrinterMode()" id="btn-printer-mode"
+                    style="background: rgba(0,204,102,0.15); border: 2px solid #00cc66; border-radius: 15px; padding: 20px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2.5vw, 24px); color: #00cc66; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    MODE: <span id="printer-mode-label">DUAL (Star + Epson)</span>
+                </button>
+                <button onclick="adminUpdateRestart()"
                     style="background: rgba(0,150,255,0.15); border: 2px solid #0096ff; border-radius: 15px; padding: 25px; font-family: 'Anton', sans-serif; font-size: clamp(20px, 3vw, 30px); color: #0096ff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
                     🔄 MISE À JOUR
                 </button>
@@ -1543,7 +1551,7 @@
             let textLines = [];
 
             // Header
-            textLines.push({ text: 'CHICKENZZ', align: 'center', bold: true, size: 2 });
+            textLines.push({ text: 'DÉLICES DE L'INDE', align: 'center', bold: true, size: 2 });
             textLines.push({ text: '9 Pl. de la Bascule', align: 'center', size: 1 });
             textLines.push({ text: '31770 Colomiers', align: 'center', size: 1 });
             textLines.push({ text: '', size: 1 });
@@ -3270,7 +3278,7 @@
 
             // Header
             client += '<div class="header">';
-            client += '<div class="logo">CHICKENZZ</div>';
+            client += '<div class="logo">DÉLICES DE L'INDE</div>';
             client += '<div class="address">9 Pl. de la Bascule<br>31770 Colomiers<br>09 56 31 83 94</div>';
             client += '</div>';
 
@@ -3352,7 +3360,7 @@
             // Ticket test CLIENT
             let clientTest = '<div class="ticket">';
             clientTest += '<div class="header">';
-            clientTest += '<div class="logo">CHICKENZZ</div>';
+            clientTest += '<div class="logo">DÉLICES DE L'INDE</div>';
             clientTest += '<div class="address">9 Pl. de la Bascule<br>31770 Colomiers</div>';
             clientTest += '</div>';
             clientTest += '<div class="black-band"><div class="client-name">TEST</div><div class="order-type">TEST</div></div>';
@@ -3504,7 +3512,7 @@
             // ========== TICKET CLIENT TEST ==========
             let client = '<div class="ticket">';
             client += '<div class="header">';
-            client += '<div class="logo">CHICKENZZ</div>';
+            client += '<div class="logo">DÉLICES DE L'INDE</div>';
             client += '<div class="address">TEST IMPRESSION</div>';
             client += '</div>';
 
@@ -3566,12 +3574,14 @@
             window.location.href = 'about:blank';
         }
 
-        // Mise à jour et redémarrage
-        function adminUpdateAndRestart() {
-            if (confirm('Mettre à jour et redémarrer la borne ?')) {
-                showToast('Mise à jour en cours...');
-                // Ouvrir le script de mise à jour
-                window.location.href = 'maj.html';
+        function adminUpdateRestart() {
+            if (confirm('Mettre à jour et redémarrer ?')) {
+                closeAdminModal();
+                showToast('Fermeture pour mise à jour...');
+                setTimeout(() => {
+                    window.close();
+                    window.location.href = 'about:blank';
+                }, 1500);
             }
         }
 
