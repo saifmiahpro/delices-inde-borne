@@ -927,6 +927,103 @@
             }
         }
 
+        /* Petits écrans en hauteur (Windows 7, vieux moniteurs) */
+        @media (max-height: 800px) {
+            .intro-screen {
+                padding: 2vh 3vw;
+            }
+
+            .intro-screen .logo-big {
+                width: min(180px, 30vw);
+                margin-bottom: 2vh;
+            }
+
+            .intro-screen h1 {
+                font-size: clamp(24px, 4vw, 36px);
+                margin-bottom: 1.5vh;
+            }
+
+            .intro-screen h2 {
+                font-size: clamp(16px, 2.5vw, 24px);
+                margin-bottom: 2vh;
+            }
+
+            .prenom-input {
+                padding: 1.5vh 3vw;
+                font-size: clamp(24px, 4vw, 36px);
+                margin-bottom: 2vh;
+            }
+
+            .keyboard {
+                gap: 3px;
+                margin-bottom: 2vh;
+            }
+
+            .key {
+                padding: 10px 4px;
+                font-size: clamp(16px, 2vw, 22px);
+            }
+
+            .btn-primary {
+                padding: 12px 40px;
+                font-size: clamp(18px, 3vw, 28px);
+                margin-top: 1vh;
+            }
+
+            .mode-card {
+                padding: 15px;
+            }
+
+            .mode-card .icon {
+                font-size: clamp(30px, 5vw, 50px);
+                margin-bottom: 1vh;
+            }
+
+            .mode-card h2 {
+                font-size: clamp(20px, 3vw, 30px);
+            }
+        }
+
+        /* Très petits écrans (800x600, 1024x768) */
+        @media (max-height: 650px) {
+            .intro-screen .logo-big {
+                width: 120px;
+                margin-bottom: 1vh;
+            }
+
+            .intro-screen h1 {
+                font-size: 22px;
+                margin-bottom: 1vh;
+            }
+
+            .intro-screen h2 {
+                font-size: 16px;
+                margin-bottom: 1vh;
+            }
+
+            .prenom-input {
+                padding: 10px 20px;
+                font-size: 22px;
+                margin-bottom: 1vh;
+            }
+
+            .keyboard {
+                gap: 2px;
+                margin-bottom: 1vh;
+            }
+
+            .key {
+                padding: 6px 2px;
+                font-size: 14px;
+                border-radius: 4px;
+            }
+
+            .btn-primary {
+                padding: 10px 30px;
+                font-size: 18px;
+            }
+        }
+
         /* ============ ÉCRAN DE VEILLE ============ */
         .screensaver {
             position: fixed;
