@@ -1,180 +1,280 @@
-// Base de données produits Chickenzz
+// Base de données produits - Délice de L'Inde
 
 // Options globales
 const VIANDES = [
-    { id: 'cordon_bleu', name: 'Cordon Bleu' },
-    { id: 'tikka', name: 'Poulet Tikka' },
     { id: 'kebab', name: 'Kebab' },
-    { id: 'steak', name: 'Steak' },
-    { id: 'kefta', name: 'Kefta' },
     { id: 'tenders', name: 'Tenders' },
+    { id: 'cordon_bleu', name: 'Cordon Bleu' },
+    { id: 'steak', name: 'Steak' },
+    { id: 'tikka', name: 'Chicken Tikka' },
     { id: 'merguez', name: 'Merguez' },
-    { id: 'nuggets', name: 'Nuggets' }
+    { id: 'kefta', name: 'Kefta' },
+    { id: 'falafel', name: 'Falafel' }
 ];
 
 const SAUCES = [
     { id: 'blanche', name: 'Blanche' },
-    { id: 'bresilienne', name: 'Brésilienne' },
-    { id: 'poivre', name: 'Poivre' },
-    { id: 'ketchup', name: 'Ketchup' },
+    { id: 'algerienne', name: 'Algérienne' },
     { id: 'harissa', name: 'Harissa' },
     { id: 'curry', name: 'Curry' },
-    { id: 'biggy', name: 'Biggy' },
     { id: 'barbecue', name: 'Barbecue' },
     { id: 'mayonnaise', name: 'Mayonnaise' },
-    { id: 'andalouse', name: 'Andalouse' },
+    { id: 'ketchup', name: 'Ketchup' },
     { id: 'samourai', name: 'Samouraï' },
-    { id: 'moutarde', name: 'Moutarde' },
-    { id: 'marocaine', name: 'Marocaine' },
-    { id: 'algerienne', name: 'Algérienne' },
-    { id: 'miami', name: 'Miami' }
+    { id: 'biggy', name: 'Biggy' },
+    { id: 'sweet_chili', name: 'Sweet Chili' },
+    { id: 'chili_thai', name: 'Chili Thaï' },
+    { id: 'fromagere', name: 'Sauce Fromagère' },
+    { id: 'cheddar', name: 'Sauce Cheddar' }
 ];
 
 const BOISSONS_33 = [
     { id: 'oasis_tropical', name: 'Oasis Tropical' },
     { id: 'oasis_pcf', name: 'Oasis Pomme Cassis Framboise' },
-    { id: 'oasis_ff', name: 'Oasis Fraise Framboise' },
     { id: 'dada_peche', name: 'Dada Pêche' },
     { id: 'dada_melon', name: 'Dada Melon' },
     { id: 'dada_litchi', name: 'Dada Litchi' },
-    { id: 'dada_cerise', name: 'Dada Cerise' },
-    { id: 'dada_fraise', name: 'Dada Fraise' },
     { id: '7up', name: '7Up' },
-    { id: '7up_mojito', name: '7Up Mojito' },
     { id: 'sprite', name: 'Sprite' },
     { id: 'orangina', name: 'Orangina' },
     { id: 'fanta_orange', name: 'Fanta Orange' },
-    { id: 'fanta_citron', name: 'Fanta Citron' },
-    { id: 'fanta_dragon', name: 'Fanta Fruit du Dragon' },
-    { id: 'hawaii', name: 'Hawaii' },
-    { id: 'schweppes_agrum', name: 'Schweppes Agrum' },
     { id: 'pepsi', name: 'Pepsi' },
     { id: 'pepsi_max', name: 'Pepsi Max' },
-    { id: 'eau', name: 'Eau' }
+    { id: 'eau', name: 'Eau' },
+    { id: 'capri_sun', name: 'Capri-Sun' }
 ];
 
 const PAINS = [
-    { id: 'naan_nature', name: 'Naan Nature' },
-    { id: 'naan_fromage', name: 'Naan Fromage' },
+    { id: 'naan', name: 'Naan' },
     { id: 'pain_rond', name: 'Pain Rond' },
     { id: 'galette', name: 'Galette' }
 ];
 
 const GRATINS = [
-    { id: 'lardon', name: 'Lardon' },
-    { id: 'cheddar', name: 'Cheddar' },
-    { id: 'raclette', name: 'Raclette' },
-    { id: 'chevre', name: 'Chèvre' },
-    { id: 'chevre_miel', name: 'Chèvre Miel' },
-    { id: 'bacon', name: 'Bacon' },
-    { id: 'olives', name: 'Olives' },
-    { id: 'poivrons', name: 'Poivrons' },
-    { id: 'mozzarella', name: 'Mozzarella' }
+    { id: 'lardon', name: 'Lardons', price: 2.00 },
+    { id: 'cheddar', name: 'Cheddar', price: 2.00 },
+    { id: 'raclette', name: 'Raclette', price: 2.00 },
+    { id: 'chevre', name: 'Chèvre', price: 2.00 },
+    { id: 'chevre_miel', name: 'Chèvre Miel', price: 2.50 },
+    { id: 'bacon', name: 'Bacon', price: 2.00 },
+    { id: 'olives_poivrons', name: 'Olives/Poivrons', price: 2.00 }
 ];
 
 const SUPPLEMENTS = [
     { id: 'supp_cheddar', name: 'Cheddar', price: 1.00 },
-    { id: 'supp_raclette', name: 'Raclette', price: 1.50 },
-    { id: 'supp_chevre', name: 'Chèvre', price: 1.50 },
-    { id: 'supp_boursin', name: 'Boursin', price: 1.50 },
+    { id: 'supp_chevre', name: 'Chèvre', price: 1.00 },
+    { id: 'supp_vache_qui_rit', name: 'Vache qui rit', price: 1.00 },
     { id: 'supp_oeuf', name: 'Œuf', price: 1.00 },
-    { id: 'supp_bacon', name: 'Bacon', price: 1.50 }
+    { id: 'supp_boursin', name: 'Boursin', price: 1.00 },
+    { id: 'supp_mozzarella', name: 'Mozzarella', price: 1.00 },
+    { id: 'supp_bacon', name: 'Bacon', price: 1.00 },
+    { id: 'supp_lardon', name: 'Lardon', price: 1.00 }
 ];
 
-// Viandes supplémentaires (choix de viande à +1.50€)
-const VIANDES_SUPP = VIANDES.map(v => ({ ...v, price: 1.50 }));
+const SUPPLEMENTS_POUTINE = [
+    { id: 'supp_mozzarella', name: 'Mozzarella', price: 1.50 },
+    { id: 'supp_bacon', name: 'Bacon', price: 1.50 },
+    { id: 'supp_lardon', name: 'Lardon', price: 1.50 },
+    { id: 'supp_cheddar', name: 'Cheddar', price: 1.50 },
+    { id: 'supp_chevre', name: 'Chèvre', price: 1.50 },
+    { id: 'supp_raclette', name: 'Raclette', price: 1.50 },
+    { id: 'supp_poivrons', name: 'Poivrons', price: 1.50 },
+    { id: 'supp_olive', name: 'Olive', price: 1.50 }
+];
 
-// Éléments qu'on peut retirer - SANDWICHS (salade, tomate, oignon)
+// Viandes supplémentaires (choix de viande à +1€)
+const VIANDES_SUPP = VIANDES.map(v => ({ ...v, price: 1.00 }));
+
+// Éléments qu'on peut retirer - SANDWICHS
 const RETRAITS_SANDWICH = [
     { id: 'sans_salade', name: 'Sans Salade' },
     { id: 'sans_tomate', name: 'Sans Tomate' },
     { id: 'sans_oignon', name: 'Sans Oignon' }
 ];
 
-// Éléments qu'on peut retirer - TACOS (uniquement sauce fromagère)
+// Éléments qu'on peut retirer - TACOS
 const RETRAITS_TACOS = [
     { id: 'sans_sauce_fromagere', name: 'Sans Sauce Fromagère' }
 ];
 
 // Catégories
 const CATEGORIES = [
-    { id: 'offres', name: 'Nos Offres', image: '../assets/common/logo.png', isHighlight: true },
+    { id: 'buckets', name: 'Buckets', image: '../assets/buckets/bucket_1.png' },
+    { id: 'bowls', name: 'Bowls', image: '../assets/bowls/bowl_classique.png' },
+    { id: 'salades', name: 'Salades', image: '../assets/salades/salade.png' },
     { id: 'tacos', name: 'Tacos', image: '../assets/tacos/tacos.png' },
     { id: 'naans', name: 'Naans', image: '../assets/naans/naan_royal.png' },
     { id: 'sandwichs', name: 'Sandwichs', image: '../assets/sandwichs/sandwich.png' },
-    { id: 'buckets', name: 'Buckets', image: '../assets/buckets/bucket_1.png' },
-    { id: 'assiettes', name: 'Assiettes', image: '../assets/common/assiette.png' },
-    { id: 'bowls', name: 'Bowls', image: '../assets/bowls/bowl_classique.png' },
-    { id: 'boxes', name: 'Boxes', image: '../assets/boxes/single_box.png' },
+    { id: 'wraps', name: 'Wraps', image: '../assets/sandwichs/sandwich_galette.png' },
     { id: 'burgers', name: 'Burgers', image: '../assets/burgers/smash_burger.png' },
+    { id: 'paninis', name: 'Paninis', image: '../assets/common/logo.png' },
     { id: 'poutines', name: 'Poutines', image: '../assets/poutines/poutine.png' },
-    { id: 'tex_mex', name: 'Tex Mex', image: '../assets/tex_mex/korean_wings.png' },
     { id: 'frites', name: 'Frites', image: '../assets/frites/frite_boisson.png' },
-    { id: 'salades', name: 'Salades', image: '../assets/salades/salade.png' },
-    { id: 'desserts', name: 'Desserts', image: '../assets/desserts/panini_nutella.png' },
-    { id: 'boissons', name: 'Boissons', image: '../assets/frites/frite_boisson.png' },
-    { id: 'enfant', name: 'Menu Enfant', image: '../assets/common/logo.png' }
+    { id: 'assiettes', name: 'Assiettes', image: '../assets/common/assiette.png' },
+    { id: 'enfant', name: 'Menu Enfant', image: '../assets/common/logo.png' },
+    { id: 'tex_mex', name: 'Tex Mex', image: '../assets/common/logo.png' },
+    { id: 'desserts', name: 'Desserts', image: '../assets/desserts/tiramisu.png' },
+    { id: 'boissons', name: 'Boissons', image: '../assets/frites/frite_boisson.png' }
 ];
 
 // Produits
 const PRODUCTS = [
-    // ==================== NOS OFFRES ====================
+
+    // ==================== BUCKETS ====================
+    // Frites & Boissons incluses
     {
-        id: 'offre_crousty_bowl',
-        category: 'offres',
-        name: 'Crousty Bowl',
-        description: 'Tenders, Sweet Chili, Oignons Frits',
-        image: '../assets/bowls/bowl_classique.png',
-        type: 'bowl',
-        hasBuilder: true,
-        isPromo: true,
-        promoLabel: '-30%',
-        sizes: [
-            { id: 'M', name: 'M', price: 6.90, originalPrice: 9.90 },
-            { id: 'XL', name: 'XL', price: 11.90, originalPrice: 14.90 }
-        ]
-    },
-    {
-        id: 'offre_bucket_1',
-        category: 'offres',
-        name: 'Bucket 1',
-        description: '3 Wings + 2 Tenders + Frites + Boisson',
+        id: 'bucket_classic',
+        category: 'buckets',
+        name: 'Classic',
+        description: '3 Wings + 3 Tenders + Frites + Boisson 33cl',
         image: '../assets/buckets/bucket_1.png',
         price: 7.90,
         type: 'bucket',
         hasBuilder: true,
-        isPromo: true,
-        promoLabel: 'BON PLAN',
         includesFrites: true,
         includesBoisson: true
     },
     {
-        id: 'offre_single_box',
-        category: 'offres',
-        name: 'Single Box',
-        description: '1 Burger + 2 Mozza Sticks + Frites Cheddar + Sauce',
-        image: '../assets/boxes/single_box.png',
+        id: 'bucket_delice',
+        category: 'buckets',
+        name: 'Délice',
+        description: '5 Wings + 3 Tenders + Frites + Boisson 33cl',
+        image: '../assets/buckets/bucket_2.png',
         price: 9.90,
-        type: 'box',
+        type: 'bucket',
         hasBuilder: true,
-        isPromo: true,
-        promoLabel: 'BON PLAN'
+        includesFrites: true,
+        includesBoisson: true
     },
     {
-        id: 'offre_mega_box',
-        category: 'offres',
-        name: 'Mega Box',
-        description: '1 Burger + 4 Mozza Sticks + Tenders dés + Frites Cheddar + Sauce',
-        image: '../assets/boxes/mega_box.png',
-        price: 11.90,
-        type: 'box',
+        id: 'bucket_mixte',
+        category: 'buckets',
+        name: 'Bucket Mixte',
+        description: '7 Wings + 5 Tenders + 4 Mozza Sticks + 2 Frites + 2 Boissons 33cl',
+        image: '../assets/buckets/bucket_3.png',
+        price: 18.90,
+        type: 'bucket',
         hasBuilder: true,
-        isPromo: true,
-        promoLabel: 'BON PLAN'
+        includesFrites: true,
+        includesBoisson: true
+    },
+    {
+        id: 'bucket_family',
+        category: 'buckets',
+        name: 'Bucket Family',
+        description: '10 Wings + 10 Tenders + 4 Mozza Sticks + 3 Frites + Bouteille 1,5L',
+        image: '../assets/buckets/bucket_4.png',
+        price: 26.90,
+        type: 'bucket',
+        hasBuilder: true,
+        includesFrites: true,
+        includesBoisson: true
+    },
+
+    // ==================== BOWLS ====================
+    // Base : Riz avec sauce maison
+    {
+        id: 'bowl_classic',
+        category: 'bowls',
+        name: 'Classic Bowl',
+        description: 'Viande au choix',
+        image: '../assets/bowls/bowl_classique.png',
+        type: 'bowl',
+        hasBuilder: true,
+        sizes: [
+            { id: 'normal', name: 'Normal', price: 8.90 },
+            { id: 'xl', name: 'XL', price: 10.90 }
+        ]
+    },
+    {
+        id: 'bowl_indien',
+        category: 'bowls',
+        name: 'Indien Bowl',
+        description: 'Chicken Tikka, oignon, poivron, œuf, sauce curry',
+        image: '../assets/bowls/bowl_indian.png',
+        type: 'bowl',
+        hasBuilder: true,
+        isSpecial: true,
+        defaultIngredients: 'Chicken Tikka • Oignon, Poivron • Œuf • Sauce Curry',
+        sizes: [
+            { id: 'normal', name: 'Normal', price: 9.90 },
+            { id: 'xl', name: 'XL', price: 14.90 }
+        ]
+    },
+    {
+        id: 'bowl_crispy',
+        category: 'bowls',
+        name: 'Crispy Bowl',
+        description: 'Tenders, cheddar, oignons frits, œuf',
+        image: '../assets/bowls/bowl_crousty.png',
+        type: 'bowl',
+        hasBuilder: true,
+        isSpecial: true,
+        defaultIngredients: 'Tenders • Cheddar • Oignons Frits • Œuf',
+        sizes: [
+            { id: 'normal', name: 'Normal', price: 9.90 },
+            { id: 'xl', name: 'XL', price: 14.90 }
+        ]
+    },
+    {
+        id: 'bowl_bangkok',
+        category: 'bowls',
+        name: 'Krousty Bangkok',
+        description: 'Tenders, sweet chili, oignon frit',
+        image: '../assets/bowls/bowl_spicy.png',
+        type: 'bowl',
+        hasBuilder: true,
+        isSpecial: true,
+        defaultIngredients: 'Tenders • Sweet Chili • Oignon Frit',
+        sizes: [
+            { id: 'normal', name: 'Normal', price: 9.90 },
+            { id: 'xl', name: 'XL', price: 14.90 }
+        ]
+    },
+    {
+        id: 'bowl_delice',
+        category: 'bowls',
+        name: 'Bowl Délice',
+        description: 'Chicken Tikka, oignons frits, sauce extra piquante',
+        image: '../assets/bowls/bowl_chef.png',
+        type: 'bowl',
+        hasBuilder: true,
+        isSpecial: true,
+        defaultIngredients: 'Chicken Tikka • Oignons Frits • Sauce Extra Piquante',
+        sizes: [
+            { id: 'normal', name: 'Normal', price: 9.90 },
+            { id: 'xl', name: 'XL', price: 14.90 }
+        ]
+    },
+
+    // ==================== SALADES ====================
+    {
+        id: 'salade_cesar',
+        category: 'salades',
+        name: 'César',
+        description: 'Poulet pané, légumes, œuf',
+        image: '../assets/salades/salade.png',
+        price: 7.50
+    },
+    {
+        id: 'salade_honey',
+        category: 'salades',
+        name: 'Honey',
+        description: 'Nem au poulet, légumes, œuf',
+        image: '../assets/salades/salade.png',
+        price: 7.50
+    },
+    {
+        id: 'salade_indienne',
+        category: 'salades',
+        name: 'Indienne',
+        description: 'Chicken Tikka, légumes, œuf',
+        image: '../assets/salades/salade.png',
+        price: 7.50
     },
 
     // ==================== TACOS ====================
-    // COMPOSE EN PREMIER
+    // TACOS CLASSIQUES
     {
         id: 'tacos_custom',
         category: 'tacos',
@@ -186,59 +286,46 @@ const PRODUCTS = [
         hasBuilder: true,
         isCustom: true,
         sizes: [
-            { id: 'S', name: 'S', price: 6.90, meatCount: 1 },
-            { id: 'M', name: 'M', price: 7.90, meatCount: 2 },
-            { id: 'L', name: 'L', price: 9.90, meatCount: 3 },
-            { id: 'XL', name: 'XL', price: 14.90, meatCount: 4 }
+            { id: 'S', name: 'Small', price: 6.00, menuPrice: 8.00, meatCount: 1 },
+            { id: 'M', name: 'Medium', price: 7.00, menuPrice: 9.00, meatCount: 2 },
+            { id: 'L', name: 'Large', price: 10.00, menuPrice: 12.00, meatCount: 3 },
+            { id: 'XXL', name: 'XXL', price: 13.00, menuPrice: 15.00, meatCount: 4 }
         ]
     },
-    // TACOS SPÉCIAUX
+    // TACOS SPÉCIAUX (Base prix Seul, Menu = +2€)
+    // Upgrades: Large (+3€) ou XL (+6€)
     {
         id: 'tacos_spicy',
         category: 'tacos',
         name: 'Tacos Spicy',
-        description: 'Kefta, Tikka, Cheddar, Chili-Thaï',
+        description: 'Chicken Tikka, Kefta, Sauce Chili Thaï, Oignon frit',
         image: '../assets/tacos/tacos_spicy.png',
         type: 'tacos',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Kefta, Tikka • Cheddar • Chili-Thaï',
-        sizes: [
-            { id: 'M', name: 'M', price: 9.90, meatCount: 2 },
-            { id: 'L', name: 'L', price: 12.90, meatCount: 3 },
-            { id: 'XL', name: 'XL', price: 15.90, meatCount: 4 }
+        defaultIngredients: 'Chicken Tikka, Kefta • Chili Thaï • Oignon Frit',
+        price: 9.90,
+        menuPrice: 11.90,
+        upgrades: [
+            { id: 'large', name: 'Large', extraPrice: 3.00 },
+            { id: 'xl', name: 'XL', extraPrice: 6.00 }
         ]
     },
     {
         id: 'tacos_crispy',
         category: 'tacos',
         name: 'Tacos Crispy',
-        description: 'Tenders, Oignon Frit, Miel',
+        description: 'Chicken Tikka, Tenders, Bacon, Oignons frits, Sauce Algérienne',
         image: '../assets/tacos/tacos_crispy.png',
         type: 'tacos',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Tenders • Oignon Frit, Miel',
-        sizes: [
-            { id: 'M', name: 'M', price: 9.90, meatCount: 2 },
-            { id: 'L', name: 'L', price: 12.90, meatCount: 3 },
-            { id: 'XL', name: 'XL', price: 15.90, meatCount: 4 }
-        ]
-    },
-    {
-        id: 'tacos_chef',
-        category: 'tacos',
-        name: 'Tacos Chef',
-        description: 'C. Bleu, Tenders, Boursin, Miami',
-        image: '../assets/tacos/tacos_chef.png',
-        type: 'tacos',
-        hasBuilder: true,
-        isSpecial: true,
-        defaultIngredients: 'Cordon Bleu, Tenders • Boursin, Miami',
-        sizes: [
-            { id: 'M', name: 'M', price: 9.90, meatCount: 2 },
-            { id: 'L', name: 'L', price: 12.90, meatCount: 3 },
-            { id: 'XL', name: 'XL', price: 15.90, meatCount: 4 }
+        defaultIngredients: 'Chicken Tikka, Tenders • Bacon • Oignons Frits • Algérienne',
+        price: 9.90,
+        menuPrice: 11.90,
+        upgrades: [
+            { id: 'large', name: 'Large', extraPrice: 3.00 },
+            { id: 'xl', name: 'XL', extraPrice: 6.00 }
         ]
     },
     {
@@ -251,364 +338,515 @@ const PRODUCTS = [
         hasBuilder: true,
         isSpecial: true,
         defaultIngredients: 'Tenders, Steak • Chèvre • Œuf',
-        sizes: [
-            { id: 'M', name: 'M', price: 9.90, meatCount: 2 },
-            { id: 'L', name: 'L', price: 12.90, meatCount: 3 },
-            { id: 'XL', name: 'XL', price: 15.90, meatCount: 4 }
+        price: 8.90,
+        menuPrice: 10.90,
+        upgrades: [
+            { id: 'large', name: 'Large', extraPrice: 3.00 },
+            { id: 'xl', name: 'XL', extraPrice: 6.00 }
         ]
     },
     {
-        id: 'tacos_oriental',
+        id: 'tacos_royal',
         category: 'tacos',
-        name: 'Tacos Oriental',
-        description: 'Kebab, Tenders, Raclette, Algérienne',
-        image: '../assets/tacos/tacos_oriental.png',
+        name: 'Tacos Royal',
+        description: '2 Viandes au choix, Oignons et poivrons, Bacon, Sauce Cheddar',
+        image: '../assets/tacos/tacos_chef.png',
         type: 'tacos',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Kebab, Tenders • Algérienne • Raclette',
-        sizes: [
-            { id: 'M', name: 'M', price: 9.90, meatCount: 2 },
-            { id: 'L', name: 'L', price: 12.90, meatCount: 3 },
-            { id: 'XL', name: 'XL', price: 15.90, meatCount: 4 }
+        defaultIngredients: '2 Viandes • Oignons, Poivrons • Bacon • Sauce Cheddar',
+        price: 10.50,
+        menuPrice: 12.50,
+        upgrades: [
+            { id: 'large', name: 'Large', extraPrice: 3.00 },
+            { id: 'xl', name: 'XL', extraPrice: 6.00 }
         ]
     },
 
-    // ==================== NAANS ====================
-    // COMPOSE EN PREMIER
-    {
-        id: 'naan_sandwich_link',
-        category: 'naans',
-        name: 'Compose ton Sandwich',
-        description: 'Pain, viande, sauce au choix',
-        image: '../assets/sandwichs/sandwich.png',
-        price: 7.90,
-        type: 'sandwich',
-        hasBuilder: true,
-        isCustom: true
-    },
-    // NAANS SPÉCIAUX
+    // ==================== NAANS SPÉCIAUX ====================
     {
         id: 'naan_royal',
         category: 'naans',
         name: 'Naan Royal',
-        description: 'Poulet Tikka, Tenders, Cheddar, Oignons Frits',
+        description: 'Chicken Tikka, Tenders, Sauce Cheddar, Oignon frit',
         image: '../assets/naans/naan_royal.png',
-        price: 9.50,
+        price: 9.00,
+        menuPrice: 11.00,
         type: 'naan',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Poulet Tikka, Tenders • Cheddar, Oignons Frits'
+        defaultIngredients: 'Chicken Tikka, Tenders • Sauce Cheddar • Oignon Frit'
     },
     {
         id: 'naan_cheesy',
         category: 'naans',
         name: 'Naan Cheesy',
-        description: 'Steak, Cordon Bleu, Raclette, Sauce Fromage',
+        description: 'Steak, Cordon Bleu, Raclette, Sauce Fromagère',
         image: '../assets/naans/naan_cheesy.png',
-        price: 10.00,
+        price: 10.50,
+        menuPrice: 12.50,
         type: 'naan',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Steak, Cordon Bleu • Sauce Fromage • Raclette'
+        defaultIngredients: 'Steak, Cordon Bleu • Raclette • Sauce Fromagère'
     },
     {
-        id: 'naan_spicy',
+        id: 'naan_crispy',
         category: 'naans',
-        name: 'Naan Spicy',
-        description: 'Tikka, Kefta, Sauce Algérienne',
-        image: '../assets/naans/naan_spicy.png',
-        price: 9.50,
+        name: 'Naan Crispy',
+        description: 'Kebab, Tenders, Bacon, Oignons frits, Sauce Algérienne',
+        image: '../assets/naans/naan_crispy.png',
+        price: 9.00,
+        menuPrice: 11.00,
         type: 'naan',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Tikka, Kefta • Algérienne'
+        defaultIngredients: 'Kebab, Tenders • Bacon • Oignons Frits • Algérienne'
     },
     {
-        id: 'naan_mexicain',
+        id: 'naan_delice',
         category: 'naans',
-        name: 'Naan Mexicain',
-        description: 'Poulet Tikka, Tenders, Chili-Thaï',
-        image: '../assets/naans/naan_mexicain.png',
-        price: 9.50,
+        name: 'Naan Délice',
+        description: 'Kebab, Tenders, Bacon, Œuf, Sauce Sweet Chili',
+        image: '../assets/naans/naan_delice.png',
+        price: 9.00,
+        menuPrice: 11.00,
         type: 'naan',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Poulet Tikka, Tenders • Chili-Thaï'
+        defaultIngredients: 'Kebab, Tenders • Bacon • Œuf • Sweet Chili'
     },
 
-    // ==================== SANDWICHS ====================
+    // ==================== SANDWICHS CLASSIQUES ====================
+    // 1 viande au choix
     {
-        id: 'sandwich',
+        id: 'sandwich_naan',
         category: 'sandwichs',
-        name: 'Sandwich',
-        description: 'Compose ton sandwich',
+        name: 'Naan',
+        description: '1 viande au choix',
         image: '../assets/sandwichs/sandwich.png',
-        price: 7.90,
+        price: 7.00,
+        menuPrice: 9.00,
+        type: 'sandwich',
+        hasBuilder: true
+    },
+    {
+        id: 'sandwich_pain_rond',
+        category: 'sandwichs',
+        name: 'Pain Rond',
+        description: '1 viande au choix',
+        image: '../assets/sandwichs/sandwich.png',
+        price: 7.00,
+        menuPrice: 9.00,
+        type: 'sandwich',
+        hasBuilder: true
+    },
+    {
+        id: 'sandwich_galette',
+        category: 'sandwichs',
+        name: 'Galette',
+        description: '1 viande au choix',
+        image: '../assets/sandwichs/sandwich_galette.png',
+        price: 7.00,
+        menuPrice: 9.00,
         type: 'sandwich',
         hasBuilder: true
     },
 
-    // ==================== BUCKETS ====================
+    // ==================== WRAPS ====================
     {
-        id: 'bucket_1',
-        category: 'buckets',
-        name: 'Bucket 1',
-        description: '3 Wings + 2 Tenders + Frites + Boisson',
-        image: '../assets/buckets/bucket_1.png',
-        price: 7.90,
-        type: 'bucket',
-        hasBuilder: true,
-        includesFrites: true,
-        includesBoisson: true
-    },
-    {
-        id: 'bucket_2',
-        category: 'buckets',
-        name: 'Bucket 2',
-        description: '5 Wings + 3 Tenders + Frites + Boisson',
-        image: '../assets/buckets/bucket_2.png',
-        price: 9.90,
-        type: 'bucket',
-        hasBuilder: true,
-        includesFrites: true,
-        includesBoisson: true
-    },
-    {
-        id: 'bucket_3',
-        category: 'buckets',
-        name: 'Bucket 3',
-        description: '7 Wings + 5 Tenders + 4 Mozza + 2 Frites + 2 Boissons',
-        image: '../assets/buckets/bucket_3.png',
-        price: 18.90,
-        type: 'bucket',
-        hasBuilder: true,
-        includesFrites: true,
-        includesBoisson: true
-    },
-    {
-        id: 'bucket_4',
-        category: 'buckets',
-        name: 'Bucket 4',
-        description: '8 Tenders + 8 Wings + 6 Mozza + 10 Rings + 3 Frites',
-        image: '../assets/buckets/bucket_4.png',
-        price: 28.90,
-        type: 'bucket',
-        hasBuilder: true,
-        includesFrites: true
-    },
-    {
-        id: 'korean_bucket',
-        category: 'buckets',
-        name: 'Korean Bucket',
-        description: '4 Wings + 4 Tenders + Frites + Boisson 33cl',
-        image: '../assets/buckets/korean_bucket.jpg',
-        price: 13.90,
-        type: 'bucket',
-        hasBuilder: true,
-        isKorean: true,
-        includesFrites: true,
-        includesBoisson: true
-    },
-
-    // ==================== ASSIETTES ====================
-    {
-        id: 'assiette',
-        category: 'assiettes',
-        name: 'Assiette',
-        description: 'Crudités, Frites, Sauce, Pain Maison',
-        image: '../assets/common/assiette.png',
-        price: 11.00,
-        type: 'assiette',
-        hasBuilder: true
-    },
-
-    // ==================== BOWLS ====================
-    {
-        id: 'bowl_dynamite',
-        category: 'bowls',
-        name: 'Dynamite Bowl',
+        id: 'wrap_classic',
+        category: 'wraps',
+        name: 'Wrap Classic',
         description: 'Viande au choix',
-        image: '../assets/bowls/bowl_crousty.png',
-        price: 9.90,
-        type: 'bowl',
+        image: '../assets/wraps/wrap.png',
+        price: 7.50,
+        menuPrice: 9.50,
+        type: 'wrap',
         hasBuilder: true
     },
     {
-        id: 'bowl_indian',
-        category: 'bowls',
-        name: 'Bowl Indien',
-        description: 'Poulet Tikka, Curry, Oignons Frits',
-        image: '../assets/bowls/bowl_indian.png',
-        price: 9.90,
-        type: 'bowl',
-        hasBuilder: true
-    },
-    {
-        id: 'bowl_crousty',
-        category: 'bowls',
-        name: 'Crousty Bowl',
-        description: 'Tenders, Sweet Chili, Oignons Frits',
-        image: '../assets/bowls/bowl_classique.png',
-        type: 'bowl',
-        hasBuilder: true,
-        isPromo: true,
-        promoLabel: '-30%',
-        sizes: [
-            { id: 'M', name: 'M', price: 6.90, originalPrice: 9.90 },
-            { id: 'XL', name: 'XL', price: 11.90, originalPrice: 14.90 }
-        ]
-    },
-    {
-        id: 'bowl_hot',
-        category: 'bowls',
-        name: 'Hot Bowl',
-        description: 'Poulet Tikka, Hot Sauce, Oignons Frits',
-        image: '../assets/bowls/bowl_spicy.png',
-        price: 9.90,
-        type: 'bowl',
-        hasBuilder: true
-    },
-    {
-        id: 'bowl_chef',
-        category: 'bowls',
-        name: 'Chef Bowl',
-        description: 'Cordon Bleu, Chili-Thaï, Oignons Frits',
-        image: '../assets/bowls/bowl_chef.png',
-        price: 10.90,
-        type: 'bowl',
-        hasBuilder: true
-    },
-
-    // ==================== BOXES ====================
-    {
-        id: 'box_single',
-        category: 'boxes',
-        name: 'Single Box',
-        description: '1 Burger + 2 Mozza Sticks + Frites Cheddar + Sauce',
-        image: '../assets/boxes/single_box.png',
-        price: 9.90,
-        type: 'box',
-        hasBuilder: true
-    },
-    {
-        id: 'box_mega',
-        category: 'boxes',
-        name: 'Mega Box',
-        description: '1 Burger + 4 Mozza Sticks + Tenders dés + Frites Cheddar + Sauce',
-        image: '../assets/boxes/mega_box.png',
-        price: 11.90,
-        type: 'box',
+        id: 'wrap_maxi',
+        category: 'wraps',
+        name: 'Wrap Maxi',
+        description: 'Viande au choix - Grande taille',
+        image: '../assets/wraps/wrap.png',
+        price: 10.00,
+        menuPrice: 12.00,
+        type: 'wrap',
         hasBuilder: true
     },
 
     // ==================== BURGERS ====================
     {
-        id: 'smash_burger',
+        id: 'burger_cheese',
+        category: 'burgers',
+        name: 'Cheese',
+        description: '1 Steak, Crudités, Cheddar',
+        image: '../assets/burgers/smash_burger.png',
+        price: 5.50,
+        menuPrice: 7.50,
+        hasBuilder: true
+    },
+    {
+        id: 'burger_double_cheese',
+        category: 'burgers',
+        name: 'Double Cheese',
+        description: '2 Steaks, Crudités, Cheddar',
+        image: '../assets/burgers/double_smash.png',
+        price: 7.00,
+        menuPrice: 9.00,
+        hasBuilder: true
+    },
+    {
+        id: 'burger_chicken_cheese',
+        category: 'burgers',
+        name: 'Chicken Cheese',
+        description: 'Poulet pané, Galette de pomme de terre, Crudités, Cheddar',
+        image: '../assets/burgers/smokey_chick.png',
+        price: 7.00,
+        menuPrice: 9.00,
+        hasBuilder: true
+    },
+    {
+        id: 'burger_crispy',
+        category: 'burgers',
+        name: 'Crispy Burger',
+        description: 'Double Tenders, Bacon, Oignons frits, Crudités, Cheddar',
+        image: '../assets/burgers/smokey_chick.png',
+        price: 8.00,
+        menuPrice: 10.00,
+        hasBuilder: true
+    },
+    {
+        id: 'burger_smash',
         category: 'burgers',
         name: 'Smash Burger',
-        description: '1 Steak Smashé',
-        image: '../assets/burgers/smash_burger.png',
-        price: 5.90,
-        menuUpgrade: 2.00,
-        hasBuilder: true
-    },
-    {
-        id: 'double_smash',
-        category: 'burgers',
-        name: 'Double Smash',
-        description: '2 Steaks Smashés',
-        image: '../assets/burgers/double_smash.png',
-        price: 7.90,
-        menuUpgrade: 2.00,
-        hasBuilder: true
-    },
-    {
-        id: 'smokey_chick',
-        category: 'burgers',
-        name: 'Smokey Chick',
-        description: '2 Tenders, Bacon, Oignons Frits',
-        image: '../assets/burgers/smokey_chick.png',
-        price: 7.90,
-        menuUpgrade: 2.00,
-        hasBuilder: true
-    },
-    {
-        id: 'delices_smash',
-        category: 'burgers',
-        name: 'Délices Smash',
-        description: 'Steak Smashé, P.D.T, Œuf, Raclette, Bacon',
+        description: '2 Steaks, 1 Tenders, Crudités, Cheddar',
         image: '../assets/burgers/delices_smash.png',
-        price: 11.50,
-        menuUpgrade: 2.00,
+        price: 8.50,
+        menuPrice: 10.50,
         hasBuilder: true
     },
     {
-        id: 'smash_tower',
+        id: 'burger_delice',
         category: 'burgers',
-        name: 'Smash Tower',
-        description: '3 Steaks Smashés, P.D.T, Cheddar, Bacon',
+        name: 'Délice Burger',
+        description: '2 Steaks, Pomme de terre, Œuf, Crudités, Cheddar',
+        image: '../assets/burgers/delices_smash.png',
+        price: 9.00,
+        menuPrice: 11.00,
+        hasBuilder: true
+    },
+    {
+        id: 'burger_delice_royal',
+        category: 'burgers',
+        name: 'Délice Royal',
+        description: '1 Poulet pané, 1 Steak, Pomme de terre, Crudités, Cheddar',
         image: '../assets/burgers/smash_tower.png',
-        price: 14.90,
-        menuUpgrade: 2.00,
+        price: 10.00,
+        menuPrice: 12.00,
+        hasBuilder: true
+    },
+
+    // ==================== PANINIS ====================
+    {
+        id: 'panini_kebab',
+        category: 'paninis',
+        name: 'Panini Kebab',
+        description: 'Kebab grillé',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        menuPrice: 8.00,
+        hasBuilder: true
+    },
+    {
+        id: 'panini_tikka',
+        category: 'paninis',
+        name: 'Panini Chicken Tikka',
+        description: 'Chicken Tikka épicé',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        menuPrice: 8.00,
+        hasBuilder: true
+    },
+    {
+        id: 'panini_cordon_bleu',
+        category: 'paninis',
+        name: 'Panini Cordon Bleu',
+        description: 'Cordon Bleu croustillant',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        menuPrice: 8.00,
+        hasBuilder: true
+    },
+    {
+        id: 'panini_merguez',
+        category: 'paninis',
+        name: 'Panini Merguez',
+        description: 'Merguez grillée',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        menuPrice: 8.00,
+        hasBuilder: true
+    },
+    {
+        id: 'panini_tenders',
+        category: 'paninis',
+        name: 'Panini Tenders',
+        description: 'Tenders croustillants',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        menuPrice: 8.00,
+        hasBuilder: true
+    },
+    {
+        id: 'panini_kefta',
+        category: 'paninis',
+        name: 'Panini Kefta',
+        description: 'Kefta épicée',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        menuPrice: 8.00,
+        hasBuilder: true
+    },
+    {
+        id: 'panini_3_fromages',
+        category: 'paninis',
+        name: 'Panini 3 Fromages',
+        description: 'Trio de fromages fondants',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        menuPrice: 8.00,
+        hasBuilder: true
+    },
+    {
+        id: 'panini_chevre_miel',
+        category: 'paninis',
+        name: 'Panini Chèvre Miel',
+        description: 'Chèvre et miel',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        menuPrice: 8.00,
         hasBuilder: true
     },
 
     // ==================== POUTINES ====================
+    // Base : Riz ou Frites + Sauce Fromagère + Gratiné Mozzarella
     {
         id: 'poutine_classic',
         category: 'poutines',
         name: 'Poutine Classic',
-        description: 'Sauce Fromagère Maison',
+        description: 'Base Gratiné Mozzarella',
         image: '../assets/poutines/poutine.png',
         type: 'poutine',
         hasBuilder: true,
         sizes: [
-            { id: 'M', name: 'M', price: 8.90 },
-            { id: 'XL', name: 'XL', price: 12.90 }
+            { id: 'small', name: 'Small', price: 6.90 },
+            { id: 'medium', name: 'Medium', price: 8.50 },
+            { id: 'xl', name: 'XL', price: 10.90 }
         ]
     },
     {
-        id: 'poutine_chevre',
+        id: 'poutine_chevre_miel',
         category: 'poutines',
         name: 'Poutine Chèvre Miel',
-        description: 'Tenders & Chèvre Miel',
+        description: 'Tenders, Steak, Gratiné Chèvre Miel',
         image: '../assets/poutines/poutine.png',
         type: 'poutine',
         hasBuilder: true,
+        isSpecial: true,
+        defaultIngredients: 'Tenders, Steak • Gratiné Chèvre Miel',
         sizes: [
-            { id: 'M', name: 'M', price: 10.90 },
-            { id: 'XL', name: 'XL', price: 14.90 }
+            { id: 'medium', name: 'Medium', price: 10.00 },
+            { id: 'xl', name: 'XL', price: 12.50 }
         ]
     },
     {
         id: 'poutine_boursin',
         category: 'poutines',
         name: 'Poutine Boursin',
-        description: 'Cordon Bleu & Boursin',
+        description: 'Cordon Bleu, Chicken Tikka, Gratiné Boursin',
         image: '../assets/poutines/poutine.png',
         type: 'poutine',
         hasBuilder: true,
+        isSpecial: true,
+        defaultIngredients: 'Cordon Bleu, Chicken Tikka • Gratiné Boursin',
         sizes: [
-            { id: 'M', name: 'M', price: 10.90 },
-            { id: 'XL', name: 'XL', price: 14.90 }
+            { id: 'medium', name: 'Medium', price: 10.00 },
+            { id: 'xl', name: 'XL', price: 12.50 }
         ]
     },
     {
         id: 'poutine_raclette',
         category: 'poutines',
         name: 'Poutine Raclette',
-        description: 'Tikka & Raclette',
+        description: 'Kefta, Tenders, Gratiné Raclette',
         image: '../assets/poutines/poutine.png',
         type: 'poutine',
         hasBuilder: true,
+        isSpecial: true,
+        defaultIngredients: 'Kefta, Tenders • Gratiné Raclette',
         sizes: [
-            { id: 'M', name: 'M', price: 10.90 },
-            { id: 'XL', name: 'XL', price: 14.90 }
+            { id: 'medium', name: 'Medium', price: 10.00 },
+            { id: 'xl', name: 'XL', price: 12.50 }
         ]
     },
 
-    // ==================== TEX MEX ====================
+    // ==================== FRITES CHEDDAR ====================
+    {
+        id: 'frites_cheddar_classic',
+        category: 'frites',
+        name: 'Frites Cheddar Classic',
+        description: 'Frites sauce cheddar',
+        image: '../assets/frites/frite_boisson.png',
+        type: 'frites',
+        sizes: [
+            { id: 'medium', name: 'Medium', price: 3.50 },
+            { id: 'xl', name: 'XL', price: 4.50 }
+        ]
+    },
+    {
+        id: 'frites_cheddar_boursin',
+        category: 'frites',
+        name: 'Frites Cheddar Boursin',
+        description: 'Frites cheddar & boursin',
+        image: '../assets/frites/frite_boisson.png',
+        type: 'frites',
+        sizes: [
+            { id: 'medium', name: 'Medium', price: 4.50 },
+            { id: 'xl', name: 'XL', price: 5.50 }
+        ]
+    },
+    {
+        id: 'frites_cheddar_lardons',
+        category: 'frites',
+        name: 'Frites Cheddar Lardons',
+        description: 'Frites cheddar & lardons',
+        image: '../assets/frites/frite_boisson.png',
+        type: 'frites',
+        sizes: [
+            { id: 'medium', name: 'Medium', price: 4.50 },
+            { id: 'xl', name: 'XL', price: 5.50 }
+        ]
+    },
+    {
+        id: 'frites_cheddar_bacon',
+        category: 'frites',
+        name: 'Frites Cheddar Bacon',
+        description: 'Frites cheddar & bacon',
+        image: '../assets/frites/frite_boisson.png',
+        type: 'frites',
+        sizes: [
+            { id: 'medium', name: 'Medium', price: 4.50 },
+            { id: 'xl', name: 'XL', price: 5.50 }
+        ]
+    },
+    {
+        id: 'frites_simple',
+        category: 'frites',
+        name: 'Frites',
+        description: 'Portion de frites',
+        image: '../assets/frites/frite_boisson.png',
+        sizes: [
+            { id: 'normal', name: 'Normal', price: 2.00 },
+            { id: 'grande', name: 'Grande', price: 3.00 }
+        ]
+    },
+    {
+        id: 'potatoes',
+        category: 'frites',
+        name: 'Potatoes',
+        description: 'Pommes de terre rôties',
+        image: '../assets/frites/frite_boisson.png',
+        sizes: [
+            { id: 'normal', name: 'Normal', price: 2.50 },
+            { id: 'grande', name: 'Grande', price: 3.50 }
+        ]
+    },
+
+    // ==================== ASSIETTES ====================
+    // Accompagnées de crudités, pain rond ou naan, sauce au choix
+    {
+        id: 'assiette_simple',
+        category: 'assiettes',
+        name: 'Assiette Simple',
+        description: '1 viande au choix + Crudités + Pain + Sauce',
+        image: '../assets/common/assiette.png',
+        price: 10.00,
+        menuPrice: 12.00,
+        type: 'assiette',
+        hasBuilder: true
+    },
+    {
+        id: 'assiette_special_delice',
+        category: 'assiettes',
+        name: 'Assiette Spécial Délice',
+        description: '3 viandes au choix + Crudités + Pain + Sauce',
+        image: '../assets/common/assiette.png',
+        price: 13.50,
+        menuPrice: 15.50,
+        type: 'assiette',
+        hasBuilder: true,
+        isSpecial: true
+    },
+
+    // ==================== MENU ENFANT ====================
+    // 7,00 € - Inclus : Frites + Boisson (Capri-Sun) + Surprise (Kinder)
+    {
+        id: 'enfant_mini_tacos',
+        category: 'enfant',
+        name: 'Mini Tacos Kebab',
+        description: 'Mini Tacos + Frites + Capri-Sun + Kinder',
+        image: '../assets/common/logo.png',
+        price: 7.00,
+        type: 'enfant',
+        hasBuilder: true,
+        includesFrites: true,
+        includesBoisson: true,
+        includesSurprise: true
+    },
+    {
+        id: 'enfant_nuggets',
+        category: 'enfant',
+        name: 'Menu Nuggets',
+        description: 'Nuggets + Frites + Capri-Sun + Kinder',
+        image: '../assets/common/logo.png',
+        price: 7.00,
+        type: 'enfant',
+        hasBuilder: true,
+        includesFrites: true,
+        includesBoisson: true,
+        includesSurprise: true
+    },
+    {
+        id: 'enfant_mini_burger',
+        category: 'enfant',
+        name: 'Mini Burger',
+        description: 'Mini Burger + Frites + Capri-Sun + Kinder',
+        image: '../assets/common/logo.png',
+        price: 7.00,
+        type: 'enfant',
+        hasBuilder: true,
+        includesFrites: true,
+        includesBoisson: true,
+        includesSurprise: true
+    },
+    {
+        id: 'enfant_tenders',
+        category: 'enfant',
+        name: 'Menu Tenders',
+        description: '3 Tenders + Frites + Capri-Sun + Kinder',
+        image: '../assets/common/logo.png',
+        price: 7.00,
+        type: 'enfant',
+        hasBuilder: true,
+        includesFrites: true,
+        includesBoisson: true,
+        includesSurprise: true
+    },
+
+    // ==================== TEX-MEX & DIVERS ====================
     {
         id: 'wings_5',
         category: 'tex_mex',
@@ -616,6 +854,46 @@ const PRODUCTS = [
         description: '5 ailes de poulet croustillantes',
         image: '../assets/common/logo.png',
         price: 5.00
+    },
+    {
+        id: 'nuggets_5',
+        category: 'tex_mex',
+        name: 'Nuggets x5',
+        description: '5 nuggets croustillants',
+        image: '../assets/common/logo.png',
+        price: 5.00
+    },
+    {
+        id: 'jalapenos_5',
+        category: 'tex_mex',
+        name: 'Jalapeños x5',
+        description: 'Jalapeños frits au fromage',
+        image: '../assets/common/logo.png',
+        price: 5.00
+    },
+    {
+        id: 'mozza_5',
+        category: 'tex_mex',
+        name: 'Mozza Sticks x5',
+        description: 'Bâtonnets de mozzarella',
+        image: '../assets/common/logo.png',
+        price: 5.00
+    },
+    {
+        id: 'camembert_5',
+        category: 'tex_mex',
+        name: 'Camembert x5',
+        description: 'Camembert pané',
+        image: '../assets/common/logo.png',
+        price: 5.00
+    },
+    {
+        id: 'bouchee_chevre_5',
+        category: 'tex_mex',
+        name: 'Bouchée Chèvre x5',
+        description: 'Bouchées de chèvre panées',
+        image: '../assets/common/logo.png',
+        price: 5.50
     },
     {
         id: 'tenders_5',
@@ -626,28 +904,12 @@ const PRODUCTS = [
         price: 6.00
     },
     {
-        id: 'nuggets_6',
+        id: 'oignons_rings_8',
         category: 'tex_mex',
-        name: 'Nuggets x6',
-        description: '6 nuggets croustillants',
-        image: '../assets/common/logo.png',
-        price: 5.00
-    },
-    {
-        id: 'jalapenos_5',
-        category: 'tex_mex',
-        name: 'Jalapenos x5',
-        description: 'Jalapeños frits au fromage',
-        image: '../assets/common/logo.png',
-        price: 5.50
-    },
-    {
-        id: 'oignons_7',
-        category: 'tex_mex',
-        name: 'Oignons Rings x7',
+        name: 'Oignons Rings x8',
         description: 'Onion rings croustillants',
         image: '../assets/common/logo.png',
-        price: 5.50
+        price: 6.00
     },
     {
         id: 'nems_5',
@@ -658,198 +920,15 @@ const PRODUCTS = [
         price: 6.00
     },
     {
-        id: 'mozza_6',
+        id: 'barquette_viande_normal',
         category: 'tex_mex',
-        name: 'Mozza Sticks x6',
-        description: 'Bâtonnets de mozzarella',
+        name: 'Barquette Viande',
+        description: 'Viande seule',
         image: '../assets/common/logo.png',
-        price: 5.00
-    },
-    {
-        id: 'camembert_6',
-        category: 'tex_mex',
-        name: 'Camembert x6',
-        description: 'Camembert pané',
-        image: '../assets/common/logo.png',
-        price: 5.00
-    },
-    {
-        id: 'chevre_5',
-        category: 'tex_mex',
-        name: 'Chèvre x5',
-        description: 'Fromage de chèvre pané',
-        image: '../assets/common/logo.png',
-        price: 6.00
-    },
-    {
-        id: 'samoussas',
-        category: 'tex_mex',
-        name: 'Samoussas',
-        description: 'Samoussas croustillants',
-        image: '../assets/common/logo.png',
-        price: 4.50
-    },
-    {
-        id: 'korean_wings_5',
-        category: 'tex_mex',
-        name: 'Korean Wings x5',
-        description: '5 Wings sauce coréenne',
-        image: '../assets/tex_mex/korean_wings.png',
-        price: 6.90
-    },
-    {
-        id: 'korean_wings_10',
-        category: 'tex_mex',
-        name: 'Korean Wings x10',
-        description: '10 Wings sauce coréenne',
-        image: '../assets/tex_mex/korean_wings.png',
-        price: 12.90
-    },
-    {
-        id: 'korean_tenders_4',
-        category: 'tex_mex',
-        name: 'Korean Tenders x4',
-        description: '4 Tenders sauce coréenne',
-        image: '../assets/tex_mex/korean_tenders.png',
-        price: 6.90
-    },
-    {
-        id: 'korean_tenders_6',
-        category: 'tex_mex',
-        name: 'Korean Tenders x6',
-        description: '6 Tenders sauce coréenne',
-        image: '../assets/tex_mex/korean_tenders.png',
-        price: 8.90
-    },
-
-    // ==================== FRITES ====================
-    {
-        id: 'frite_simple',
-        category: 'frites',
-        name: 'Frite Simple',
-        description: 'Portion de frites',
-        image: '../assets/frites/frite_boisson.png',
-        price: 2.50
-    },
-    {
-        id: 'grande_frite',
-        category: 'frites',
-        name: 'Grande Frite',
-        description: 'Grande portion de frites',
-        image: '../assets/frites/frite_boisson.png',
-        price: 3.50
-    },
-    {
-        id: 'frites_cheddar',
-        category: 'frites',
-        name: 'Frites Cheddar',
-        description: 'Frites sauce cheddar',
-        image: '../assets/frites/frite_boisson.png',
-        type: 'frites',
-        hasBuilder: true,
         sizes: [
-            { id: 'M', name: 'M', price: 3.90 },
-            { id: 'XL', name: 'XL', price: 4.90 }
+            { id: 'normal', name: 'Normal', price: 6.00 },
+            { id: 'grande', name: 'Grande', price: 8.50 }
         ]
-    },
-    {
-        id: 'frites_cheddar_bacon',
-        category: 'frites',
-        name: 'Frites Cheddar Bacon',
-        description: 'Frites cheddar & bacon',
-        image: '../assets/frites/frite_boisson.png',
-        type: 'frites',
-        hasBuilder: true,
-        sizes: [
-            { id: 'M', name: 'M', price: 4.90 },
-            { id: 'XL', name: 'XL', price: 5.90 }
-        ]
-    },
-    {
-        id: 'frites_cheddar_lardon',
-        category: 'frites',
-        name: 'Frites Cheddar Lardon',
-        description: 'Frites cheddar & lardons',
-        image: '../assets/frites/frite_boisson.png',
-        type: 'frites',
-        hasBuilder: true,
-        sizes: [
-            { id: 'M', name: 'M', price: 4.90 },
-            { id: 'XL', name: 'XL', price: 5.90 }
-        ]
-    },
-    {
-        id: 'frites_cheddar_boursin',
-        category: 'frites',
-        name: 'Frites Cheddar Boursin',
-        description: 'Frites cheddar & boursin',
-        image: '../assets/frites/frite_boisson.png',
-        type: 'frites',
-        hasBuilder: true,
-        sizes: [
-            { id: 'M', name: 'M', price: 4.90 },
-            { id: 'XL', name: 'XL', price: 5.90 }
-        ]
-    },
-    {
-        id: 'patate_douce',
-        category: 'frites',
-        name: 'Patate Douce',
-        description: 'Frites de patate douce',
-        image: '../assets/frites/frite_boisson.png',
-        type: 'frites',
-        hasBuilder: true,
-        sizes: [
-            { id: 'M', name: 'M', price: 3.90 },
-            { id: 'XL', name: 'XL', price: 4.90 }
-        ]
-    },
-    {
-        id: 'potato_pops',
-        category: 'frites',
-        name: 'Potato Pops',
-        description: 'Billes de pomme de terre',
-        image: '../assets/frites/frite_boisson.png',
-        type: 'frites',
-        hasBuilder: true,
-        sizes: [
-            { id: 'M', name: 'M', price: 3.90 },
-            { id: 'XL', name: 'XL', price: 4.90 }
-        ]
-    },
-
-    // ==================== SALADES ====================
-    {
-        id: 'salade_cesar',
-        category: 'salades',
-        name: 'Salade César',
-        description: 'Poulet & Parmesan',
-        image: '../assets/salades/salade.png',
-        price: 7.50
-    },
-    {
-        id: 'salade_nems',
-        category: 'salades',
-        name: 'Salade Nems',
-        description: 'Poulet & Soja',
-        image: '../assets/salades/salade.png',
-        price: 7.50
-    },
-    {
-        id: 'salade_indienne',
-        category: 'salades',
-        name: 'Salade Indienne',
-        description: 'Tikka & Épices',
-        image: '../assets/salades/salade.png',
-        price: 7.50
-    },
-    {
-        id: 'salade_thon',
-        category: 'salades',
-        name: 'Salade Thon',
-        description: 'Thon & Œuf',
-        image: '../assets/salades/salade.png',
-        price: 7.50
     },
 
     // ==================== DESSERTS ====================
@@ -859,7 +938,7 @@ const PRODUCTS = [
         name: 'Tiramisu',
         description: 'Maison & Café',
         image: '../assets/desserts/tiramisu.png',
-        price: 3.50
+        price: 3.00
     },
     {
         id: 'panini_nutella',
@@ -867,7 +946,7 @@ const PRODUCTS = [
         name: 'Panini Nutella',
         description: 'Panini Fondant',
         image: '../assets/desserts/panini_nutella.png',
-        price: 4.00
+        price: 3.50
     },
     {
         id: 'tarte_daim',
@@ -875,7 +954,7 @@ const PRODUCTS = [
         name: 'Tarte Daim',
         description: 'Croustillant',
         image: '../assets/desserts/tarte_daim.png',
-        price: 2.50
+        price: 3.00
     },
 
     // ==================== BOISSONS ====================
@@ -890,18 +969,10 @@ const PRODUCTS = [
         hasBuilder: true
     },
     {
-        id: 'pepsi_150',
+        id: 'bouteille_150',
         category: 'boissons',
-        name: 'Pepsi 1.5L',
-        description: '',
-        image: '../assets/frites/frite_boisson.png',
-        price: 4.00
-    },
-    {
-        id: 'oasis_150',
-        category: 'boissons',
-        name: 'Oasis 1.5L',
-        description: '',
+        name: 'Bouteille 1.5L',
+        description: 'Pepsi, Oasis ou Eau',
         image: '../assets/frites/frite_boisson.png',
         price: 4.00
     },
@@ -912,27 +983,5 @@ const PRODUCTS = [
         description: '',
         image: '../assets/frites/frite_boisson.png',
         price: 3.50
-    },
-
-    // ==================== MENU ENFANT ====================
-    {
-        id: 'enfant_nuggets',
-        category: 'enfant',
-        name: 'Menu Nuggets',
-        description: 'Nuggets + Frites + Boisson',
-        image: '../assets/common/logo.png',
-        price: 6.90,
-        type: 'enfant',
-        hasBuilder: true
-    },
-    {
-        id: 'enfant_tenders',
-        category: 'enfant',
-        name: 'Menu Tenders',
-        description: 'Tenders + Frites + Boisson',
-        image: '../assets/common/logo.png',
-        price: 6.90,
-        type: 'enfant',
-        hasBuilder: true
     }
 ];
