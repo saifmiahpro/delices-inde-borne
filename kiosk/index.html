@@ -1087,7 +1087,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="../AssetsTv3/delices_inde_logo.jpg" alt="Chickenzz">
+                <img src="../assets/common/logo.png" alt="Chickenzz">
             </div>
             <div class="sidebar-mode">
                 <div class="client-name" id="sidebar-name">SAIF</div>
@@ -1796,7 +1796,7 @@
                 if (product.isCustom) {
                     card.className = 'product-card compose-card';
                     card.innerHTML = `
-                        <img src="${product.image}" alt="${displayName}" onerror="this.src='../AssetsTv3/delices_inde_logo.jpg'">
+                        <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
                         <div class="compose-text">
                             <h4>${displayName}</h4>
                             <p class="desc">${product.description || ''}</p>
@@ -1816,7 +1816,7 @@
 
                     card.innerHTML = `
                         ${badgeHtml}
-                        <img src="${product.image}" alt="${displayName}" onerror="this.src='../AssetsTv3/delices_inde_logo.jpg'">
+                        <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
                         <h4>${displayName}</h4>
                         <p class="desc">${product.description || ''}</p>
                         <div class="price">${priceDisplay}</div>
@@ -2835,7 +2835,7 @@
                 state.cart.forEach(item => {
                     const hasBuilder = item.product && item.product.hasBuilder;
                     html += `<div class="cart-item">
-                        <img src="${item.image}" alt="${item.name}" onerror="this.src='../AssetsTv3/delices_inde_logo.jpg'">
+                        <img src="${item.image}" alt="${item.name}" onerror="this.src='../assets/common/logo.png'">
                         <div class="cart-item-info">
                             <h4>${item.name}</h4>
                             <p class="details">${item.details}</p>
