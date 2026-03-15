@@ -1,0 +1,114 @@
+================================================================
+   LES DELICES DE L'INDE - LISTE DES ASSETS
+   Status: OK / A REMPLACER / MANQUANT
+================================================================
+
+LEGENDE:
+  [OK]        = Image sans logo Chickenzz, prete a l'emploi
+  [REMPLACER] = Image avec logo Chickenzz visible, a modifier
+  [MANQUANT]  = Image non existante, a creer
+
+================================================================
+                    IMAGES OK (11 images)
+         Ne rien faire, elles sont bonnes!
+================================================================
+
+BURGERS (5 images OK):
+  [OK] assets/burgers/smash_burger.png
+  [OK] assets/burgers/double_smash.png
+  [OK] assets/burgers/smokey_chick.png
+  [OK] assets/burgers/delices_smash.png
+  [OK] assets/burgers/smash_tower.png
+
+SANDWICHS (2 images OK):
+  [OK] assets/sandwichs/sandwich.png
+  [OK] assets/sandwichs/sandwich_galette.png
+
+DESSERTS (3 images OK):
+  [OK] assets/desserts/tiramisu.png
+  [OK] assets/desserts/panini_nutella.png
+  [OK] assets/desserts/tarte_daim.png
+
+FRITES (1 image OK):
+  [OK] assets/frites/frite_boisson.png
+
+
+================================================================
+             IMAGES A REMPLACER (26 images)
+       Logo Chickenzz visible - Modifier avec Photoshop
+================================================================
+
+01_BUCKETS (5 images) >>> DROP_ZONE/01_BUCKETS/
+  [REMPLACER] bucket_1.png    -> Bucket 1 portion
+  [REMPLACER] bucket_2.png    -> Bucket 2 portions
+  [REMPLACER] bucket_3.png    -> Bucket 3 portions
+  [REMPLACER] bucket_4.png    -> Bucket 4 portions
+  [REMPLACER] korean_bucket.jpg -> Bucket Korean
+
+02_BOXES (2 images) >>> DROP_ZONE/02_BOXES/
+  [REMPLACER] single_box.png  -> Single box menu enfant
+  [REMPLACER] mega_box.png    -> Mega box
+
+03_BOWLS (5 images) >>> DROP_ZONE/03_BOWLS/
+  [REMPLACER] bowl_classique.png -> Bowl classique
+  [REMPLACER] bowl_crousty.png   -> Bowl crousty
+  [REMPLACER] bowl_indian.png    -> Bowl indian
+  [REMPLACER] bowl_spicy.png     -> Bowl spicy
+  [REMPLACER] bowl_chef.png      -> Bowl chef
+
+04_NAANS (4 images) >>> DROP_ZONE/04_NAANS/
+  [REMPLACER] naan_royal.png     -> Naan Royal
+  [REMPLACER] naan_cheesy.png    -> Naan Cheesy
+  [REMPLACER] naan_spicy.png     -> Naan Spicy
+  [REMPLACER] naan_mexicain.png  -> Naan Mexicain
+
+05_TACOS (6 images) >>> DROP_ZONE/05_TACOS/
+  [REMPLACER] tacos.png          -> Tacos classique
+  [REMPLACER] tacos_spicy.png    -> Tacos spicy
+  [REMPLACER] tacos_crispy.png   -> Tacos crispy
+  [REMPLACER] tacos_chef.png     -> Tacos chef
+  [REMPLACER] tacos_chevre.png   -> Tacos chevre
+  [REMPLACER] tacos_oriental.png -> Tacos oriental
+
+06_POUTINES (1 image) >>> DROP_ZONE/06_POUTINES/
+  [REMPLACER] poutine.png        -> Poutine
+
+07_SALADES (1 image) >>> DROP_ZONE/07_SALADES/
+  [REMPLACER] salade.png         -> Salade
+
+08_TEX_MEX (2 images) >>> DROP_ZONE/08_TEX_MEX/
+  [REMPLACER] korean_wings.png   -> Wings korean
+  [REMPLACER] korean_tenders.png -> Tenders korean
+
+09_ASSIETTES (1 image) >>> DROP_ZONE/09_ASSIETTES/
+  [REMPLACER] assiette.png       -> Assiette
+
+
+================================================================
+                    IMAGES MANQUANTES (0)
+          Pas d'images manquantes identifiees
+================================================================
+
+Toutes les images produits sont presentes.
+Le logo "Delices de l'Inde" est deja dans:
+  assets/common/logo.png
+  kiosk/videos/delices_inde_logo.png
+
+
+================================================================
+                     INSTRUCTIONS
+================================================================
+
+1. Ouvre les images originales dans Photoshop
+2. Retire/remplace le logo Chickenzz par rien ou ton logo
+3. Exporte en PNG avec le NOM EXACT indique ci-dessus
+4. Glisse les images dans le bon dossier DROP_ZONE
+5. Une fois toutes les images pretes, je les deplace vers assets/
+
+IMPORTANT: Respecter les noms de fichiers exactement!
+           Pas d'espaces, pas d'accents, tout en minuscules
+
+
+================================================================
+              RESUME: 11 OK / 26 A REMPLACER / 0 MANQUANT
+================================================================
