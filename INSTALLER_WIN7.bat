@@ -11,7 +11,7 @@ echo.
 
 REM Creer le raccourci .url sur le bureau
 echo [InternetShortcut] > "%USERPROFILE%\Desktop\Borne Delices.url"
-echo URL=file:///%~dp0kiosk/index.html >> "%USERPROFILE%\Desktop\Borne Delices.url"
+echo URL=file:///%~dp0kiosk/index_win7.html >> "%USERPROFILE%\Desktop\Borne Delices.url"
 echo IconIndex=0 >> "%USERPROFILE%\Desktop\Borne Delices.url"
 
 echo.

@@ -1,0 +1,3785 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Les Délices de l'Inde - Borne de Commande</title>
+    <!-- Impression: 2 tickets sur Star (imprimante par défaut) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        :root {
+            --yellow: #FFC000;
+            --orange: #FF5722;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --glass: rgba(20, 20, 20, 0.95);
+            --glass-light: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+            --sidebar-width: 280px;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Barlow Condensed', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+        }
+
+        /* ============ ÉCRANS INTRO ============ */
+        .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(180deg, var(--dark) 0%, #1a1a1a 100%);
+            z-index: 100;
+            padding: 5vh 5vw;
+        }
+
+        .intro-screen.active {
+            display: flex;
+        }
+
+        .intro-screen .logo-big {
+            width: min(350px, 45vw);
+            margin-bottom: 5vh;
+        }
+
+        .intro-screen h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(32px, 6vw, 60px);
+            color: var(--yellow);
+            text-align: center;
+            margin-bottom: 3vh;
+        }
+
+        .intro-screen h2 {
+            font-size: clamp(22px, 4vw, 40px);
+            color: var(--text-dim);
+            text-align: center;
+            margin-bottom: 4vh;
+        }
+
+        /* Input prénom */
+        .prenom-input {
+            background: var(--glass);
+            border: 3px solid var(--border);
+            border-radius: 15px;
+            padding: 2.5vh 4vw;
+            font-size: clamp(32px, 5vw, 52px);
+            font-family: 'Anton', sans-serif;
+            color: var(--text);
+            text-align: center;
+            width: 100%;
+            max-width: min(700px, 90vw);
+            margin-bottom: 3vh;
+            letter-spacing: 3px;
+        }
+
+        /* Clavier */
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: clamp(4px, 0.8vw, 10px);
+            width: 100%;
+            max-width: min(800px, 95vw);
+            margin-bottom: 3vh;
+        }
+
+        .key {
+            background: var(--glass);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: clamp(14px, 2.2vh, 28px) clamp(5px, 0.5vw, 10px);
+            font-size: clamp(20px, 2.8vw, 34px);
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .key:active {
+            background: var(--yellow);
+            color: var(--dark);
+        }
+
+        .key.wide {
+            grid-column: span 2;
+        }
+
+        .key.delete {
+            background: #ff3333;
+            color: white;
+        }
+
+        /* Cartes mode (sur place / emporter) */
+        .mode-cards {
+            display: flex;
+            gap: clamp(15px, 3vw, 40px);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-card {
+            background: var(--glass);
+            border: 3px solid var(--border);
+            border-radius: 20px;
+            padding: clamp(25px, 4vw, 50px);
+            width: min(350px, 40vw);
+            min-width: 200px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .mode-card:active {
+            border-color: var(--yellow);
+            background: rgba(255, 192, 0, 0.1);
+        }
+
+        .mode-card .icon {
+            font-size: clamp(50px, 8vw, 100px);
+            margin-bottom: 2vh;
+        }
+
+        .mode-card h2 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(28px, 4.5vw, 48px);
+        }
+
+        /* Bouton principal */
+        .btn-primary {
+            background: var(--yellow);
+            color: var(--dark);
+            border: none;
+            padding: clamp(18px, 3vh, 35px) clamp(50px, 8vw, 100px);
+            font-size: clamp(24px, 4vw, 40px);
+            font-family: 'Anton', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 2vh;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ============ LAYOUT PRINCIPAL AVEC SIDEBAR ============ */
+        .app-layout {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            max-height: 100vh;
+        }
+
+        .app-layout.active {
+            display: flex;
+            flex-direction: row;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: 200px;
+            max-width: 320px;
+            height: 100%;
+            background: var(--darker);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 2vh 1.5vw;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header img {
+            height: clamp(40px, 6vh, 70px);
+        }
+
+        .sidebar-mode {
+            padding: 1.5vh 1vw;
+            text-align: center;
+            background: var(--glass);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-mode .client-name {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(16px, 2vw, 22px);
+            color: var(--yellow);
+        }
+
+        .sidebar-mode .order-mode {
+            font-size: clamp(12px, 1.5vw, 16px);
+            color: var(--text-dim);
+        }
+
+        /* Navigation catégories */
+        .nav-categories {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1vh 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: clamp(15px, 2vh, 22px) clamp(18px, 2vw, 30px);
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            font-size: clamp(18px, 2.2vw, 26px);
+            font-weight: 600;
+        }
+
+        .nav-item:hover {
+            background: var(--glass-light);
+        }
+
+        .nav-item.active {
+            background: var(--glass);
+            border-left-color: var(--yellow);
+            color: var(--yellow);
+        }
+
+        .nav-item img {
+            width: clamp(40px, 5vw, 60px);
+            height: clamp(40px, 5vw, 60px);
+            object-fit: contain;
+        }
+
+        /* Bouton panier sidebar */
+        .sidebar-cart {
+            padding: 2vh 1vw;
+            border-top: 1px solid var(--border);
+        }
+
+        .cart-btn-sidebar {
+            width: 100%;
+            background: var(--yellow);
+            color: var(--dark);
+            border: none;
+            border-radius: 15px;
+            padding: clamp(12px, 2vh, 20px);
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(16px, 2vw, 22px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .cart-btn-sidebar .count {
+            background: var(--dark);
+            color: var(--yellow);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: clamp(14px, 1.5vw, 18px);
+        }
+
+        .cancel-btn-sidebar {
+            width: 100%;
+            background: rgba(255, 51, 51, 0.1);
+            color: #ff3333;
+            border: 2px solid #ff3333;
+            border-radius: 15px;
+            padding: clamp(10px, 1.5vh, 15px);
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(14px, 1.8vw, 20px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1vh;
+        }
+
+        .cancel-btn-sidebar:active {
+            background: #ff3333;
+            color: white;
+        }
+
+        /* Zone principale */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100vh;
+            max-height: 100vh;
+        }
+
+        #products-view {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .main-header {
+            padding: 2vh 2vw;
+            background: var(--darker);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .main-header h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(28px, 4vw, 44px);
+            color: var(--yellow);
+        }
+
+        .main-header .back-btn {
+            background: var(--glass);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 1vh 2vw;
+            font-size: clamp(14px, 1.8vw, 20px);
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .main-body {
+            flex: 1 1 0;
+            min-height: 0;
+            max-height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 2vh 2vw;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Grille produits */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding-bottom: 5vh;
+        }
+
+        .product-card {
+            background: var(--darker);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:active {
+            border-color: var(--yellow);
+        }
+
+        .product-card.compose-card {
+            grid-column: 1 / -1;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 30px;
+            padding: 25px 30px;
+            background: linear-gradient(90deg, var(--darker) 0%, rgba(255, 192, 0, 0.08) 100%);
+            border: 2px solid var(--yellow);
+            border-left: 6px solid var(--yellow);
+            min-height: 140px;
+        }
+
+        .product-card.compose-card img {
+            height: clamp(90px, 12vw, 130px);
+            width: auto;
+            margin-bottom: 0;
+        }
+
+        .product-card.compose-card .compose-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .product-card.compose-card h4 {
+            font-size: clamp(22px, 3vw, 32px);
+            margin-bottom: 5px;
+        }
+
+        .product-card.compose-card .desc {
+            font-size: clamp(12px, 1.5vw, 16px);
+            margin-bottom: 0;
+        }
+
+        .product-card.compose-card .price {
+            font-size: clamp(20px, 2.5vw, 28px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: clamp(240px, 36vh, 440px);
+            object-fit: contain;
+            margin-bottom: 1vh;
+        }
+
+        .product-card h4 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(24px, 3vw, 36px);
+            color: var(--text);
+            margin-bottom: 0.5vh;
+        }
+
+        .product-card .desc {
+            font-size: clamp(14px, 1.8vw, 20px);
+            color: var(--text-dim);
+            margin-bottom: 1vh;
+            flex: 1;
+        }
+
+        .product-card .price {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(26px, 3.5vw, 40px);
+            color: var(--yellow);
+        }
+
+        .product-card .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--orange);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: clamp(10px, 1.2vw, 14px);
+            font-weight: 700;
+        }
+
+        /* ============ PANIER ============ */
+        .cart-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .cart-view.active {
+            display: flex;
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2vh 2vw;
+        }
+
+        .cart-item {
+            background: var(--glass);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: clamp(12px, 2vh, 20px);
+            margin-bottom: clamp(10px, 1.5vh, 15px);
+            display: flex;
+            align-items: center;
+            gap: clamp(10px, 1.5vw, 20px);
+        }
+
+        .cart-item img {
+            width: clamp(60px, 8vw, 100px);
+            height: clamp(60px, 8vw, 100px);
+            object-fit: contain;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-info h4 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(20px, 2.5vw, 30px);
+            margin-bottom: 0.5vh;
+        }
+
+        .cart-item-info .details {
+            font-size: clamp(14px, 1.8vw, 20px);
+            color: var(--text-dim);
+        }
+
+        .cart-item-qty {
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1vw, 15px);
+        }
+
+        .qty-btn {
+            width: clamp(35px, 5vw, 50px);
+            height: clamp(35px, 5vw, 50px);
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--glass);
+            color: var(--text);
+            font-size: clamp(18px, 2.5vw, 28px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:active {
+            background: var(--yellow);
+            color: var(--dark);
+        }
+
+        .cart-item-price {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(18px, 2.5vw, 26px);
+            color: var(--yellow);
+            min-width: clamp(60px, 8vw, 100px);
+            text-align: right;
+        }
+
+        .delete-btn {
+            width: clamp(35px, 5vw, 50px);
+            height: clamp(35px, 5vw, 50px);
+            border-radius: 50%;
+            background: #ff3333;
+            color: white;
+            border: none;
+            font-size: clamp(16px, 2vw, 24px);
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background: var(--yellow);
+            color: var(--dark);
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: clamp(12px, 1.4vw, 16px);
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .edit-btn:active {
+            opacity: 0.8;
+        }
+
+        .cart-footer {
+            padding: 2vh 2vw;
+            background: var(--darker);
+            border-top: 1px solid var(--border);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2vh;
+        }
+
+        .cart-total span {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(22px, 3vw, 32px);
+        }
+
+        .cart-total .amount {
+            color: var(--yellow);
+            font-size: clamp(28px, 4vw, 42px);
+        }
+
+        .cart-buttons {
+            display: flex;
+            gap: clamp(10px, 2vw, 20px);
+        }
+
+        .cart-buttons button {
+            flex: 1;
+            padding: clamp(12px, 2vh, 22px);
+            border-radius: 15px;
+            font-size: clamp(16px, 2vw, 24px);
+            font-family: 'Anton', sans-serif;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text);
+            border: 2px solid var(--border) !important;
+        }
+
+        /* Panier vide */
+        .empty-cart {
+            text-align: center;
+            padding: 10vh 4vw;
+        }
+
+        .empty-cart h3 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(22px, 3vw, 32px);
+            color: var(--text-dim);
+            margin-bottom: 2vh;
+        }
+
+        /* ============ MODAL BUILDER ============ */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-header {
+            padding: 2vh 3vw;
+            background: var(--darker);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(22px, 3vw, 32px);
+            color: var(--yellow);
+        }
+
+        .modal-close {
+            min-width: clamp(100px, 15vw, 160px);
+            height: clamp(50px, 7vw, 70px);
+            border-radius: 15px;
+            background: #ff3333;
+            color: white;
+            border: 3px solid #ff6666;
+            font-size: clamp(18px, 2.5vw, 26px);
+            font-family: 'Anton', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 51, 51, 0.4);
+        }
+
+        .modal-close:active {
+            transform: scale(0.95);
+        }
+
+        .modal-content {
+            flex: 1;
+            padding: 2vh 3vw;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 2vh 3vw;
+            background: var(--darker);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-price {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--yellow);
+        }
+
+        .step-title {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(28px, 4.5vw, 48px);
+            margin-bottom: 4vh;
+            color: var(--yellow);
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .builder-subtitle {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(18px, 2.5vw, 28px);
+            color: var(--text);
+            text-align: center;
+            margin-bottom: 2vh;
+            opacity: 0.9;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(10px, 1.5vw, 20px);
+            margin-bottom: 3vh;
+            width: 100%;
+            padding: 0 2vw;
+        }
+
+        .option-btn {
+            background: var(--glass);
+            border: 3px solid var(--border);
+            border-radius: 15px;
+            padding: clamp(18px, 2.5vh, 30px) clamp(10px, 1.5vw, 20px);
+            text-align: center;
+            cursor: pointer;
+            font-size: clamp(18px, 2.5vw, 30px);
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s, border-color 0.2s, background 0.2s;
+        }
+
+        /* Gros boutons (2-3 options comme taille, menu, formule) */
+        .options-grid.big {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: clamp(15px, 2vw, 30px);
+        }
+
+        .options-grid.big .option-btn {
+            padding: clamp(20px, 3vh, 40px) clamp(15px, 2vw, 30px);
+            font-size: clamp(22px, 3vw, 34px);
+        }
+
+        .option-btn:active {
+            transform: scale(0.95);
+        }
+
+        .option-btn.selected {
+            border-color: var(--yellow);
+            background: rgba(255, 192, 0, 0.15);
+        }
+
+        .option-btn .option-price {
+            display: block;
+            color: var(--yellow);
+            font-size: clamp(14px, 1.8vw, 22px);
+            margin-top: 0.8vh;
+            font-family: 'Anton', sans-serif;
+        }
+
+        .options-grid.big .option-btn .option-price {
+            font-size: clamp(18px, 2.5vw, 28px);
+        }
+
+        /* ============ TOAST ============ */
+        #toast {
+            position: fixed;
+            bottom: 5vh;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--yellow);
+            color: var(--dark);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(18px, 2.5vw, 24px);
+            z-index: 9999;
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* ============ BUILDER STEPS ============ */
+        .builder-step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+            height: 100%;
+        }
+
+        .builder-step.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============ ÉCRAN CONFIRMATION ============ */
+        .confirm-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            z-index: 2000;
+            padding: 5vh 5vw;
+        }
+
+        .confirm-screen.active {
+            display: flex;
+        }
+
+        .confirm-screen h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(28px, 5vw, 48px);
+            color: var(--yellow);
+            margin-bottom: 3vh;
+        }
+
+        .order-number {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(60px, 12vw, 120px);
+            color: var(--yellow);
+            margin: 3vh 0;
+        }
+
+        .confirm-message {
+            font-size: clamp(20px, 3vw, 32px);
+            color: var(--text-dim);
+            margin-bottom: 3vh;
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 200px;
+            }
+
+            .keyboard {
+                grid-template-columns: repeat(7, 1fr);
+            }
+
+            .key.wide {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .sidebar {
+                width: 70px;
+                min-width: 70px;
+            }
+
+            .nav-item span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .sidebar-mode,
+            .sidebar-header img {
+                display: none;
+            }
+
+            .cart-btn-sidebar span {
+                display: none;
+            }
+
+            .keyboard {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        /* Petits écrans en hauteur (Windows 7, vieux moniteurs) */
+        @media (max-height: 800px) {
+            .intro-screen {
+                padding: 2vh 3vw;
+            }
+
+            .intro-screen .logo-big {
+                width: min(180px, 30vw);
+                margin-bottom: 2vh;
+            }
+
+            .intro-screen h1 {
+                font-size: clamp(24px, 4vw, 36px);
+                margin-bottom: 1.5vh;
+            }
+
+            .intro-screen h2 {
+                font-size: clamp(16px, 2.5vw, 24px);
+                margin-bottom: 2vh;
+            }
+
+            .prenom-input {
+                padding: 1.5vh 3vw;
+                font-size: clamp(24px, 4vw, 36px);
+                margin-bottom: 2vh;
+            }
+
+            .keyboard {
+                gap: 3px;
+                margin-bottom: 2vh;
+            }
+
+            .key {
+                padding: 10px 4px;
+                font-size: clamp(16px, 2vw, 22px);
+            }
+
+            .btn-primary {
+                padding: 12px 40px;
+                font-size: clamp(18px, 3vw, 28px);
+                margin-top: 1vh;
+            }
+
+            .mode-card {
+                padding: 15px;
+            }
+
+            .mode-card .icon {
+                font-size: clamp(30px, 5vw, 50px);
+                margin-bottom: 1vh;
+            }
+
+            .mode-card h2 {
+                font-size: clamp(20px, 3vw, 30px);
+            }
+        }
+
+        /* Très petits écrans (800x600, 1024x768) */
+        @media (max-height: 650px) {
+            .intro-screen .logo-big {
+                width: 120px;
+                margin-bottom: 1vh;
+            }
+
+            .intro-screen h1 {
+                font-size: 22px;
+                margin-bottom: 1vh;
+            }
+
+            .intro-screen h2 {
+                font-size: 16px;
+                margin-bottom: 1vh;
+            }
+
+            .prenom-input {
+                padding: 10px 20px;
+                font-size: 22px;
+                margin-bottom: 1vh;
+            }
+
+            .keyboard {
+                gap: 2px;
+                margin-bottom: 1vh;
+            }
+
+            .key {
+                padding: 6px 2px;
+                font-size: 14px;
+                border-radius: 4px;
+            }
+
+            .btn-primary {
+                padding: 10px 30px;
+                font-size: 18px;
+            }
+        }
+
+        /* ============ ÉCRAN DE VEILLE ============ */
+        .screensaver {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: none;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .screensaver.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .screensaver-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .screensaver-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 5vh;
+        }
+
+        .screensaver-logo {
+            width: min(300px, 50vw);
+            margin-bottom: 5vh;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .screensaver-cta {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(40px, 8vw, 80px);
+            color: var(--yellow);
+            text-shadow: 0 0 30px rgba(255, 192, 0, 0.5);
+            animation: pulse-glow 2s ease-in-out infinite;
+            letter-spacing: 3px;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                transform: scale(1);
+                text-shadow: 0 0 30px rgba(255, 192, 0, 0.5);
+            }
+
+            50% {
+                transform: scale(1.05);
+                text-shadow: 0 0 60px rgba(255, 192, 0, 0.8), 0 0 100px rgba(255, 192, 0, 0.4);
+            }
+        }
+
+        .screensaver-touch {
+            font-size: clamp(18px, 3vw, 28px);
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5vh;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ============ IMPRESSION ============ */
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ============ ÉCRAN DE VEILLE ============ -->
+    <div id="screensaver" class="screensaver" onclick="hideScreensaver()">
+        <!-- Option 1: Vidéo YouTube (ne marche pas toujours en mode file://) -->
+        <iframe id="screensaver-youtube" class="screensaver-video" src="" frameborder="0"
+            allow="autoplay; encrypted-media" allowfullscreen style="display: none;">
+        </iframe>
+        <!-- Option 2: Vidéo locale (drag & drop dans kiosk/videos/) -->
+        <video id="screensaver-local" class="screensaver-video" autoplay muted loop playsinline style="display: none;">
+            <source src="videos/screensaver.mp4" type="video/mp4">
+        </video>
+        <div class="screensaver-content">
+            <img src="videos/delices_inde_logo.png" alt="Chickenzz" class="screensaver-logo">
+            <div class="screensaver-cta">COMMANDEZ ICI</div>
+            <div class="screensaver-touch">Touchez l'écran pour commander</div>
+        </div>
+    </div>
+
+    <!-- ============ ÉCRAN 1: PRÉNOM ============ -->
+    <div id="screen-prenom" class="intro-screen active">
+        <img src="videos/delices_inde_logo.png" alt="Chickenzz" class="logo-big">
+        <h1>ENTREZ VOTRE PRÉNOM</h1>
+        <input type="text" class="prenom-input" id="prenom-input" readonly placeholder="VOTRE PRÉNOM">
+        <div class="keyboard" id="keyboard"></div>
+        <button class="btn-primary" id="btn-suivant" disabled>SUIVANT</button>
+    </div>
+
+    <!-- ============ ÉCRAN 2: MODE ============ -->
+    <div id="screen-mode" class="intro-screen">
+        <img src="videos/delices_inde_logo.png" alt="Chickenzz" class="logo-big">
+        <h1>BONJOUR <span id="display-prenom"></span> !</h1>
+        <h2>Où souhaitez-vous manger ?</h2>
+        <div class="mode-cards">
+            <div class="mode-card" onclick="selectMode('sur_place')">
+                <div class="icon" style="font-size:28px;font-weight:bold;">ICI</div>
+                <h2>SUR PLACE</h2>
+            </div>
+            <div class="mode-card" onclick="selectMode('emporter')">
+                <div class="icon" style="font-size:28px;font-weight:bold;">SAC</div>
+                <h2>À EMPORTER</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ LAYOUT PRINCIPAL ============ -->
+    <div class="app-layout" id="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../assets/common/logo.png" alt="Chickenzz">
+            </div>
+            <div class="sidebar-mode">
+                <div class="client-name" id="sidebar-name">SAIF</div>
+                <div class="order-mode" id="sidebar-mode">SUR PLACE</div>
+            </div>
+            <nav class="nav-categories" id="nav-categories">
+                <!-- Généré par JS -->
+            </nav>
+            <div class="sidebar-cart">
+                <button class="cart-btn-sidebar" onclick="showCart()">
+                    PANIER
+                    <span class="count" id="cart-count">0</span>
+                </button>
+                <button class="cancel-btn-sidebar" onclick="showCancelModal()">
+                    X ABANDONNER
+                </button>
+            </div>
+        </aside>
+
+        <!-- Zone principale -->
+        <main class="main-content">
+            <!-- Vue produits -->
+            <div id="products-view">
+                <div class="main-header">
+                    <h1 id="category-title">TACOS</h1>
+                </div>
+                <div class="main-body">
+                    <div class="products-grid" id="products-grid">
+                        <!-- Généré par JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vue panier -->
+            <div id="cart-view" class="cart-view">
+                <div class="main-header">
+                    <button class="back-btn" onclick="hideCart()">Retour</button>
+                    <h1>VOTRE PANIER</h1>
+                    <div style="width: 100px;"></div>
+                </div>
+                <div class="cart-items" id="cart-items">
+                    <!-- Généré par JS -->
+                </div>
+                <div class="cart-footer">
+                    <div class="cart-total">
+                        <span>TOTAL</span>
+                        <span class="amount" id="cart-total">0.00€</span>
+                    </div>
+                    <div class="cart-buttons">
+                        <button class="btn-secondary" onclick="hideCart()">AJOUTER</button>
+                        <button class="btn-primary" id="btn-validate" onclick="validateOrder()">VALIDER</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============ MODAL BUILDER ============ -->
+    <div class="modal" id="builder-modal">
+        <div class="modal-header">
+            <h2 id="builder-title">Personnaliser</h2>
+            <button class="modal-close" onclick="closeBuilder()">FERMER</button>
+        </div>
+        <div class="modal-content" id="builder-content"></div>
+        <div class="modal-footer" style="display: flex; gap: 15px;">
+            <button class="btn-secondary" id="btn-builder-prev" onclick="prevBuilderStep()"
+                style="padding: 10px 20px; font-size: clamp(16px, 2vw, 24px); border-radius: 10px; min-width: 120px;">RETOUR</button>
+            <div class="modal-price" id="builder-price" style="flex: 1; text-align: center;">0.00€</div>
+            <button class="btn-primary" id="btn-builder-next" onclick="nextBuilderStep()"
+                style="margin-top: 0; padding: 10px 20px; font-size: clamp(16px, 2vw, 24px); border-radius: 10px; min-width: 120px;">SUIVANT</button>
+        </div>
+    </div>
+
+    <!-- ============ ÉCRAN CONFIRMATION ============ -->
+    <div id="screen-confirm" class="confirm-screen">
+        <h1>COMMANDE VALIDÉE !</h1>
+        <p class="confirm-message" style="margin-top: 3vh;">Merci de votre visite,</p>
+        <div class="order-number" id="confirm-name">SAIF</div>
+
+        <p class="confirm-message" style="font-size: clamp(20px, 3vw, 32px); color: var(--yellow); margin-top: 3vh;">
+            Impression automatique de votre ticket en cours...
+        </p>
+        <p class="confirm-message" style="font-size: clamp(16px, 2vw, 24px); margin-top: 1vh;">
+            Récupérez vos tickets et allez en caisse.
+        </p>
+    </div>
+
+    <!-- ============ ÉCRAN MERCI ============ -->
+    <div id="screen-thanks" class="confirm-screen">
+        <h1>MERCI <span id="thank-name"></span> !</h1>
+        <p class="confirm-message" style="margin-bottom: 5vh;">Récupérez vos tickets et allez en caisse</p>
+        <button class="btn-primary" onclick="resetKiosk()"
+            style="font-size: clamp(20px, 3vw, 28px); padding: 20px 40px; border-radius: 20px;">NOUVELLE
+            COMMANDE</button>
+    </div>
+
+    <!-- ============ MODAL ABANDON ============ -->
+    <div class="modal" id="cancel-modal" style="justify-content: center; align-items: center; z-index: 3000;">
+        <div
+            style="background: var(--darker); border: 2px solid var(--border); border-radius: 20px; padding: 4vh 4vw; text-align: center; max-width: 500px; width: 90%;">
+            <h2
+                style="font-family: 'Anton', sans-serif; font-size: clamp(28px, 4vw, 42px); color: #ff3333; margin-bottom: 2vh;">
+                ABANDONNER ?</h2>
+            <p style="font-size: clamp(18px, 2.5vw, 26px); color: var(--text-dim); margin-bottom: 4vh;">Êtes-vous sûr de
+                vouloir annuler toute votre commande ?</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn-secondary" onclick="closeCancelModal()"
+                    style="padding: 15px 30px; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2vw, 22px); cursor: pointer; flex: 1; min-width: 150px;">NON,
+                    RETOUR</button>
+                <button class="btn-primary" onclick="resetKiosk(); closeCancelModal();"
+                    style="background: #ff3333; color: white; padding: 15px 30px; border-radius: 10px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2vw, 22px); cursor: pointer; border: none; flex: 1; min-width: 150px; margin-top: 0;">OUI,
+                    ANNULER</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de notification -->
+    <div id="toast">Ajouté au panier !</div>
+
+    <!-- ============ MODAL ADMIN (5 clics secrets) ============ -->
+    <div class="modal" id="admin-modal" style="justify-content: center; align-items: center; z-index: 5000;">
+        <div
+            style="background: var(--darker); border: 2px solid var(--yellow); border-radius: 20px; padding: 4vh 4vw; text-align: center; max-width: 600px; width: 90%;">
+            <h2
+                style="font-family: 'Anton', sans-serif; font-size: clamp(28px, 4vw, 42px); color: var(--yellow); margin-bottom: 3vh;">
+                MENU ADMIN</h2>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <button onclick="showOrderHistory()"
+                    style="background: rgba(0,204,102,0.15); border: 2px solid #00cc66; border-radius: 15px; padding: 25px; font-family: 'Anton', sans-serif; font-size: clamp(20px, 3vw, 30px); color: #00cc66; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    HISTORIQUE COMMANDES
+                </button>
+                <button onclick="adminTestPrint()"
+                    style="background: var(--glass); border: 2px solid var(--border); border-radius: 15px; padding: 25px; font-family: 'Anton', sans-serif; font-size: clamp(20px, 3vw, 30px); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    IMPRIMER TICKET TEST
+                </button>
+                <button onclick="listQZPrinters()"
+                    style="background: rgba(0,150,255,0.15); border: 2px solid #0096ff; border-radius: 15px; padding: 20px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2.5vw, 24px); color: #0096ff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    VOIR IMPRIMANTES QZ
+                </button>
+                <button onclick="installQZv2()"
+                    style="background: rgba(255,150,0,0.15); border: 2px solid #ff9600; border-radius: 15px; padding: 20px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2.5vw, 24px); color: #ff9600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    INSTALLER QZ v2.0
+                </button>
+                <button onclick="togglePrinterMode()" id="btn-printer-mode"
+                    style="background: rgba(0,204,102,0.15); border: 2px solid #00cc66; border-radius: 15px; padding: 20px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2.5vw, 24px); color: #00cc66; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    MODE: <span id="printer-mode-label">DUAL (Star + Epson)</span>
+                </button>
+                <button onclick="adminUpdateRestart()"
+                    style="background: rgba(0,150,255,0.15); border: 2px solid #0096ff; border-radius: 15px; padding: 25px; font-family: 'Anton', sans-serif; font-size: clamp(20px, 3vw, 30px); color: #0096ff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    🔄 MISE À JOUR
+                </button>
+                <button onclick="adminCloseKiosk()"
+                    style="background: rgba(255,51,51,0.15); border: 2px solid #ff3333; border-radius: 15px; padding: 25px; font-family: 'Anton', sans-serif; font-size: clamp(20px, 3vw, 30px); color: #ff3333; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                    FERMER LA BORNE
+                </button>
+                <!-- OUTILS ADMIN - DRIVERS -->
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border);">
+                    <div style="font-family: 'Anton', sans-serif; font-size: 16px; color: var(--text-dim); margin-bottom: 15px;">DRIVERS:</div>
+                    <button onclick="exitFullscreenAndOpen('https://epson.com/Support/Point-of-Sale/TM-Series/Epson-TM-m30II/s/SPT_C31CJ27012')"
+                        style="width: 100%; background: #0066cc; color: white; padding: 15px; border-radius: 12px; border: none; font-family: 'Anton', sans-serif; font-size: clamp(14px, 1.8vw, 18px); cursor: pointer;">
+                        📥 DRIVER EPSON TM-M30II
+                    </button>
+                </div>
+                <button onclick="closeAdminModal()"
+                    style="background: transparent; border: 2px solid var(--border); border-radius: 15px; padding: 18px; font-family: 'Anton', sans-serif; font-size: clamp(18px, 2.5vw, 26px); color: var(--text-dim); cursor: pointer; margin-top: 15px;">
+                    RETOUR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MODAL HISTORIQUE COMMANDES ============ -->
+    <div class="modal" id="history-modal" style="justify-content: center; align-items: center; z-index: 5001;">
+        <div
+            style="background: var(--darker); border: 2px solid var(--yellow); border-radius: 20px; padding: 3vh 3vw; max-width: 700px; width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+            <h2
+                style="font-family: 'Anton', sans-serif; font-size: clamp(24px, 3.5vw, 36px); color: var(--yellow); margin-bottom: 2vh; text-align: center;">
+                HISTORIQUE DES COMMANDES
+            </h2>
+            <div id="history-content" style="flex: 1; overflow-y: auto; padding: 10px;"></div>
+            <div style="display: flex; gap: 15px; margin-top: 2vh;">
+                <button onclick="reprintLastOrder()"
+                    style="flex: 1; background: rgba(0,204,102,0.15); border: 2px solid #00cc66; border-radius: 15px; padding: 18px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2vw, 22px); color: #00cc66; cursor: pointer;">
+                    REIMPRIMER DERNIERE
+                </button>
+                <button onclick="closeHistoryModal()"
+                    style="flex: 1; background: transparent; border: 2px solid var(--border); border-radius: 15px; padding: 18px; font-family: 'Anton', sans-serif; font-size: clamp(16px, 2vw, 22px); color: var(--text-dim); cursor: pointer;">
+                    RETOUR
+                </button>
+            </div>
+            <!-- OUTILS ADMIN -->
+            <div style="margin-top: 3vh; padding-top: 2vh; border-top: 1px solid var(--border);">
+                <div style="font-family: 'Anton', sans-serif; font-size: 14px; color: var(--text-dim); margin-bottom: 10px;">OUTILS ADMIN:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <a href="https://epson.com/Support/Point-of-Sale/TM-Series/Epson-TM-m30II/s/SPT_C31CJ27012" target="_blank"
+                        style="background: #0066cc; color: white; padding: 10px 15px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: bold;">
+                        📥 Driver Epson TM-M30II
+                    </a>
+                    <button onclick="window.open('ms-settings:printers', '_blank')"
+                        style="background: #333; color: white; padding: 10px 15px; border-radius: 8px; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">
+                        🖨️ Paramètres Imprimantes
+                    </button>
+                    <button onclick="testPrintBoth()"
+                        style="background: #ff9800; color: white; padding: 10px 15px; border-radius: 8px; border: none; font-size: 14px; font-weight: bold; cursor: pointer;">
+                        🧪 Test Impression
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="products.js"></script>
+    <script>
+        // ============ CONFIGURATION IMPRIMANTES ============
+        // IMPORTANT: Modifier ces noms pour correspondre aux noms exacts dans Windows
+        // Pour trouver les noms: Paramètres → Imprimantes → voir le nom exact
+        const PRINTER_CONFIG = {
+            // Imprimante CLIENT (Epson TM-M30II) - doit être l'imprimante par défaut Windows
+            client: {
+                name: 'EPSON TM-m30II receipt',
+                ip: '192.168.1.200'
+            },
+            // Imprimante CUISINE (Star MCP31)
+            kitchen: {
+                name: 'Star MCP31',
+                ip: '192.168.1.149'
+            },
+            // Mode: 'dual' = 2 imprimantes, 'single' = tout sur défaut
+            mode: 'dual'
+        };
+
+        // ============ IMPRESSION ============
+        // 2 tickets séparés sur Star (imprimante par défaut)
+        async function printDualTickets(clientTicket, kitchenTicket) {
+            console.log('Impression: 2 tickets sur Star');
+
+            // 1. Ticket CUISINE
+            printTicket(kitchenTicket);
+            showToast('Ticket CUISINE imprimé');
+
+            // 2. Ticket CLIENT (après délai)
+            setTimeout(() => {
+                printTicket(clientTicket);
+                showToast('Ticket CLIENT imprimé');
+            }, 2500);
+        }
+
+        // Fonctions placeholder (boutons admin désactivés)
+        function listQZPrinters() {
+            alert('QZ Tray désactivé');
+        }
+        function installQZv2() {
+            alert('QZ Tray désactivé');
+        }
+
+        // Envoyer ticket client à Epson via ePOS
+        async function printToEpsonePOS(htmlContent) {
+            const ip = PRINTER_CONFIG.client.ip;
+
+            try {
+                // Créer le XML ePOS pour Epson
+                const eposXml = `<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+    <s:Body>
+        <epos-print xmlns="http://www.epson-pos.com/schemas/2011/03/epos-print">
+            <text lang="fr" smooth="true"/>
+            <text>${escapeXml(stripHtmlToText(htmlContent))}</text>
+            <feed line="4"/>
+            <cut type="feed"/>
+        </epos-print>
+    </s:Body>
+</s:Envelope>`;
+
+                const response = await fetch(`http://${ip}/cgi-bin/epos/service.cgi`, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/xml; charset=utf-8',
+                        'SOAPAction': '""'
+                    },
+                    body: eposXml
+                });
+
+                console.log('✓ Ticket client envoyé à Epson ' + ip);
+                showToast('Ticket CLIENT → Epson');
+                return true;
+            } catch (error) {
+                console.error('Erreur Epson ePOS:', error);
+                showToast('Erreur Epson - fallback Star');
+                return false;
+            }
+        }
+
+        // Convertir HTML en texte simple pour ePOS
+        function stripHtmlToText(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.textContent || div.innerText || '';
+        }
+
+        // Envoyer ticket cuisine à Star via WebPRNT (fonctionne depuis localhost)
+        async function printToStarWebPRNT(htmlContent) {
+            const ip = PRINTER_CONFIG.kitchen.ip;
+
+            // Convertir HTML en texte formaté pour imprimante thermique
+            const textContent = convertHtmlToStarText(htmlContent);
+
+            // Commandes ESC/POS pour Star
+            const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
+<starxml version="1.0">
+    <print>
+        <text font="1" size="normal" align="center" style="bold">================================</text>
+        ${textContent}
+        <text font="1" size="normal" align="center">================================</text>
+        <feed line="3"/>
+        <cut type="partial"/>
+    </print>
+</starxml>`;
+
+            try {
+                const response = await fetch(`http://${ip}/StarWebPRNT/SendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/xml; charset=utf-8' },
+                    body: xmlContent
+                });
+
+                if (response.ok) {
+                    console.log('✓ Ticket cuisine envoyé à Star ' + ip);
+                    showToast('Ticket cuisine imprimé !');
+                } else {
+                    throw new Error('Réponse: ' + response.status);
+                }
+            } catch (error) {
+                console.error('Erreur Star WebPRNT:', error);
+                showToast('Erreur Star - vérifier connexion');
+                // PAS de fallback pour éviter d'imprimer en double sur Epson
+            }
+        }
+
+        // Convertir HTML ticket cuisine en texte Star
+        function convertHtmlToStarText(htmlContent) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+
+            let starXml = '';
+
+            // Nom du client
+            const clientName = tempDiv.querySelector('.client-name');
+            const orderType = tempDiv.querySelector('.order-type');
+            if (clientName) {
+                starXml += `<text font="1" size="double" align="center" style="bold">${escapeXml(clientName.textContent)}</text>`;
+            }
+            if (orderType) {
+                starXml += `<text font="1" size="normal" align="center">${escapeXml(orderType.textContent)}</text>`;
+            }
+            starXml += `<text font="1" size="normal" align="center">--------------------------------</text>`;
+
+            // Articles
+            const items = tempDiv.querySelectorAll('.kitchen-item');
+            items.forEach(item => {
+                const header = item.querySelector('.kitchen-item-header');
+                if (header) {
+                    starXml += `<text font="1" size="large" style="bold">${escapeXml(header.textContent)}</text>`;
+                }
+
+                const details = item.querySelectorAll('.kitchen-item-detail');
+                details.forEach(d => {
+                    starXml += `<text font="1" size="normal">  ${escapeXml(d.textContent)}</text>`;
+                });
+                starXml += `<feed line="1"/>`;
+            });
+
+            // Heure
+            const time = tempDiv.querySelector('.kitchen-time');
+            if (time) {
+                starXml += `<text font="1" size="normal" align="center">--------------------------------</text>`;
+                starXml += `<text font="1" size="normal" align="center">${escapeXml(time.textContent)}</text>`;
+            }
+
+            return starXml;
+        }
+
+        // Fonction pour envoyer à l'imprimante Star via WebSocket/HTTP
+        async function printToStarKitchen(htmlContent) {
+            const ip = PRINTER_CONFIG.kitchen.ip;
+
+            // Convertir HTML en texte simple pour la cuisine
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+
+            // Extraire le texte brut avec formatage basique
+            let textContent = '';
+
+            // Bande nom
+            const clientName = tempDiv.querySelector('.client-name');
+            const orderType = tempDiv.querySelector('.order-type');
+            if (clientName) textContent += '\n' + '='.repeat(32) + '\n';
+            if (clientName) textContent += '   ' + clientName.textContent + '\n';
+            if (orderType) textContent += '   ' + orderType.textContent + '\n';
+            if (clientName) textContent += '='.repeat(32) + '\n\n';
+
+            // Articles
+            const items = tempDiv.querySelectorAll('.kitchen-item');
+            items.forEach(item => {
+                const header = item.querySelector('.kitchen-item-header');
+                if (header) textContent += header.textContent + '\n';
+
+                const details = item.querySelectorAll('.kitchen-item-detail');
+                details.forEach(d => {
+                    textContent += '  ' + d.textContent + '\n';
+                });
+                textContent += '\n';
+            });
+
+            // Heure
+            const time = tempDiv.querySelector('.kitchen-time');
+            if (time) textContent += '-'.repeat(32) + '\n' + time.textContent + '\n';
+
+            textContent += '\n\n\n';  // Espace avant coupe
+
+            // Essayer d'envoyer via Star WebPRNT
+            try {
+                const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
+                <StarWebPrint xmlns="http://www.star-m.jp/StarWebPRNT">
+                <Request>
+                    <SetEncoding name="UTF-8"/>
+                    <Text scale="2x2">${escapeXml(textContent)}</Text>
+                    <CutPaper feed="true"/>
+                </Request>
+                </StarWebPrint>`;
+
+                await fetch(`http://${ip}/StarWebPRNT/SendMessage`, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/xml; charset=utf-8' },
+                    body: xmlContent
+                });
+                console.log('✓ Ticket cuisine envoyé à Star ' + ip);
+            } catch (error) {
+                console.error('Erreur Star WebPRNT:', error);
+                // PAS de fallback pour éviter d'imprimer en double sur Epson
+            }
+        }
+
+        function escapeXml(text) {
+            return text.replace(/&/g, '&amp;')
+                       .replace(/</g, '&lt;')
+                       .replace(/>/g, '&gt;')
+                       .replace(/"/g, '&quot;')
+                       .replace(/'/g, '&apos;');
+        }
+
+        // Fonction pour envoyer à l'imprimante Epson via ePOS
+        async function printToEpsonClient(htmlContent) {
+            const ip = PRINTER_CONFIG.client.ip;
+
+            // Convertir HTML en texte simple pour le ticket
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+
+            let textLines = [];
+
+            // Header
+            textLines.push({ text: "DÉLICES DE L'INDE", align: 'center', bold: true, size: 2 });
+            textLines.push({ text: '31 Bd Charles de Gaulle', align: 'center', size: 1 });
+            textLines.push({ text: '31800 Saint-Gaudens', align: 'center', size: 1 });
+            textLines.push({ text: '', size: 1 });
+
+            // Nom client et mode
+            const clientName = tempDiv.querySelector('.client-name');
+            const orderType = tempDiv.querySelector('.order-type');
+            if (clientName) {
+                textLines.push({ text: '================================', align: 'center', size: 1 });
+                textLines.push({ text: clientName.textContent.toUpperCase(), align: 'center', bold: true, size: 2 });
+            }
+            if (orderType) {
+                textLines.push({ text: orderType.textContent, align: 'center', bold: true, size: 1 });
+            }
+            textLines.push({ text: '================================', align: 'center', size: 1 });
+            textLines.push({ text: '', size: 1 });
+
+            // Articles
+            const items = tempDiv.querySelectorAll('.item');
+            items.forEach(item => {
+                const name = item.querySelector('.item-name');
+                const price = item.querySelector('.item-price');
+                if (name && price) {
+                    textLines.push({ text: name.textContent + '  ' + price.textContent, align: 'left', size: 1 });
+                }
+            });
+
+            // Total
+            const total = tempDiv.querySelector('.total-price');
+            if (total) {
+                textLines.push({ text: '', size: 1 });
+                textLines.push({ text: '--------------------------------', align: 'center', size: 1 });
+                textLines.push({ text: 'TOTAL: ' + total.textContent, align: 'right', bold: true, size: 2 });
+                textLines.push({ text: '--------------------------------', align: 'center', size: 1 });
+            }
+
+            textLines.push({ text: '', size: 1 });
+            textLines.push({ text: 'Bon appétit !', align: 'center', bold: true, size: 1 });
+            textLines.push({ text: '', size: 1 });
+
+            // Construire XML ePOS
+            let eposCommands = '';
+            textLines.forEach(line => {
+                const align = line.align === 'center' ? 'center' : line.align === 'right' ? 'right' : 'left';
+                const height = line.size || 1;
+                const width = line.size || 1;
+                const bold = line.bold ? 'true' : 'false';
+                eposCommands += `<text align="${align}" dw="${width > 1}" dh="${height > 1}" em="${bold}">${escapeXml(line.text)}&#10;</text>`;
+            });
+
+            const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+                <s:Body>
+                    <epos-print xmlns="http://www.epson-pos.com/schemas/2011/03/epos-print">
+                        ${eposCommands}
+                        <feed unit="24"/>
+                        <cut type="feed"/>
+                    </epos-print>
+                </s:Body>
+            </s:Envelope>`;
+
+            try {
+                await fetch(`http://${ip}/cgi-bin/epos/service.cgi?devid=local_printer&timeout=10000`, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/xml; charset=utf-8' },
+                    body: xmlContent
+                });
+                console.log('✓ Ticket client envoyé à Epson ' + ip);
+            } catch (error) {
+                console.error('Erreur Epson ePOS:', error);
+                // Fallback: impression via fenêtre popup
+                printTicket(htmlContent);
+            }
+        }
+
+        // ============ ÉTAT ============
+        const state = {
+            prenom: '',
+            mode: '',
+            cart: [],
+            currentCategory: null,
+            currentProduct: null,
+            builderSelections: {},
+            builderTotalSteps: 0,
+            builderCurrentStep: 0
+        };
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            const cartBtn = document.querySelector('.cart-btn-sidebar');
+            if (cartBtn) {
+                cartBtn.style.transform = 'scale(1.1)';
+                cartBtn.style.transition = 'transform 0.2s';
+                setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
+            }
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // ============ NAVIGATION ============
+        function showIntroScreen(id) {
+            document.querySelectorAll('.intro-screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('app-layout').classList.remove('active');
+            document.getElementById('screen-confirm').classList.remove('active');
+            document.getElementById('screen-thanks').classList.remove('active');
+
+            // Gérer le screensaver selon l'écran
+            if (id === 'screen-prenom') {
+                resetScreensaverTimer();
+            } else {
+                clearTimeout(screensaverTimer);
+            }
+        }
+
+        function showAppLayout() {
+            document.querySelectorAll('.intro-screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('app-layout').classList.add('active');
+            document.getElementById('screen-confirm').classList.remove('active'); // Ensure confirm screen is hidden
+            document.getElementById('screen-thanks').classList.remove('active'); // Ensure thanks screen is hidden
+        }
+
+        // ============ CLAVIER ============
+        function initKeyboard() {
+            const keyboard = document.getElementById('keyboard');
+            const keys = 'AZERTYUIOPQSDFGHJKLMWXCVBN'.split('');
+
+            keys.forEach(key => {
+                const btn = document.createElement('div');
+                btn.className = 'key';
+                btn.textContent = key;
+                btn.onclick = () => addLetter(key);
+                keyboard.appendChild(btn);
+            });
+
+            const deleteBtn = document.createElement('div');
+            deleteBtn.className = 'key wide delete';
+            deleteBtn.textContent = 'X';
+            deleteBtn.onclick = deleteLetter;
+            keyboard.appendChild(deleteBtn);
+
+            const spaceBtn = document.createElement('div');
+            spaceBtn.className = 'key wide';
+            spaceBtn.textContent = '⎵';
+            spaceBtn.onclick = () => addLetter(' ');
+            keyboard.appendChild(spaceBtn);
+        }
+
+        function addLetter(letter) {
+            if (state.prenom.length < 12) {
+                state.prenom += letter;
+                document.getElementById('prenom-input').value = state.prenom;
+                updateSuivantBtn();
+            }
+        }
+
+        function deleteLetter() {
+            state.prenom = state.prenom.slice(0, -1);
+            document.getElementById('prenom-input').value = state.prenom;
+            updateSuivantBtn();
+        }
+
+        function updateSuivantBtn() {
+            document.getElementById('btn-suivant').disabled = state.prenom.trim().length === 0;
+        }
+
+        document.getElementById('btn-suivant').onclick = () => {
+            document.getElementById('display-prenom').textContent = state.prenom.toUpperCase();
+            showIntroScreen('screen-mode');
+        };
+
+        // ============ MODE ============
+        function selectMode(mode) {
+            state.mode = mode;
+            document.getElementById('sidebar-name').textContent = state.prenom.toUpperCase();
+            document.getElementById('sidebar-mode').textContent = mode === 'sur_place' ? 'SUR PLACE' : 'À EMPORTER';
+            initNavigation();
+            showAppLayout();
+            selectCategory(CATEGORIES[0].id);
+
+            // Arrêter le timer du screensaver (on n'est plus sur l'écran prénom)
+            clearTimeout(screensaverTimer);
+        }
+
+        // ============ NAVIGATION SIDEBAR ============
+        function initNavigation() {
+            const nav = document.getElementById('nav-categories');
+            nav.innerHTML = '';
+
+            CATEGORIES.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'nav-item';
+                item.dataset.id = cat.id;
+                item.onclick = () => selectCategory(cat.id);
+                item.innerHTML = `
+                    <img src="${cat.image}" alt="${cat.name}" onerror="this.style.display='none'">
+                    <span>${cat.name}</span>
+                `;
+                nav.appendChild(item);
+            });
+        }
+
+        function selectCategory(categoryId) {
+            state.currentCategory = categoryId;
+
+            // MAJ nav active
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.id === categoryId);
+            });
+
+            const category = CATEGORIES.find(c => c.id === categoryId);
+            document.getElementById('category-title').textContent = category.name.toUpperCase();
+
+            renderProducts(categoryId);
+            hideCart();
+        }
+
+        // ============ PRODUITS ============
+        function renderProducts(categoryId) {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+
+            const products = PRODUCTS.filter(p => p.category === categoryId);
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.onclick = () => handleProductClick(product);
+
+                const priceDisplay = product.sizes ?
+                    `À partir de ${product.sizes[0].price.toFixed(2)}€` :
+                    `${product.price.toFixed(2)}€`;
+
+                const displayName = product.displayName || product.name;
+
+                // Carte spéciale "Compose" en haut
+                if (product.isCustom) {
+                    card.className = 'product-card compose-card';
+                    card.innerHTML = `
+                        <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
+                        <div class="compose-text">
+                            <h4>${displayName}</h4>
+                            <p class="desc">${product.description || ''}</p>
+                        </div>
+                        <div class="price">${priceDisplay}</div>
+                    `;
+                } else {
+                    card.className = 'product-card';
+
+                    // Badge: promo ou composer
+                    let badgeHtml = '';
+                    if (product.isPromo && product.promoLabel) {
+                        badgeHtml = `<div class="badge" style="background:#ff3333;">${product.promoLabel}</div>`;
+                    } else if (product.hasBuilder) {
+                        badgeHtml = '<div class="badge">COMPOSER</div>';
+                    }
+
+                    card.innerHTML = `
+                        ${badgeHtml}
+                        <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
+                        <h4>${displayName}</h4>
+                        <p class="desc">${product.description || ''}</p>
+                        <div class="price">${priceDisplay}</div>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        function handleProductClick(product) {
+            state.currentProduct = product;
+
+            if (product.hasBuilder) {
+                openBuilder(product);
+            } else {
+                addSimpleToCart(product);
+            }
+        }
+
+        function addSimpleToCart(product) {
+            const cartItem = {
+                id: Date.now(),
+                product: product,
+                name: product.name,
+                price: product.price,
+                quantity: 1,
+                details: '',
+                image: product.image
+            };
+            state.cart.push(cartItem);
+            updateCartCount();
+            showToast(`${product.name} ajouté !`);
+        }
+
+        // ============ BUILDER ============
+        function openBuilder(product) {
+            state.builderSelections = {};
+            document.getElementById('builder-title').textContent = product.name;
+
+            const content = document.getElementById('builder-content');
+            content.innerHTML = '';
+
+            if (product.type === 'tacos') buildTacosBuilder(content, product);
+            else if (product.type === 'naan') buildNaanBuilder(content, product);
+            else if (product.type === 'sandwich') buildSandwichBuilder(content, product);
+            else if (product.type === 'bowl') buildBowlBuilder(content, product);
+            else if (product.type === 'poutine') buildPoutineBuilder(content, product);
+            else if (product.type === 'assiette') buildAssietteBuilder(content, product);
+            else if (product.type === 'box') buildBoxBuilder(content, product);
+            else if (product.type === 'bucket') buildBucketBuilder(content, product);
+            else if (product.type === 'boisson_seule') buildBoissonBuilder(content, product);
+            else if (product.type === 'enfant') buildEnfantBuilder(content, product);
+            else if (product.type === 'frites') buildFritesBuilder(content, product);
+            else if (product.menuUpgrade) buildBurgerBuilder(content, product);
+
+            processBuilderSteps();
+            updateBuilderPrice();
+            document.getElementById('builder-modal').classList.add('active');
+        }
+
+        function processBuilderSteps() {
+            const content = document.getElementById('builder-content');
+            let steps = [];
+            let currentStep = document.createElement('div');
+            currentStep.className = 'builder-step';
+
+            Array.from(content.children).forEach(child => {
+                if (child.classList.contains('step-title')) {
+                    if (currentStep.children.length > 0) {
+                        steps.push(currentStep);
+                        currentStep = document.createElement('div');
+                        currentStep.className = 'builder-step';
+                    }
+                }
+                currentStep.appendChild(child.cloneNode(true));
+            });
+
+            if (currentStep.children.length > 0) {
+                steps.push(currentStep);
+            }
+
+            content.innerHTML = '';
+            steps.forEach(step => content.appendChild(step));
+
+            state.builderTotalSteps = steps.length;
+            showBuilderStep(1);
+        }
+
+        function showBuilderStep(stepNum) {
+            state.builderCurrentStep = stepNum;
+            const steps = document.querySelectorAll('.builder-step');
+            steps.forEach((step, index) => {
+                step.classList.toggle('active', index === (stepNum - 1));
+            });
+
+            const prevBtn = document.getElementById('btn-builder-prev');
+            const nextBtn = document.getElementById('btn-builder-next');
+
+            prevBtn.style.visibility = stepNum === 1 ? 'hidden' : 'visible';
+
+            if (stepNum === state.builderTotalSteps) {
+                // Mode édition ou ajout ?
+                if (state.editingCartItemId) {
+                    nextBtn.textContent = 'MODIFIER';
+                    nextBtn.onclick = updateCartItemFromBuilder;
+                } else {
+                    nextBtn.textContent = 'COMPLÉTER MA COMMANDE';
+                    nextBtn.onclick = addToCartFromBuilder;
+                }
+            } else {
+                nextBtn.textContent = 'SUIVANT';
+                nextBtn.onclick = nextBuilderStep;
+            }
+        }
+
+        function nextBuilderStep() {
+            if (state.builderCurrentStep < state.builderTotalSteps) {
+                showBuilderStep(state.builderCurrentStep + 1);
+            }
+        }
+
+        function prevBuilderStep() {
+            if (state.builderCurrentStep > 1) {
+                showBuilderStep(state.builderCurrentStep - 1);
+            }
+        }
+
+        function getBoissonsHtml() {
+            let html = '';
+            BOISSONS_33.forEach((b, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('menuBoisson', '${b.name}', this)">${b.name}</div>`;
+            });
+            return html;
+        }
+
+        function buildTacosBuilder(content, product) {
+            let html = '';
+
+            // TACOS SPÉCIAL : Taille + Modifications + Viande supp + Menu
+            if (product.isSpecial) {
+                // Taille
+                html += `<div class="step-title">Taille</div><div class="options-grid big">`;
+                product.sizes.forEach((size, i) => {
+                    html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('size', '${size.id}', this)" data-price="${size.price}">
+                        ${size.name} <span class="option-price">${size.price.toFixed(2)}€</span>
+                    </div>`;
+                });
+                html += '</div>';
+
+                // Modifier la recette (retirer des éléments) - TACOS = sauce fromagère uniquement
+                html += `<div class="step-title">Modifier la recette ?</div><div class="options-grid">`;
+                RETRAITS_TACOS.forEach(r => {
+                    html += `<div class="option-btn" onclick="toggleRetrait('${r.id}', this)">${r.name}</div>`;
+                });
+                html += '</div>';
+
+                // Viande supplémentaire
+                html += `<div class="step-title">Viande supplémentaire ?</div><div class="options-grid">`;
+                VIANDES.forEach(v => {
+                    html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.50€</span></div>`;
+                });
+                html += '</div>';
+
+                // Menu
+                html += `<div class="step-title">En menu ? (Frites + Boisson)</div><div class="options-grid big">
+                    <div class="option-btn selected" onclick="selectOption('menu', false, this)">SEUL</div>
+                    <div class="option-btn" onclick="selectOption('menu', true, this)" data-price="2">MENU <span class="option-price">+2€</span></div>
+                </div>`;
+                html += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                    <div class="builder-subtitle">Choix de la boisson</div>
+                    <div class="options-grid">
+                        ${getBoissonsHtml()}
+                    </div>
+                </div>`;
+
+                content.innerHTML = html;
+                state.builderSelections.size = product.sizes[0];
+                state.builderSelections.menu = false;
+                state.builderSelections.retraits = [];
+                state.builderSelections.viandesSupp = [];
+                state.builderSelections.isSpecial = true;
+                return;
+            }
+
+            // TACOS CUSTOM : composition complète - TOUT SUR UNE PAGE
+            // Taille
+            html += `<div class="step-title">Taille</div><div class="options-grid big">`;
+            product.sizes.forEach((size, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('size', '${size.id}', this)" data-price="${size.price}">
+                    ${size.name} <span class="option-price">${size.price.toFixed(2)}€ (${size.meatCount} viande${size.meatCount > 1 ? 's' : ''})</span>
+                </div>`;
+            });
+            html += '</div>';
+
+            // Viandes + Sauces
+            html += `<div class="step-title">Viandes & Sauces</div>`;
+            html += `<div class="builder-subtitle">Viandes (selon taille)</div><div class="options-grid">`;
+            VIANDES.forEach(v => {
+                html += `<div class="option-btn" onclick="toggleMeat('${v.id}', this)">${v.name}</div>`;
+            });
+            html += '</div>';
+            html += `<div class="builder-subtitle" style="margin-top:15px;">Sauces (3 max)</div><div class="options-grid">`;
+            SAUCES.forEach(s => {
+                html += `<div class="option-btn" onclick="toggleSauce('${s.id}', this)">${s.name}</div>`;
+            });
+            html += '</div>';
+
+            // Gratin + Suppléments
+            let initialGratinPrice = (product.sizes[0].id === 'L' || product.sizes[0].id === 'XL') ? 2.50 : 2.00;
+            html += `<div class="step-title">Extras (optionnels)</div>`;
+            html += `<div class="builder-subtitle">Gratiner ?</div><div class="options-grid">
+                <div class="option-btn selected" onclick="selectOption('gratin', 'none', this)">Sans gratin</div>`;
+            GRATINS.forEach(g => {
+                html += `<div class="option-btn" onclick="selectOption('gratin', '${g.id}', this)">${g.name} <span class="option-price gratin-price-display">+${initialGratinPrice.toFixed(2)}€</span></div>`;
+            });
+            html += '</div>';
+            html += `<div class="builder-subtitle" style="margin-top:15px;">Suppléments</div><div class="options-grid">`;
+            SUPPLEMENTS.forEach(supp => {
+                html += `<div class="option-btn" onclick="toggleSupplement('${supp.id}', this)">${supp.name} <span class="option-price">+${supp.price.toFixed(2)}€</span></div>`;
+            });
+            html += '</div>';
+
+            // Menu
+            html += `<div class="step-title">En menu ? (Frites + Boisson)</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('menu', false, this)">SEUL</div>
+                <div class="option-btn" onclick="selectOption('menu', true, this)" data-price="2">MENU <span class="option-price">+2€</span></div>
+            </div>`;
+            html += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                <div class="builder-subtitle">Choix de la boisson</div>
+                <div class="options-grid">
+                    ${getBoissonsHtml()}
+                </div>
+            </div>`;
+
+            content.innerHTML = html;
+            state.builderSelections.size = product.sizes[0];
+            state.builderSelections.meats = [];
+            state.builderSelections.gratin = null;
+            state.builderSelections.sauces = [];
+            state.builderSelections.supplements = [];
+            state.builderSelections.menu = false;
+        }
+
+        function buildNaanBuilder(content, product) {
+            let html = '';
+
+            // NAAN SPÉCIAL : formule + modifications + viande supp
+            if (product.isSpecial) {
+                // Formule
+                html += `<div class="step-title">Formule</div><div class="options-grid big">
+                    <div class="option-btn selected" onclick="selectOption('formula', 'seul', this)" data-price="0">SEUL</div>
+                    <div class="option-btn" onclick="selectOption('formula', 'menu', this)" data-price="2">MENU <span class="option-price">+2€</span></div>
+                    <div class="option-btn" onclick="selectOption('formula', 'mega', this)" data-price="3.5">MÉGA XL <span class="option-price">+3.50€</span></div>
+                </div>`;
+                html += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                    <div class="builder-subtitle">Choix de la boisson</div>
+                    <div class="options-grid">
+                        ${getBoissonsHtml()}
+                    </div>
+                </div>`;
+
+                // Modifier la recette (retirer des éléments) - NAANS/SANDWICHS = salade, tomate, oignon
+                html += `<div class="step-title">Modifier la recette ?</div><div class="options-grid">`;
+                RETRAITS_SANDWICH.forEach(r => {
+                    html += `<div class="option-btn" onclick="toggleRetrait('${r.id}', this)">${r.name}</div>`;
+                });
+                html += '</div>';
+
+                // Viande supplémentaire
+                html += `<div class="step-title">Viande supplémentaire ?</div><div class="options-grid">`;
+                VIANDES.forEach(v => {
+                    html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.50€</span></div>`;
+                });
+                html += '</div>';
+
+                // Suppléments fromage
+                html += `<div class="step-title">Suppléments ?</div><div class="options-grid">`;
+                SUPPLEMENTS.forEach(supp => {
+                    html += `<div class="option-btn" onclick="toggleSupplement('${supp.id}', this)">${supp.name} <span class="option-price">+${supp.price.toFixed(2)}€</span></div>`;
+                });
+                html += '</div>';
+
+                content.innerHTML = html;
+                state.builderSelections.formula = { id: 'seul', price: 0 };
+                state.builderSelections.basePrice = product.price;
+                state.builderSelections.retraits = [];
+                state.builderSelections.viandesSupp = [];
+                state.builderSelections.supplements = [];
+                state.builderSelections.isSpecial = true;
+                return;
+            }
+
+            // NAAN CUSTOM (compose ton sandwich via naan) - redirige vers sandwich builder
+            content.innerHTML = `<div class="step-title">Choisissez la formule</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('formula', 'seul', this)" data-price="0">SEUL</div>
+                <div class="option-btn" onclick="selectOption('formula', 'menu', this)" data-price="2">MENU <span class="option-price">+2€</span></div>
+                <div class="option-btn" onclick="selectOption('formula', 'mega', this)" data-price="3.5">MÉGA XL <span class="option-price">+3.50€</span></div>
+            </div>`;
+            content.innerHTML += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                <div class="builder-subtitle">Choix de la boisson</div>
+                <div class="options-grid">
+                    ${getBoissonsHtml()}
+                </div>
+            </div>`;
+            state.builderSelections.formula = { id: 'seul', price: 0 };
+            state.builderSelections.basePrice = product.price;
+        }
+
+        function buildSandwichBuilder(content, product) {
+            let html = '';
+
+            // Formule (Classique ou Mega XL - pas de boisson incluse)
+            html += `<div class="step-title">Formule</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('formula', 'classique', this)" data-price="7.9">CLASSIQUE <span class="option-price">7.90€</span></div>
+                <div class="option-btn" onclick="selectOption('formula', 'mega', this)" data-price="11">MÉGA XL <span class="option-price">11€</span></div>
+            </div>`;
+
+            // Pain
+            html += `<div class="step-title">Pain</div><div class="options-grid big">`;
+            PAINS.forEach((p, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('bread', '${p.id}', this)">${p.name}</div>`;
+            });
+            html += '</div>';
+
+            // Viande
+            html += `<div class="step-title">Viande</div><div class="options-grid">`;
+            VIANDES.forEach((v, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
+            });
+            html += '</div>';
+
+            // Sauces
+            html += `<div class="step-title">Sauces (3 max)</div><div class="options-grid">`;
+            SAUCES.forEach(s => {
+                html += `<div class="option-btn" onclick="toggleSauce('${s.id}', this)">${s.name}</div>`;
+            });
+            html += '</div>';
+
+            // Modifier la recette (retirer des éléments) - SANDWICHS = salade, tomate, oignon
+            html += `<div class="step-title">Modifier la recette ?</div><div class="options-grid">`;
+            RETRAITS_SANDWICH.forEach(r => {
+                html += `<div class="option-btn" onclick="toggleRetrait('${r.id}', this)">${r.name}</div>`;
+            });
+            html += '</div>';
+
+            // Viande supplémentaire avec choix
+            html += `<div class="step-title">Viande supplémentaire ?</div><div class="options-grid">`;
+            VIANDES.forEach(v => {
+                html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.50€</span></div>`;
+            });
+            html += '</div>';
+
+            // Suppléments
+            html += `<div class="step-title">Suppléments (optionnels)</div><div class="options-grid">`;
+            SUPPLEMENTS.forEach(supp => {
+                html += `<div class="option-btn" onclick="toggleSupplement('${supp.id}', this)">${supp.name} <span class="option-price">+${supp.price.toFixed(2)}€</span></div>`;
+            });
+            html += '</div>';
+
+            // Menu
+            html += `<div class="step-title">En menu ?</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('menuOpt', false, this)">SEUL</div>
+                <div class="option-btn" onclick="selectOption('menuOpt', true, this)" data-price="2">MENU <span class="option-price">+2€</span></div>
+            </div>`;
+            html += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                <div class="builder-subtitle">Choix de la boisson</div>
+                <div class="options-grid">
+                    ${getBoissonsHtml()}
+                </div>
+            </div>`;
+
+            content.innerHTML = html;
+            state.builderSelections.formula = { id: 'classique', price: 7.9, meatCount: 1 };
+            state.builderSelections.bread = PAINS[0];
+            state.builderSelections.meat = VIANDES[0];
+            state.builderSelections.sauces = [];
+            state.builderSelections.retraits = [];
+            state.builderSelections.viandesSupp = [];
+            state.builderSelections.supplements = [];
+            state.builderSelections.menuOpt = false;
+        }
+
+        function buildBowlBuilder(content, product) {
+            let html = '';
+
+            // Gestion des produits avec sizes (promo) ou sans
+            if (product.sizes) {
+                html += `<div class="step-title">Taille ${product.isPromo ? '<span style="background:#ff3333;color:white;padding:2px 8px;border-radius:10px;font-size:0.6em;margin-left:10px;">PROMO</span>' : ''}</div><div class="options-grid big">`;
+                product.sizes.forEach((size, i) => {
+                    const promoDisplay = size.originalPrice
+                        ? `<div style="font-size:0.7em;text-decoration:line-through;color:#ff3333;">${size.originalPrice.toFixed(2)}€</div>`
+                        : '';
+                    html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('size', '${size.id}', this)" data-price="${size.price}">
+                        ${size.name} ${promoDisplay}<span class="option-price" style="color:#00cc66;font-size:1.2em;">${size.price.toFixed(2)}€</span>
+                    </div>`;
+                });
+                html += '</div>';
+                state.builderSelections.size = product.sizes[0];
+                state.builderSelections.basePrice = 0;
+            } else {
+                html += `<div class="step-title">Taille</div><div class="options-grid big">
+                    <div class="option-btn selected" onclick="selectOption('size', 'normal', this)">NORMAL</div>
+                    <div class="option-btn" onclick="selectOption('size', 'xl', this)" data-price="5">XL <span class="option-price">+5€</span></div>
+                </div>`;
+                state.builderSelections.size = { id: 'normal', price: 0 };
+                state.builderSelections.basePrice = product.price;
+            }
+
+            // Seulement Dynamite Bowl a le choix de viande (Crousty = Tenders fixe)
+            if (product.id === 'bowl_dynamite') {
+                html += `<div class="step-title">Viande</div><div class="options-grid">`;
+                VIANDES.forEach((v, i) => {
+                    html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
+                });
+                html += '</div>';
+                state.builderSelections.meat = VIANDES[0];
+            }
+
+            content.innerHTML = html;
+        }
+
+        function buildPoutineBuilder(content, product) {
+            let html = '';
+
+            html += `<div class="step-title">Taille</div><div class="options-grid big">`;
+            product.sizes.forEach((size, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('size', '${size.id}', this)" data-price="${size.price}">
+                    ${size.name} <span class="option-price">${size.price.toFixed(2)}€</span>
+                </div>`;
+            });
+            html += '</div>';
+
+            html += `<div class="step-title">Base</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('base', 'frites', this)">FRITES</div>
+                <div class="option-btn" onclick="selectOption('base', 'riz', this)">RIZ</div>
+            </div>`;
+
+            content.innerHTML = html;
+            state.builderSelections.size = product.sizes[0];
+            state.builderSelections.base = 'frites';
+        }
+
+        function buildFritesBuilder(content, product) {
+            let html = '';
+
+            html += `<div class="step-title">Taille</div><div class="options-grid big">`;
+            product.sizes.forEach((size, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('size', '${size.id}', this)" data-price="${size.price}">
+                    ${size.name} <span class="option-price">${size.price.toFixed(2)}€</span>
+                </div>`;
+            });
+            html += '</div>';
+
+            content.innerHTML = html;
+            state.builderSelections.size = product.sizes[0];
+        }
+
+        function buildAssietteBuilder(content, product) {
+            let html = '';
+
+            // Type d'assiette
+            html += `<div class="step-title">Type d'assiette</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectAssietteType('1viande', this)" data-price="11">1 VIANDE <span class="option-price">11€</span></div>
+                <div class="option-btn" onclick="selectAssietteType('3viandes', this)" data-price="14.5">3 VIANDES <span class="option-price">14.50€</span></div>
+            </div>`;
+
+            // Viande(s) - dynamique selon le type
+            html += `<div class="step-title" id="assiette-viande-title">Viande</div><div class="options-grid" id="assiette-viandes-grid">`;
+            VIANDES.forEach((v, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="toggleAssietteViande('${v.id}', this)">${v.name}</div>`;
+            });
+            html += '</div>';
+
+            // Sauce
+            html += `<div class="step-title">Sauce</div><div class="options-grid">`;
+            SAUCES.forEach((s, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('sauce', '${s.id}', this)">${s.name}</div>`;
+            });
+            html += '</div>';
+
+            // Options
+            html += `<div class="step-title">Options</div><div class="options-grid big">
+                <div class="option-btn" onclick="toggleOption('naanFromage', this)" data-price="1">Naan Fromage <span class="option-price">+1€</span></div>
+                <div class="option-btn" onclick="toggleOption('boisson', this)" data-price="1">Boisson <span class="option-price">+1€</span></div>
+            </div>`;
+
+            content.innerHTML = html;
+            state.builderSelections.type = { id: '1viande', price: 11 };
+            state.builderSelections.meats = [VIANDES[0]]; // Utiliser un tableau pour supporter 1 ou 3 viandes
+            state.builderSelections.sauce = SAUCES[0];
+            state.builderSelections.naanFromage = false;
+            state.builderSelections.boisson = false;
+        }
+
+        function selectAssietteType(typeId, element) {
+            element.parentElement.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+
+            state.builderSelections.type = typeId === '1viande'
+                ? { id: '1viande', price: 11 }
+                : { id: '3viandes', price: 14.5 };
+
+            // Mettre à jour le titre
+            const title = document.getElementById('assiette-viande-title');
+            if (title) {
+                title.textContent = typeId === '3viandes' ? 'Viandes (choisissez 3)' : 'Viande';
+            }
+
+            // Réinitialiser les sélections de viandes
+            const grid = document.getElementById('assiette-viandes-grid');
+            if (grid) {
+                grid.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+                // Sélectionner la première par défaut
+                const firstBtn = grid.querySelector('.option-btn');
+                if (firstBtn) firstBtn.classList.add('selected');
+            }
+            state.builderSelections.meats = [VIANDES[0]];
+
+            updateBuilderPrice();
+        }
+
+        function buildBoxBuilder(content, product) {
+            content.innerHTML = `<div class="step-title">Type de viande</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('meat', 'steak', this)">STEAK</div>
+                <div class="option-btn" onclick="selectOption('meat', 'poulet', this)">POULET</div>
+            </div>`;
+            content.innerHTML += `<div class="step-title">Boisson (+1€) ?</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('boisson1e', false, this)">SANS BOISSON</div>
+                <div class="option-btn" onclick="selectOption('boisson1e', true, this)" data-price="1">AVEC BOISSON <span class="option-price">+1€</span></div>
+            </div>`;
+            content.innerHTML += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                <div class="builder-subtitle">Choix de la boisson</div>
+                <div class="options-grid">
+                    ${getBoissonsHtml()}
+                </div>
+            </div>`;
+            state.builderSelections.meat = 'steak';
+            state.builderSelections.boisson1e = false;
+            state.builderSelections.basePrice = product.price;
+        }
+
+        function buildBurgerBuilder(content, product) {
+            content.innerHTML = `<div class="step-title">En menu ?</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('menu', false, this)">SEUL <span class="option-price">${product.price.toFixed(2)}€</span></div>
+                <div class="option-btn" onclick="selectOption('menu', true, this)" data-price="2">MENU <span class="option-price">+2€</span></div>
+            </div>`;
+            content.innerHTML += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                <div class="builder-subtitle">Choix de la boisson</div>
+                <div class="options-grid">
+                    ${getBoissonsHtml()}
+                </div>
+            </div>`;
+            state.builderSelections.menu = false;
+            state.builderSelections.basePrice = product.price;
+        }
+
+        function buildBucketBuilder(content, product) {
+            let html = '';
+
+            // Nombre de sauces selon le bucket (bucket 1-2 = 1 sauce, bucket 3 = 2, bucket 4 = 3)
+            let maxSauces = 1;
+            if (product.id === 'bucket_3') maxSauces = 2;
+            else if (product.id === 'bucket_4') maxSauces = 3;
+
+            // Choix des sauces
+            html += `<div class="step-title">Choisissez vos sauces (${maxSauces} max)</div><div class="options-grid">`;
+            SAUCES.forEach(s => {
+                html += `<div class="option-btn" onclick="toggleBucketSauce('${s.id}', this, ${maxSauces})">${s.name}</div>`;
+            });
+            html += '</div>';
+
+            // Option boisson supplémentaire uniquement pour bucket 4 (qui n'inclut pas de boisson)
+            if (product.id === 'bucket_4') {
+                html += `<div class="step-title">Ajouter une Boisson ?</div><div class="options-grid big">
+                    <div class="option-btn selected" onclick="selectOption('boisson', false, this)">SANS BOISSON</div>
+                    <div class="option-btn" onclick="selectOption('boisson', '33cl', this)" data-price="2">BOISSON 33cl <span class="option-price">+2€</span></div>
+                    <div class="option-btn" onclick="selectOption('boisson', '1.5L', this)" data-price="4">BOISSON 1.5L <span class="option-price">+4€</span></div>
+                </div>`;
+            }
+
+            // Frites supplémentaires
+            html += `<div class="step-title">Frites supplémentaires ?</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('fritesSupp', 'non', this)">NON MERCI</div>
+                <div class="option-btn" onclick="selectOption('fritesSupp', 'M', this)" data-price="2.5">FRITES M <span class="option-price">+2.50€</span></div>
+                <div class="option-btn" onclick="selectOption('fritesSupp', 'XL', this)" data-price="3.5">FRITES XL <span class="option-price">+3.50€</span></div>
+            </div>`;
+
+            content.innerHTML = html;
+            state.builderSelections.bucketSauces = [];
+            state.builderSelections.fritesSupp = 'non';
+            state.builderSelections.boisson = false;
+            state.builderSelections.basePrice = product.price;
+            state.builderSelections.maxSauces = maxSauces;
+        }
+
+        function buildBoissonBuilder(content, product) {
+            content.innerHTML = `<div class="step-title">Choisissez votre boisson</div><div class="options-grid">
+                ${getBoissonsHtml()}
+            </div>`;
+            state.builderSelections.basePrice = product.price;
+            state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+        }
+
+        function buildEnfantBuilder(content, product) {
+            content.innerHTML = `<div class="step-title">Choix de la boisson enfant</div><div class="options-grid">
+                ${getBoissonsHtml()}
+            </div>`;
+            state.builderSelections.basePrice = product.price;
+            state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+        }
+
+        function selectOption(type, value, element) {
+            element.parentElement.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const product = state.currentProduct;
+
+            if (type === 'size') {
+                if (product.sizes) {
+                    state.builderSelections.size = product.sizes.find(s => s.id === value) || { id: value, price: parseFloat(element.dataset.price) || 0 };
+                } else {
+                    state.builderSelections.size = { id: value, price: parseFloat(element.dataset.price) || 0 };
+                }
+
+                // Mettre à jour les prix des gratins affichés en direct dynamiquement
+                if (state.currentProduct && state.currentProduct.type === 'tacos') {
+                    const dynamicGratinPrice = (value === 'L' || value === 'XL') ? 2.50 : 2.00;
+                    document.querySelectorAll('.gratin-price-display').forEach(span => {
+                        span.textContent = `+${dynamicGratinPrice.toFixed(2)}€`;
+                    });
+                }
+
+            } else if (type === 'formula') {
+                // Pour sandwichs: Classique ou Mega (pas de boisson incluse)
+                if (value === 'classique') state.builderSelections.formula = { id: 'classique', price: 7.9, meatCount: 1 };
+                else if (value === 'mega') state.builderSelections.formula = { id: 'mega', price: 11, meatCount: 2 };
+                else state.builderSelections.formula = { id: value, price: parseFloat(element.dataset.price) || 0 };
+                // NE PAS afficher la boisson ici - c'est géré par menuOpt
+            } else if (type === 'type') {
+                state.builderSelections.type = value === '1viande' ? { id: '1viande', price: 11 } : { id: '3viandes', price: 14.5 };
+            } else if (type === 'gratin') {
+                state.builderSelections.gratin = value === 'none' ? null : GRATINS.find(g => g.id === value);
+            } else if (type === 'sauce') {
+                state.builderSelections.sauce = SAUCES.find(s => s.id === value);
+            } else if (type === 'bread') {
+                state.builderSelections.bread = PAINS.find(p => p.id === value);
+            } else if (type === 'meat') {
+                state.builderSelections.meat = VIANDES.find(v => v.id === value) || value;
+            } else if (type === 'menu' || type === 'menuOpt' || type === 'boisson1e') {
+                state.builderSelections[type] = value;
+                const drinkSection = document.getElementById('menu-drink-section');
+                if (drinkSection) drinkSection.style.display = value ? 'block' : 'none';
+                if (value && !state.builderSelections.menuBoisson) {
+                    state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+                }
+            } else if (type === 'menuBoisson') {
+                state.builderSelections.menuBoisson = value;
+            } else if (type === 'base') {
+                state.builderSelections.base = value;
+            }
+
+            updateBuilderPrice();
+        }
+
+        function toggleMeat(meatId, element) {
+            const maxMeats = state.builderSelections.size?.meatCount || 1;
+
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                state.builderSelections.meats = state.builderSelections.meats.filter(m => m.id !== meatId);
+            } else if (state.builderSelections.meats.length < maxMeats) {
+                element.classList.add('selected');
+                state.builderSelections.meats.push(VIANDES.find(v => v.id === meatId));
+            }
+            updateBuilderPrice();
+        }
+
+        function toggleSauce(sauceId, element) {
+            const maxSauces = 3;
+
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                state.builderSelections.sauces = state.builderSelections.sauces.filter(s => s.id !== sauceId);
+            } else if (state.builderSelections.sauces.length < maxSauces) {
+                element.classList.add('selected');
+                state.builderSelections.sauces.push(SAUCES.find(s => s.id === sauceId));
+            }
+            updateBuilderPrice();
+        }
+
+        function toggleSupplement(suppId, element) {
+            const supp = SUPPLEMENTS.find(s => s.id === suppId);
+            if (!supp) return;
+
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                state.builderSelections.supplements = state.builderSelections.supplements.filter(s => s.id !== suppId);
+            } else {
+                element.classList.add('selected');
+                if (!state.builderSelections.supplements) state.builderSelections.supplements = [];
+                state.builderSelections.supplements.push(supp);
+            }
+            updateBuilderPrice();
+        }
+
+        function toggleOption(optionId, element) {
+            element.classList.toggle('selected');
+            state.builderSelections[optionId] = !state.builderSelections[optionId];
+            updateBuilderPrice();
+        }
+
+        // Retirer des éléments de la recette
+        function toggleRetrait(retraitId, element) {
+            if (!state.builderSelections.retraits) state.builderSelections.retraits = [];
+
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                state.builderSelections.retraits = state.builderSelections.retraits.filter(r => r.id !== retraitId);
+            } else {
+                element.classList.add('selected');
+                // Chercher dans les deux arrays (sandwich ou tacos)
+                const retrait = RETRAITS_SANDWICH.find(r => r.id === retraitId) || RETRAITS_TACOS.find(r => r.id === retraitId);
+                if (retrait) state.builderSelections.retraits.push(retrait);
+            }
+            updateBuilderPrice();
+        }
+
+        // Viande supplémentaire (+1.50€ par viande)
+        function toggleViandeSupp(viandeId, element) {
+            if (!state.builderSelections.viandesSupp) state.builderSelections.viandesSupp = [];
+
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                state.builderSelections.viandesSupp = state.builderSelections.viandesSupp.filter(v => v.id !== viandeId);
+            } else {
+                element.classList.add('selected');
+                const viande = VIANDES.find(v => v.id === viandeId);
+                if (viande) state.builderSelections.viandesSupp.push({ ...viande, price: 1.50 });
+            }
+            updateBuilderPrice();
+        }
+
+        // Sauces pour Buckets (avec limite)
+        function toggleBucketSauce(sauceId, element, maxSauces) {
+            if (!state.builderSelections.bucketSauces) state.builderSelections.bucketSauces = [];
+
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                state.builderSelections.bucketSauces = state.builderSelections.bucketSauces.filter(s => s.id !== sauceId);
+            } else if (state.builderSelections.bucketSauces.length < maxSauces) {
+                element.classList.add('selected');
+                state.builderSelections.bucketSauces.push(SAUCES.find(s => s.id === sauceId));
+            }
+            updateBuilderPrice();
+        }
+
+        // Viandes multiples pour assiettes 3 viandes
+        function toggleAssietteViande(viandeId, element) {
+            if (!state.builderSelections.meats) state.builderSelections.meats = [];
+            const maxViandes = state.builderSelections.type?.id === '3viandes' ? 3 : 1;
+
+            if (element.classList.contains('selected')) {
+                // Désélectionner
+                element.classList.remove('selected');
+                state.builderSelections.meats = state.builderSelections.meats.filter(m => m.id !== viandeId);
+            } else {
+                // Si max = 1, remplacer la sélection précédente
+                if (maxViandes === 1) {
+                    // Désélectionner l'ancienne viande visuellement
+                    const grid = document.getElementById('assiette-viandes-grid');
+                    if (grid) {
+                        grid.querySelectorAll('.option-btn.selected').forEach(btn => btn.classList.remove('selected'));
+                    }
+                    state.builderSelections.meats = [];
+                }
+                // Ajouter si pas au max
+                if (state.builderSelections.meats.length < maxViandes) {
+                    element.classList.add('selected');
+                    state.builderSelections.meats.push(VIANDES.find(v => v.id === viandeId));
+                }
+            }
+            updateBuilderPrice();
+        }
+
+        function updateBuilderPrice() {
+            let price = 0;
+            const sel = state.builderSelections;
+            const product = state.currentProduct;
+
+            if (product.type === 'tacos') {
+                price = sel.size?.price || 0;
+
+                // Gratin price depends on size
+                if (sel.gratin && sel.gratin.id !== 'none') {
+                    if (sel.size?.id === 'L' || sel.size?.id === 'XL') {
+                        price += 2.50;
+                    } else {
+                        price += 2.00; // S or M
+                    }
+                }
+
+                if (sel.menu) price += 2;
+            } else if (product.type === 'naan') {
+                price = (sel.basePrice || product.price) + (sel.formula?.price || 0);
+            } else if (product.type === 'sandwich') {
+                price = sel.formula?.price || 7.9;
+                if (sel.menuOpt) price += 2;
+            } else if (product.type === 'bowl') {
+                // Produits avec sizes (comme Crousty Bowl promo)
+                if (product.sizes && sel.size?.price !== undefined) {
+                    price = sel.size.price;
+                } else {
+                    price = sel.basePrice || product.price;
+                    if (sel.size?.id === 'xl') price += 5;
+                }
+            } else if (product.type === 'poutine') {
+                price = sel.size?.price || product.sizes[0].price;
+            } else if (product.type === 'frites') {
+                price = sel.size?.price || product.sizes[0].price;
+            } else if (product.type === 'assiette') {
+                price = sel.type?.price || 11;
+                if (sel.naanFromage) price += 1;
+                if (sel.boisson) price += 1;
+            } else if (product.type === 'box') {
+                price = sel.basePrice || product.price;
+                if (sel.boisson1e) price += 1;
+            } else if (product.type === 'boisson_seule' || product.type === 'enfant') {
+                price = sel.basePrice || product.price;
+            } else if (product.type === 'bucket') {
+                price = sel.basePrice || product.price;
+                // Frites supplémentaires
+                if (sel.fritesSupp === 'M') price += 2.5;
+                else if (sel.fritesSupp === 'XL') price += 3.5;
+                // Boisson (uniquement pour bucket 4)
+                if (sel.boisson === '33cl') price += 2;
+                else if (sel.boisson === '1.5L') price += 4;
+            } else if (product.menuUpgrade) {
+                price = sel.basePrice || product.price;
+                if (sel.menu) price += 2;
+            }
+
+            // Add Supplements
+            if (sel.supplements && sel.supplements.length > 0) {
+                sel.supplements.forEach(supp => {
+                    price += supp.price;
+                });
+            }
+
+            // Add Viandes supplémentaires (+1.50€ chacune)
+            if (sel.viandesSupp && sel.viandesSupp.length > 0) {
+                sel.viandesSupp.forEach(v => {
+                    price += 1.50;
+                });
+            }
+
+            document.getElementById('builder-price').textContent = price.toFixed(2) + '€';
+            state.builderSelections.totalPrice = price;
+        }
+
+        function closeBuilder() {
+            document.getElementById('builder-modal').classList.remove('active');
+            state.editingCartItemId = null; // Reset le mode édition
+        }
+
+        function addToCartFromBuilder() {
+            const product = state.currentProduct;
+            const sel = state.builderSelections;
+            let details = [];
+            let cartName = product.name;
+
+            if (product.type === 'tacos') {
+                // Nom : "Tacos Spicy XL" ou "Tacos M"
+                if (product.isSpecial) {
+                    cartName = `${product.name} ${sel.size?.name || 'M'}`;
+                    // Ingrédients par défaut du produit
+                    if (product.defaultIngredients) {
+                        details.push(product.defaultIngredients);
+                    }
+                    // Retraits
+                    if (sel.retraits?.length) {
+                        details.push(sel.retraits.map(r => r.name).join(', '));
+                    }
+                    // Viandes supplémentaires
+                    if (sel.viandesSupp?.length) {
+                        details.push('+' + sel.viandesSupp.map(v => v.name).join(', +'));
+                    }
+                } else {
+                    cartName = `Tacos ${sel.size?.name || 'M'}`;
+                    // Ordre: Viandes + Sauces ensemble, puis Gratins à la fin
+                    let viandesSauces = [];
+                    if (sel.meats?.length) viandesSauces.push(sel.meats.map(m => m.name).join(', '));
+                    if (sel.sauces?.length) viandesSauces.push(sel.sauces.map(s => s.name).join(', '));
+                    if (viandesSauces.length) details.push(viandesSauces.join(' • '));
+                    if (sel.gratin && sel.gratin.id !== 'none') details.push('Gratin ' + sel.gratin.name);
+                    if (sel.supplements?.length) details.push('+ ' + sel.supplements.map(s => s.name).join(', '));
+                }
+                if (sel.menu) details.push('MENU (Frites + ' + (sel.menuBoisson || 'Boisson') + ')');
+            } else if (product.type === 'naan') {
+                // Naan spécial ou custom
+                if (product.isSpecial) {
+                    if (product.defaultIngredients) {
+                        details.push(product.defaultIngredients);
+                    }
+                    // Retraits
+                    if (sel.retraits?.length) {
+                        details.push(sel.retraits.map(r => r.name).join(', '));
+                    }
+                    // Viandes supplémentaires
+                    if (sel.viandesSupp?.length) {
+                        details.push('+' + sel.viandesSupp.map(v => v.name).join(', +'));
+                    }
+                    // Suppléments
+                    if (sel.supplements?.length) {
+                        details.push('+ ' + sel.supplements.map(s => s.name).join(', '));
+                    }
+                }
+                if (sel.formula?.id === 'menu') details.push('MENU (Frites + ' + (sel.menuBoisson || 'Boisson') + ')');
+                else if (sel.formula?.id === 'mega') details.push('MÉGA XL (' + (sel.menuBoisson || 'Boisson') + ')');
+            } else if (product.type === 'sandwich') {
+                // Nom correct avec le pain choisi
+                if (sel.bread) {
+                    cartName = sel.bread.name;
+                }
+                if (sel.formula?.id === 'mega') details.push('Méga XL');
+                // Ordre: Viande + Sauces ensemble
+                let viandesSauces = [];
+                if (sel.meat?.name) viandesSauces.push(sel.meat.name);
+                if (sel.sauces?.length) viandesSauces.push(sel.sauces.map(s => s.name).join(', '));
+                if (viandesSauces.length) details.push(viandesSauces.join(' • '));
+                // Viandes supplémentaires
+                if (sel.viandesSupp?.length) {
+                    details.push('+' + sel.viandesSupp.map(v => v.name).join(', +'));
+                }
+                if (sel.supplements?.length) details.push('+ ' + sel.supplements.map(s => s.name).join(', '));
+                if (sel.menuOpt) details.push('MENU (Frites + ' + (sel.menuBoisson || 'Boisson') + ')');
+            } else if (product.type === 'bowl') {
+                if (sel.size?.id === 'xl') details.push('XL');
+                if (sel.meat?.name) details.push(sel.meat.name);
+            } else if (product.type === 'poutine') {
+                details.push(sel.size?.name || 'M');
+                details.push(sel.base === 'riz' ? 'Riz' : 'Frites');
+            } else if (product.type === 'assiette') {
+                details.push(sel.type?.id === '3viandes' ? '3 Viandes' : '1 Viande');
+                // Viande(s) - tableau maintenant
+                if (sel.meats?.length) {
+                    details.push(sel.meats.map(m => m.name).join(', '));
+                }
+                // Sauce
+                if (sel.sauce?.name) details.push('Sauce ' + sel.sauce.name);
+                if (sel.naanFromage) details.push('Naan Fromage');
+                if (sel.boisson) details.push('Boisson');
+            } else if (product.type === 'box') {
+                details.push(sel.meat === 'poulet' ? 'Poulet' : 'Steak');
+                if (sel.boisson1e) details.push('+ Boisson ' + (sel.menuBoisson || BOISSONS_33[0].name));
+            } else if (product.type === 'bucket') {
+                // Sauces choisies
+                if (sel.bucketSauces?.length) {
+                    details.push('Sauces: ' + sel.bucketSauces.map(s => s.name).join(', '));
+                }
+                // Frites supplémentaires
+                if (sel.fritesSupp && sel.fritesSupp !== 'non') {
+                    details.push('+Frites ' + sel.fritesSupp);
+                }
+                // Boisson (bucket 4 uniquement)
+                if (sel.boisson) {
+                    details.push('Boisson ' + sel.boisson);
+                }
+            } else if (product.type === 'boisson_seule' || product.type === 'enfant') {
+                if (sel.menuBoisson) details.push(sel.menuBoisson);
+            } else if (product.menuUpgrade && sel.menu) {
+                details.push('MENU (Frites + ' + (sel.menuBoisson || BOISSONS_33[0].name) + ')');
+            }
+
+            // Sauvegarder les sélections pour pouvoir modifier plus tard
+            state.cart.push({
+                id: Date.now(),
+                product: product,
+                name: cartName,
+                price: sel.totalPrice || product.price,
+                quantity: 1,
+                details: details.join(' • '),
+                selections: JSON.parse(JSON.stringify(sel)),
+                image: product.image
+            });
+
+            updateCartCount();
+            closeBuilder();
+            showToast(`${cartName} ajouté !`);
+        }
+
+        // ============ PANIER ============
+        function updateCartCount() {
+            const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = count;
+        }
+
+        function showCart() {
+            document.getElementById('products-view').style.display = 'none';
+            document.getElementById('cart-view').classList.add('active');
+            renderCart();
+        }
+
+        function hideCart() {
+            document.getElementById('cart-view').classList.remove('active');
+            document.getElementById('products-view').style.display = 'block';
+        }
+
+        function renderCart() {
+            const content = document.getElementById('cart-items');
+
+            if (state.cart.length === 0) {
+                content.innerHTML = `<div class="empty-cart"><h3>Votre panier est vide</h3></div>`;
+                document.getElementById('btn-validate').disabled = true;
+            } else {
+                let html = '';
+                state.cart.forEach(item => {
+                    const hasBuilder = item.product && item.product.hasBuilder;
+                    html += `<div class="cart-item">
+                        <img src="${item.image}" alt="${item.name}" onerror="this.src='../assets/common/logo.png'">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p class="details">${item.details}</p>
+                            ${hasBuilder ? `<button class="edit-btn" onclick="editCartItem(${item.id})">✎ Modifier</button>` : ''}
+                        </div>
+                        <div class="cart-item-qty">
+                            <button class="qty-btn" onclick="updateQty(${item.id}, -1)">−</button>
+                            <span style="font-size: clamp(16px, 2vw, 24px); font-weight: 700; min-width: 30px; text-align: center;">${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+                        </div>
+                        <div class="cart-item-price">${(item.price * item.quantity).toFixed(2)}€</div>
+                        <button class="delete-btn" onclick="removeFromCart(${item.id})">X</button>
+                    </div>`;
+                });
+                content.innerHTML = html;
+                document.getElementById('btn-validate').disabled = false;
+            }
+
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('cart-total').textContent = total.toFixed(2) + '€';
+        }
+
+        function updateQty(itemId, delta) {
+            const item = state.cart.find(i => i.id === itemId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) removeFromCart(itemId);
+                else { renderCart(); updateCartCount(); }
+            }
+        }
+
+        function removeFromCart(itemId) {
+            state.cart = state.cart.filter(i => i.id !== itemId);
+            renderCart();
+            updateCartCount();
+        }
+
+        function editCartItem(itemId) {
+            const item = state.cart.find(i => i.id === itemId);
+            if (!item || !item.product) return;
+
+            // Stocker l'ID de l'item en cours d'édition
+            state.editingCartItemId = itemId;
+
+            // Fermer le panier et ouvrir le builder
+            hideCart();
+            state.currentProduct = item.product;
+            state.builderSelections = item.selections ? JSON.parse(JSON.stringify(item.selections)) : {};
+
+            document.getElementById('builder-title').textContent = 'Modifier: ' + item.product.name;
+
+            const content = document.getElementById('builder-content');
+            content.innerHTML = '';
+
+            if (item.product.type === 'tacos') buildTacosBuilder(content, item.product);
+            else if (item.product.type === 'naan') buildNaanBuilder(content, item.product);
+            else if (item.product.type === 'sandwich') buildSandwichBuilder(content, item.product);
+            else if (item.product.type === 'bowl') buildBowlBuilder(content, item.product);
+            else if (item.product.type === 'poutine') buildPoutineBuilder(content, item.product);
+            else if (item.product.type === 'assiette') buildAssietteBuilder(content, item.product);
+            else if (item.product.type === 'box') buildBoxBuilder(content, item.product);
+            else if (item.product.type === 'bucket') buildBucketBuilder(content, item.product);
+            else if (item.product.menuUpgrade) buildBurgerBuilder(content, item.product);
+
+            processBuilderSteps();
+            updateBuilderPrice();
+            document.getElementById('builder-modal').classList.add('active');
+        }
+
+        function updateCartItemFromBuilder() {
+            const itemId = state.editingCartItemId;
+            const item = state.cart.find(i => i.id === itemId);
+            if (!item) return;
+
+            // Supprimer l'ancien et ajouter le nouveau
+            removeFromCart(itemId);
+            state.editingCartItemId = null;
+            addToCartFromBuilder();
+        }
+
+        // ============ VALIDATION & RESET ============
+        function validateOrder() {
+            document.getElementById('confirm-name').textContent = state.prenom.toUpperCase() + " !";
+            document.getElementById('screen-confirm').classList.add('active');
+
+            // Sauvegarder la commande dans l'historique AVANT d'imprimer
+            saveOrderToHistory();
+
+            setTimeout(async () => {
+                const tickets = generateTicketHTML();
+
+                // Imprimer sur 2 imprimantes: Epson (client) + Star (cuisine)
+                await printDualTickets(tickets.client, tickets.kitchen);
+
+                document.getElementById('screen-confirm').classList.remove('active');
+                document.getElementById('thank-name').textContent = state.prenom.toUpperCase();
+                document.getElementById('screen-thanks').classList.add('active');
+            }, 500);
+        }
+
+        // ============ HISTORIQUE DES COMMANDES ============
+        function saveOrderToHistory() {
+            const now = new Date();
+            const order = {
+                id: Date.now(),
+                prenom: state.prenom,
+                mode: state.mode,
+                date: now.toLocaleDateString('fr-FR'),
+                time: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+                cart: JSON.parse(JSON.stringify(state.cart)),
+                total: state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+            };
+
+            // Récupérer l'historique existant
+            let history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+
+            // Ajouter la nouvelle commande au début
+            history.unshift(order);
+
+            // Garder seulement les 20 dernières commandes
+            history = history.slice(0, 20);
+
+            // Sauvegarder
+            localStorage.setItem('delices_inde_orders', JSON.stringify(history));
+        }
+
+        function showOrderHistory() {
+            closeAdminModal();
+
+            const history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+            const content = document.getElementById('history-content');
+
+            if (history.length === 0) {
+                content.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 40px; font-size: 20px;">Aucune commande enregistrée</div>';
+            } else {
+                let html = '';
+                history.slice(0, 10).forEach((order, index) => {
+                    const modeLabel = order.mode === 'sur_place' ? 'SUR PLACE' : 'EMPORTER';
+                    html += `
+                        <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 12px; ${index === 0 ? 'border-color: var(--yellow);' : ''}">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div>
+                                    <span style="font-family: 'Anton', sans-serif; font-size: 20px; color: var(--yellow);">${order.prenom.toUpperCase()}</span>
+                                    <span style="color: var(--text-dim); font-size: 14px; margin-left: 10px;">${modeLabel}</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 14px; color: var(--text-dim);">${order.date} ${order.time}</div>
+                                    <div style="font-family: 'Anton', sans-serif; font-size: 22px; color: #00cc66;">${order.total.toFixed(2)}€</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 14px; color: var(--text);">
+                                ${order.cart.map(item => `${item.quantity}x ${item.name}`).join(' • ')}
+                            </div>
+                            <button onclick="reprintOrder(${order.id})" style="margin-top: 10px; background: rgba(255,192,0,0.15); border: 1px solid var(--yellow); border-radius: 8px; padding: 8px 15px; font-family: 'Anton', sans-serif; font-size: 14px; color: var(--yellow); cursor: pointer;">
+                                REIMPRIMER
+                            </button>
+                        </div>
+                    `;
+                });
+                content.innerHTML = html;
+            }
+
+            document.getElementById('history-modal').classList.add('active');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('history-modal').classList.remove('active');
+        }
+
+        function reprintLastOrder() {
+            const history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+            if (history.length === 0) {
+                showToast('Aucune commande à réimprimer');
+                return;
+            }
+            reprintOrder(history[0].id);
+        }
+
+        function reprintOrder(orderId) {
+            const history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+            const order = history.find(o => o.id === orderId);
+
+            if (!order) {
+                showToast('Commande introuvable');
+                return;
+            }
+
+            // Recréer temporairement l'état pour générer les tickets
+            const savedState = { prenom: state.prenom, mode: state.mode, cart: state.cart };
+            state.prenom = order.prenom;
+            state.mode = order.mode;
+            state.cart = order.cart;
+
+            const tickets = generateTicketHTML();
+
+            // Restaurer l'état original
+            state.prenom = savedState.prenom;
+            state.mode = savedState.mode;
+            state.cart = savedState.cart;
+
+            // Imprimer les 2 tickets sur les 2 imprimantes
+            showToast('Réimpression en cours...');
+            closeHistoryModal();
+            printDualTickets(tickets.client, tickets.kitchen);
+        }
+
+        function printTicket(htmlContent) {
+            const printWindow = window.open('', 'PRINT_TICKET', 'width=350,height=900');
+
+            if (!printWindow) {
+                showToast('Erreur: popup bloqué');
+                return;
+            }
+
+            // CSS optimisé pour Star mCPrint3 - Ticket client lisible, ticket cuisine compact
+            const ticketStyles = `
+                @page {
+                    size: 80mm auto;
+                    margin: 0;
+                }
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                }
+                html, body {
+                    width: 80mm;
+                    font-family: 'Arial', 'Helvetica', sans-serif;
+                    font-size: 12pt;
+                    line-height: 1.3;
+                    color: #000;
+                    background: #fff;
+                }
+                .ticket {
+                    width: 76mm;
+                    padding: 2mm;
+                    page-break-after: always;
+                }
+                .ticket:last-child {
+                    page-break-after: auto;
+                }
+
+                /* Header - Ticket Client */
+                .header {
+                    text-align: center;
+                    padding: 3mm 0;
+                    border-bottom: 2px solid #000;
+                }
+                .logo {
+                    font-size: 24pt;
+                    font-weight: 900;
+                    letter-spacing: 2px;
+                }
+                .address {
+                    font-size: 9pt;
+                    margin-top: 2mm;
+                    line-height: 1.4;
+                }
+
+                /* Bande noire - Ticket Client */
+                .black-band {
+                    background: #000 !important;
+                    color: #fff !important;
+                    padding: 2mm 2mm;
+                    margin: 2mm 0;
+                    text-align: center;
+                }
+                .client-name {
+                    font-size: 16pt;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                }
+                .order-type {
+                    font-size: 11pt;
+                    font-weight: 700;
+                    margin-top: 1mm;
+                    padding: 1mm 3mm;
+                    border: 1px solid #fff;
+                    display: inline-block;
+                }
+
+                /* Date/heure */
+                .datetime {
+                    text-align: center;
+                    font-size: 11pt;
+                    padding: 2mm 0;
+                    border-bottom: 1px dashed #000;
+                }
+
+                /* Articles - Ticket Client */
+                .items {
+                    padding: 3mm 0;
+                }
+                .item {
+                    margin-bottom: 3mm;
+                    padding-bottom: 2mm;
+                    border-bottom: 1px dotted #ccc;
+                }
+                .item:last-child {
+                    border-bottom: none;
+                }
+                .item-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                }
+                .item-name {
+                    font-size: 13pt;
+                    font-weight: 700;
+                    flex: 1;
+                }
+                .item-price {
+                    font-size: 13pt;
+                    font-weight: 700;
+                    text-align: right;
+                    min-width: 50px;
+                }
+                .item-details {
+                    font-size: 10pt;
+                    color: #333;
+                    padding-left: 3mm;
+                    margin-top: 1mm;
+                    font-style: italic;
+                }
+
+                /* Totaux - Ticket Client */
+                .totals {
+                    border-top: 2px solid #000;
+                    padding-top: 3mm;
+                    margin-top: 2mm;
+                }
+                .total-row {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 11pt;
+                    padding: 1mm 0;
+                }
+                .total-final {
+                    font-size: 16pt;
+                    font-weight: 900;
+                    border-top: 1px solid #000;
+                    margin-top: 2mm;
+                    padding-top: 2mm;
+                }
+
+                /* Footer - Ticket Client */
+                .footer {
+                    text-align: center;
+                    padding: 3mm 0;
+                    border-top: 2px solid #000;
+                    margin-top: 3mm;
+                }
+                .merci {
+                    font-size: 14pt;
+                    font-weight: 700;
+                }
+                .legal {
+                    font-size: 8pt;
+                    color: #666;
+                    margin-top: 2mm;
+                }
+
+                /* ========== TICKET CUISINE ========== */
+                .kitchen .black-band {
+                    padding: 3mm 2mm;
+                }
+                .kitchen .client-name {
+                    font-size: 18pt;
+                }
+                .kitchen .order-type {
+                    font-size: 11pt;
+                    padding: 1mm 2mm;
+                    border: 1px solid #fff;
+                    margin-top: 1mm;
+                }
+                .kitchen-item {
+                    border: 1px solid #000;
+                    padding: 2mm;
+                    margin-bottom: 2mm;
+                }
+                .kitchen-item-header {
+                    font-size: 14pt;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    border-bottom: 1px dashed #000;
+                    padding-bottom: 1mm;
+                    margin-bottom: 1mm;
+                }
+                .kitchen-item-detail {
+                    font-size: 11pt;
+                    padding-left: 2mm;
+                    line-height: 1.4;
+                }
+                .kitchen-time {
+                    text-align: center;
+                    font-size: 11pt;
+                    font-weight: 700;
+                    padding: 2mm;
+                    border-top: 1px solid #000;
+                    margin-top: 2mm;
+                }
+
+                /* Espacement fin de ticket */
+                .cut-space {
+                    height: 10mm;
+                }
+                .kitchen .cut-space {
+                    height: 5mm;
+                }
+            `;
+
+            const ticketPage = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Ticket</title><style>' +
+                ticketStyles + '</style></head><body>' + htmlContent + '</body></html>';
+
+            printWindow.document.write(ticketPage);
+            printWindow.document.close();
+
+            printWindow.onload = function () {
+                setTimeout(function () {
+                    printWindow.print();
+                    setTimeout(function () { printWindow.close(); }, 3000);
+                }, 500);
+            };
+        }
+
+        function generateTicketHTML() {
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const tva = total * 0.10;
+            const ht = total - tva;
+            const mode = state.mode === 'sur_place' ? 'SUR PLACE' : 'À EMPORTER';
+            const now = new Date();
+            const date = now.toLocaleDateString('fr-FR');
+            const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+            // ========== TICKET CLIENT ==========
+            let client = '<div class="ticket">';
+
+            // Header
+            client += '<div class="header">';
+            client += '<div class="logo">DÉLICES DE L\'INDE</div>';
+            client += '<div class="address">31 Bd Charles de Gaulle<br>31800 Saint-Gaudens</div>';
+            client += '</div>';
+
+            // Bande noire avec nom
+            client += '<div class="black-band">';
+            client += '<div class="client-name">' + state.prenom.toUpperCase() + '</div>';
+            client += '<div class="order-type">' + mode + '</div>';
+            client += '</div>';
+
+            // Date/heure
+            client += '<div class="datetime">' + date + ' à ' + time + '</div>';
+
+            // Articles
+            client += '<div class="items">';
+            state.cart.forEach(item => {
+                client += '<div class="item">';
+                client += '<div class="item-row">';
+                client += '<span class="item-name">' + item.quantity + 'x ' + item.name + '</span>';
+                client += '<span class="item-price">' + (item.price * item.quantity).toFixed(2) + '€</span>';
+                client += '</div>';
+                if (item.details) {
+                    client += '<div class="item-details">' + item.details + '</div>';
+                }
+                client += '</div>';
+            });
+            client += '</div>';
+
+            // Totaux
+            client += '<div class="totals">';
+            client += '<div class="total-row"><span>Sous-total HT</span><span>' + ht.toFixed(2) + '€</span></div>';
+            client += '<div class="total-row"><span>TVA 10%</span><span>' + tva.toFixed(2) + '€</span></div>';
+            client += '<div class="total-row total-final"><span>TOTAL</span><span>' + total.toFixed(2) + '€</span></div>';
+            client += '</div>';
+
+            // Footer
+            client += '<div class="footer">';
+            client += '<div class="merci">Merci ' + state.prenom + ' !</div>';
+            client += '<div>Présentez ce ticket en caisse</div>';
+                        client += '</div>';
+
+            client += '<div class="cut-space"></div>';
+            client += '</div>';
+
+            // ========== TICKET CUISINE ==========
+            let kitchen = '<div class="ticket kitchen">';
+
+            // Bande noire
+            kitchen += '<div class="black-band">';
+            kitchen += '<div class="client-name">' + state.prenom.toUpperCase() + '</div>';
+            kitchen += '<div class="order-type">' + mode + '</div>';
+            kitchen += '</div>';
+
+            // Articles en gros
+            state.cart.forEach(item => {
+                kitchen += '<div class="kitchen-item">';
+                kitchen += '<div class="kitchen-item-header">' + item.quantity + 'x ' + item.name.toUpperCase() + '</div>';
+                if (item.details) {
+                    item.details.split(' • ').forEach(d => {
+                        kitchen += '<div class="kitchen-item-detail">→ ' + d + '</div>';
+                    });
+                }
+                kitchen += '</div>';
+            });
+
+            // Heure
+            kitchen += '<div class="kitchen-time">Commande reçue à ' + time + '</div>';
+
+            kitchen += '<div class="cut-space"></div>';
+            kitchen += '</div>';
+
+            return { client: client, kitchen: kitchen };
+        }
+
+        // Test des deux imprimantes
+        function testPrintBoth() {
+            showToast('Test impression en cours...');
+
+            // Ticket test CLIENT
+            let clientTest = '<div class="ticket">';
+            clientTest += '<div class="header">';
+            clientTest += '<div class="logo">DÉLICES DE L\'INDE</div>';
+            clientTest += '<div class="address">31 Bd Charles de Gaulle<br>31800 Saint-Gaudens</div>';
+            clientTest += '</div>';
+            clientTest += '<div class="black-band"><div class="client-name">TEST</div><div class="order-type">TEST</div></div>';
+            clientTest += '<div class="items"><div class="item"><div class="item-row"><span class="item-name">1x Test Produit</span><span class="item-price">9.90€</span></div></div></div>';
+            clientTest += '<div class="totals"><div class="total-row total-final"><span>TOTAL</span><span>9.90€</span></div></div>';
+            clientTest += '<div class="footer"><div class="merci">Merci !</div></div>';
+            clientTest += '<div class="cut-space"></div></div>';
+
+            // Ticket test CUISINE
+            let kitchenTest = '<div class="ticket kitchen">';
+            kitchenTest += '<div class="black-band"><div class="client-name">TEST</div><div class="order-type">TEST</div></div>';
+            kitchenTest += '<div class="kitchen-item"><div class="kitchen-item-header">1x TEST PRODUIT</div></div>';
+            kitchenTest += '<div class="kitchen-time">' + new Date().toLocaleString('fr-FR') + '</div>';
+            kitchenTest += '<div class="cut-space"></div></div>';
+
+            // Imprimer sur les 2 imprimantes
+            printDualTickets(clientTest, kitchenTest);
+            showToast('Test envoyé: Epson + Star !');
+        }
+
+        function resetKiosk() {
+            document.getElementById('screen-thanks').classList.remove('active');
+
+            state.prenom = '';
+            state.mode = '';
+            state.cart = [];
+
+            document.getElementById('prenom-input').value = '';
+            updateSuivantBtn();
+            updateCartCount();
+
+            showIntroScreen('screen-prenom');
+
+            // Relancer le timer du screensaver
+            resetScreensaverTimer();
+        }
+
+        // ============ ABANDON & TIMEOUT ============
+        function showCancelModal() {
+            document.getElementById('cancel-modal').classList.add('active');
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancel-modal').classList.remove('active');
+        }
+
+        let idleTimer;
+        const IDLE_TIMEOUT = 120000; // 2 minutes d'inactivité
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            // Ne s'active que si on n'est pas sur l'écran d'accueil
+            if (!document.getElementById('screen-prenom').classList.contains('active')) {
+                idleTimer = setTimeout(() => {
+                    closeCancelModal();
+                    resetKiosk();
+                }, IDLE_TIMEOUT);
+            }
+        }
+
+        // Relancer le timer d'inactivité à chaque interaction utilisateur
+        ['touchstart', 'click', 'input', 'scroll'].forEach(evt => {
+            document.addEventListener(evt, resetIdleTimer);
+        });
+
+        // ============ MENU ADMIN SECRET ============
+        let secretClicks = 0;
+        let secretTimer = null;
+
+        function handleSecretClick() {
+            secretClicks++;
+            clearTimeout(secretTimer);
+
+            if (secretClicks >= 5) {
+                document.getElementById('admin-modal').classList.add('active');
+                secretClicks = 0;
+            } else {
+                secretTimer = setTimeout(() => {
+                    secretClicks = 0;
+                }, 1500);
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.remove('active');
+        }
+
+        // Basculer entre mode DUAL (2 imprimantes) et SINGLE (1 imprimante)
+        function togglePrinterMode() {
+            if (PRINTER_CONFIG.mode === 'dual') {
+                PRINTER_CONFIG.mode = 'single';
+                showToast('Mode SINGLE: tout sur imprimante par défaut');
+            } else {
+                PRINTER_CONFIG.mode = 'dual';
+                showToast('Mode DUAL: Epson + Star');
+            }
+            updatePrinterModeLabel();
+        }
+
+        function updatePrinterModeLabel() {
+            const label = document.getElementById('printer-mode-label');
+            const btn = document.getElementById('btn-printer-mode');
+            if (PRINTER_CONFIG.mode === 'dual') {
+                label.textContent = 'DUAL (Star + Epson)';
+                btn.style.borderColor = '#00cc66';
+                btn.style.color = '#00cc66';
+                btn.style.background = 'rgba(0,204,102,0.15)';
+            } else {
+                label.textContent = 'SINGLE (défaut)';
+                btn.style.borderColor = '#ff9800';
+                btn.style.color = '#ff9800';
+                btn.style.background = 'rgba(255,152,0,0.15)';
+            }
+        }
+
+        // Mettre à jour le label au chargement
+        window.addEventListener('load', () => {
+            setTimeout(updatePrinterModeLabel, 100);
+        });
+
+        // Sortir du plein écran et ouvrir une URL
+        function exitFullscreenAndOpen(url) {
+            closeAdminModal();
+            // Sortir du mode plein écran
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }
+            // Attendre un peu puis ouvrir l'URL
+            setTimeout(() => {
+                window.open(url, '_blank');
+            }, 300);
+        }
+
+        function adminTestPrint() {
+            const modeMsg = PRINTER_CONFIG.mode === 'dual'
+                ? 'Test DUAL: Epson (client) + Star (cuisine)'
+                : 'Test SINGLE: tout sur imprimante par défaut';
+            showToast(modeMsg);
+            closeAdminModal();
+
+            const now = new Date();
+            const date = now.toLocaleDateString('fr-FR');
+            const time = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+            // ========== TICKET CLIENT TEST ==========
+            let client = '<div class="ticket">';
+            client += '<div class="header">';
+            client += '<div class="logo">DÉLICES DE L\'INDE</div>';
+            client += '<div class="address">TEST IMPRESSION</div>';
+            client += '</div>';
+
+            client += '<div class="black-band">';
+            client += '<div class="client-name">TEST</div>';
+            client += '<div class="order-type">SUR PLACE</div>';
+            client += '</div>';
+
+            client += '<div class="datetime">' + date + ' à ' + time + '</div>';
+
+            client += '<div class="items">';
+            client += '<div class="item">';
+            client += '<div class="item-row"><span class="item-name">1x Tacos XL</span><span class="item-price">14.90€</span></div>';
+            client += '<div class="item-details">Tikka, Steak • Gratin Cheddar • Algérienne</div>';
+            client += '</div>';
+            client += '<div class="item">';
+            client += '<div class="item-row"><span class="item-name">1x Naan Royal Menu</span><span class="item-price">11.50€</span></div>';
+            client += '</div>';
+            client += '</div>';
+
+            client += '<div class="totals">';
+            client += '<div class="total-row total-final"><span>TOTAL</span><span>26.40€</span></div>';
+            client += '</div>';
+
+            client += '<div class="footer"><div class="merci">Test réussi !</div></div>';
+            client += '<div class="cut-space"></div>';
+            client += '</div>';
+
+            // ========== TICKET CUISINE TEST ==========
+            let kitchen = '<div class="ticket kitchen">';
+
+            kitchen += '<div class="black-band">';
+            kitchen += '<div class="client-name">TEST</div>';
+            kitchen += '<div class="order-type">SUR PLACE</div>';
+            kitchen += '</div>';
+
+            kitchen += '<div class="kitchen-item">';
+            kitchen += '<div class="kitchen-item-header">1x TACOS XL</div>';
+            kitchen += '<div class="kitchen-item-detail">→ Tikka, Steak</div>';
+            kitchen += '<div class="kitchen-item-detail">→ Gratin Cheddar</div>';
+            kitchen += '<div class="kitchen-item-detail">→ Algérienne</div>';
+            kitchen += '</div>';
+
+            kitchen += '<div class="kitchen-item">';
+            kitchen += '<div class="kitchen-item-header">1x NAAN ROYAL MENU</div>';
+            kitchen += '</div>';
+
+            kitchen += '<div class="kitchen-time">Test à ' + time + '</div>';
+            kitchen += '<div class="cut-space"></div>';
+            kitchen += '</div>';
+
+            // Imprimer sur les 2 imprimantes: Epson (client) + Star (cuisine)
+            printDualTickets(client, kitchen);
+        }
+
+        function adminCloseKiosk() {
+            closeAdminModal();
+            window.close();
+            window.location.href = 'about:blank';
+        }
+
+        function adminUpdateRestart() {
+            if (confirm('Mettre à jour et redémarrer ?')) {
+                closeAdminModal();
+                showToast('Mise à jour en cours...');
+                // Appeler le serveur pour git pull et relancer
+                fetch('/api/update')
+                    .then(() => {
+                        showToast('Redémarrage...');
+                    })
+                    .catch(() => {
+                        // Fallback: fermer la fenêtre
+                        window.close();
+                    });
+            }
+        }
+
+        // ============ ÉCRAN DE VEILLE ============
+        let screensaverTimer = null;
+        const SCREENSAVER_TIMEOUT = 20000; // 20 secondes d'inactivité sur l'écran prénom
+
+        // URL de la vidéo YouTube (format embed avec autoplay et mute)
+        const YOUTUBE_VIDEO_URL = 'https://www.youtube.com/embed/LDiEvqi-cmU?autoplay=1&mute=1&loop=1&playlist=LDiEvqi-cmU&controls=0&showinfo=0&rel=0&modestbranding=1';
+
+        // Mode vidéo: 'local' ou 'youtube'
+        // 'local' = utilise videos/screensaver.mp4 (recommandé pour mode file://)
+        // 'youtube' = utilise l'iframe YouTube
+        const VIDEO_MODE = 'local'; // Change en 'youtube' si tu veux utiliser YouTube
+
+        function showScreensaver() {
+            const screensaver = document.getElementById('screensaver');
+            const youtube = document.getElementById('screensaver-youtube');
+            const local = document.getElementById('screensaver-local');
+
+            if (VIDEO_MODE === 'youtube') {
+                youtube.src = YOUTUBE_VIDEO_URL;
+                youtube.style.display = 'block';
+                local.style.display = 'none';
+            } else {
+                // Mode local - la vidéo est déjà dans le HTML
+                local.style.display = 'block';
+                local.play();
+                youtube.style.display = 'none';
+            }
+
+            screensaver.classList.add('active');
+        }
+
+        function hideScreensaver() {
+            const screensaver = document.getElementById('screensaver');
+            const youtube = document.getElementById('screensaver-youtube');
+            const local = document.getElementById('screensaver-local');
+
+            screensaver.classList.remove('active');
+
+            // Arrêter les vidéos
+            youtube.src = '';
+            local.pause();
+            local.currentTime = 0;
+
+            // Relancer le timer
+            resetScreensaverTimer();
+        }
+
+        function resetScreensaverTimer() {
+            clearTimeout(screensaverTimer);
+
+            // Ne s'active que si on est sur l'écran prénom
+            if (document.getElementById('screen-prenom').classList.contains('active')) {
+                screensaverTimer = setTimeout(() => {
+                    showScreensaver();
+                }, SCREENSAVER_TIMEOUT);
+            }
+        }
+
+        // ============ INIT ============
+        // Initialisation immédiate (le script est en fin de body, le DOM est prêt)
+        (function init() {
+            // Attendre que le DOM soit prêt (double sécurité)
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+                return;
+            }
+
+            console.log('Initialisation de la borne...');
+
+            // Initialiser le clavier
+            initKeyboard();
+            console.log('Clavier initialisé');
+
+            // Timers
+            resetIdleTimer();
+            resetScreensaverTimer();
+
+            // Ajouter le listener sur tous les logos (click ET touch pour écran tactile)
+            document.querySelectorAll('.logo-big, .sidebar-header img').forEach(logo => {
+                logo.addEventListener('click', handleSecretClick);
+                logo.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    handleSecretClick();
+                });
+            });
+            console.log('Listeners logos ajoutés');
+
+            // Relancer le timer du screensaver à chaque interaction sur l'écran prénom
+            document.getElementById('screen-prenom').addEventListener('click', resetScreensaverTimer);
+            document.getElementById('screen-prenom').addEventListener('touchstart', resetScreensaverTimer);
+
+            console.log('Borne prête !');
+        })();
+    </script>
+</body>
+
+</html>
