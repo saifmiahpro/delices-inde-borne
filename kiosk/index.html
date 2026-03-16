@@ -1169,11 +1169,11 @@
         <h2>Où souhaitez-vous manger ?</h2>
         <div class="mode-cards">
             <div class="mode-card" onclick="selectMode('sur_place')">
-                <div class="icon">SUR<br>PLACE</div>
+                <div class="icon">🍽️</div>
                 <h2>SUR PLACE</h2>
             </div>
             <div class="mode-card" onclick="selectMode('emporter')">
-                <div class="icon">A<br>EMPORTER</div>
+                <div class="icon">🥡</div>
                 <h2>À EMPORTER</h2>
             </div>
         </div>
@@ -1195,11 +1195,11 @@
             </nav>
             <div class="sidebar-cart">
                 <button class="cart-btn-sidebar" onclick="showCart()">
-                    PANIER
+                    🛒 <span>PANIER</span>
                     <span class="count" id="cart-count">0</span>
                 </button>
                 <button class="cancel-btn-sidebar" onclick="showCancelModal()">
-                    X ABANDONNER
+                    ✕ <span>ABANDONNER</span>
                 </button>
             </div>
         </aside>
@@ -1221,7 +1221,7 @@
             <!-- Vue panier -->
             <div id="cart-view" class="cart-view">
                 <div class="main-header">
-                    <button class="back-btn" onclick="hideCart()">Retour</button>
+                    <button class="back-btn" onclick="hideCart()">← Continuer</button>
                     <h1>VOTRE PANIER</h1>
                     <div style="width: 100px;"></div>
                 </div>
@@ -1792,7 +1792,7 @@
 
             const deleteBtn = document.createElement('div');
             deleteBtn.className = 'key wide delete';
-            deleteBtn.textContent = 'DEL';
+            deleteBtn.textContent = '⌫';
             deleteBtn.onclick = deleteLetter;
             keyboard.appendChild(deleteBtn);
 
@@ -2944,7 +2944,7 @@
                             <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
                         </div>
                         <div class="cart-item-price">${(item.price * item.quantity).toFixed(2)}€</div>
-                        <button class="delete-btn" onclick="removeFromCart(${item.id})">X</button>
+                        <button class="delete-btn" onclick="removeFromCart(${item.id})">✕</button>
                     </div>`;
                 });
                 content.innerHTML = html;
