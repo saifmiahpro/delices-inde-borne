@@ -1397,47 +1397,109 @@
     </div>
 
     <script src="products.js"></script>
+    <!-- QZ Tray pour impression automatique Windows 7 -->
+    <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.min.js"></script>
     <script>
         // ============ CONFIGURATION IMPRIMANTES ============
-        // IMPORTANT: Modifier ces noms pour correspondre aux noms exacts dans Windows
-        // Pour trouver les noms: Paramètres → Imprimantes → voir le nom exact
         const PRINTER_CONFIG = {
-            // Imprimante CLIENT (Epson TM-M30II) - doit être l'imprimante par défaut Windows
             client: {
                 name: 'EPSON TM-m30II receipt',
                 ip: '192.168.1.200'
             },
-            // Imprimante CUISINE (Star MCP31)
             kitchen: {
                 name: 'Star MCP31',
                 ip: '192.168.1.149'
             },
-            // Mode: 'dual' = 2 imprimantes, 'single' = tout sur défaut
             mode: 'dual'
         };
 
-        // ============ IMPRESSION ============
-        // 2 tickets séparés sur Star (imprimante par défaut)
-        async function printDualTickets(clientTicket, kitchenTicket) {
-            console.log('Impression: 2 tickets sur Star');
+        // ============ QZ TRAY SETUP ============
+        let qzReady = false;
 
-            // 1. Ticket CUISINE
-            printTicket(kitchenTicket);
+        async function initQZ() {
+            try {
+                if (typeof qz === 'undefined') {
+                    console.log('QZ Tray non chargé');
+                    return false;
+                }
+
+                if (!qz.websocket.isActive()) {
+                    await qz.websocket.connect();
+                }
+                qzReady = true;
+                console.log('QZ Tray connecté!');
+                showToast('QZ Tray OK');
+                return true;
+            } catch (err) {
+                console.error('QZ Tray erreur:', err);
+                qzReady = false;
+                return false;
+            }
+        }
+
+        // Connexion auto au démarrage
+        window.addEventListener('load', () => {
+            setTimeout(initQZ, 2000);
+        });
+
+        // ============ IMPRESSION QZ TRAY ============
+        async function printWithQZ(htmlContent, printerName) {
+            if (!qzReady) {
+                await initQZ();
+            }
+
+            if (!qzReady) {
+                console.log('QZ non dispo, fallback window.print');
+                printTicketFallback(htmlContent);
+                return;
+            }
+
+            try {
+                const config = qz.configs.create(printerName || null);
+                const data = [{
+                    type: 'html',
+                    format: 'plain',
+                    data: htmlContent
+                }];
+                await qz.print(config, data);
+                console.log('Imprimé via QZ:', printerName);
+            } catch (err) {
+                console.error('Erreur QZ print:', err);
+                printTicketFallback(htmlContent);
+            }
+        }
+
+        async function printDualTickets(clientTicket, kitchenTicket) {
+            console.log('Impression via QZ Tray');
+
+            // Ticket cuisine
+            await printWithQZ(kitchenTicket, PRINTER_CONFIG.kitchen.name);
             showToast('Ticket CUISINE imprimé');
 
-            // 2. Ticket CLIENT (après délai)
-            setTimeout(() => {
-                printTicket(clientTicket);
+            // Ticket client après délai
+            setTimeout(async () => {
+                await printWithQZ(clientTicket, PRINTER_CONFIG.client.name);
                 showToast('Ticket CLIENT imprimé');
-            }, 2500);
+            }, 2000);
         }
 
-        // Fonctions placeholder (boutons admin désactivés)
-        function listQZPrinters() {
-            alert('QZ Tray désactivé');
+        // Lister les imprimantes QZ
+        async function listQZPrinters() {
+            if (!qzReady) await initQZ();
+            if (!qzReady) {
+                alert('QZ Tray non connecté!\n\nVérifiez que QZ Tray est lancé (icône dans la barre des tâches)');
+                return;
+            }
+            try {
+                const printers = await qz.printers.find();
+                alert('Imprimantes disponibles:\n\n' + printers.join('\n'));
+            } catch (err) {
+                alert('Erreur: ' + err);
+            }
         }
+
         function installQZv2() {
-            alert('QZ Tray désactivé');
+            window.open('https://qz.io/download/', '_blank');
         }
 
         // Envoyer ticket client à Epson via ePOS
@@ -1720,8 +1782,8 @@
                 console.log('✓ Ticket client envoyé à Epson ' + ip);
             } catch (error) {
                 console.error('Erreur Epson ePOS:', error);
-                // Fallback: impression via fenêtre popup
-                printTicket(htmlContent);
+                // Fallback: impression via QZ ou fenêtre popup
+                printWithQZ(htmlContent, PRINTER_CONFIG.client.name);
             }
         }
 
@@ -3139,7 +3201,7 @@
             printDualTickets(tickets.client, tickets.kitchen);
         }
 
-        function printTicket(htmlContent) {
+        function printTicketFallback(htmlContent) {
             const printWindow = window.open('', 'PRINT_TICKET', 'width=350,height=900');
 
             if (!printWindow) {
