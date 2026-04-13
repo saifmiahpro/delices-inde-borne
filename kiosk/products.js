@@ -25,23 +25,35 @@ const SAUCES = [
     { id: 'sweet_chili', name: 'Sweet Chili' },
     { id: 'chili_thai', name: 'Chili Thaï' },
     { id: 'fromagere', name: 'Sauce Fromagère' },
-    { id: 'cheddar', name: 'Sauce Cheddar' }
+    { id: 'cheddar', name: 'Sauce Cheddar' },
+    { id: 'brazil', name: 'Brazil' }
 ];
 
 const BOISSONS_33 = [
+    { id: 'coca_cola', name: 'Coca Cola' },
+    { id: 'coca_cherry', name: 'Coca Cola Cherry' },
+    { id: 'coca_zero', name: 'Coca Cola Zero' },
+    { id: 'pepsi', name: 'Pepsi' },
     { id: 'oasis_tropical', name: 'Oasis Tropical' },
+    { id: 'oasis_pomme_poire', name: 'Oasis Pomme Poire' },
     { id: 'oasis_pcf', name: 'Oasis Pomme Cassis Framboise' },
-    { id: 'dada_peche', name: 'Dada Pêche' },
-    { id: 'dada_melon', name: 'Dada Melon' },
-    { id: 'dada_litchi', name: 'Dada Litchi' },
-    { id: '7up', name: '7Up' },
-    { id: 'sprite', name: 'Sprite' },
+    { id: 'hawai', name: 'Hawaï' },
     { id: 'orangina', name: 'Orangina' },
     { id: 'fanta_orange', name: 'Fanta Orange' },
-    { id: 'pepsi', name: 'Pepsi' },
-    { id: 'pepsi_max', name: 'Pepsi Max' },
-    { id: 'eau', name: 'Eau' },
-    { id: 'capri_sun', name: 'Capri-Sun' }
+    { id: '7up', name: '7Up' },
+    { id: '7up_cerise', name: '7Up Cerise' },
+    { id: '7up_mojito', name: '7Up Mojito' },
+    { id: 'sprite', name: 'Sprite' },
+    { id: 'tropico', name: 'Tropico' },
+    { id: 'schweppes', name: 'Schweppes Agrumes' },
+    { id: 'lipton', name: 'Lipton Ice Tea Pêche' },
+    { id: 'perrier', name: 'Perrier' },
+    { id: 'dada_cerise', name: 'Dada Cerise' },
+    { id: 'dada_melon', name: 'Dada Melon' },
+    { id: 'dada_litchi', name: 'Dada Litchi' },
+    { id: 'eau', name: 'Eau Cristalline 50cl' },
+    { id: 'capri_sun', name: 'Capri-Sun' },
+    { id: 'redbull', name: 'Red Bull' }
 ];
 
 const PAINS = [
@@ -51,13 +63,15 @@ const PAINS = [
 ];
 
 const GRATINS = [
-    { id: 'lardon', name: 'Lardons', price: 2.00 },
-    { id: 'cheddar', name: 'Cheddar', price: 2.00 },
-    { id: 'raclette', name: 'Raclette', price: 2.00 },
-    { id: 'chevre', name: 'Chèvre', price: 2.00 },
-    { id: 'chevre_miel', name: 'Chèvre Miel', price: 2.50 },
+    { id: 'mozzarella', name: 'Mozzarella', price: 2.00 },
     { id: 'bacon', name: 'Bacon', price: 2.00 },
-    { id: 'olives_poivrons', name: 'Olives/Poivrons', price: 2.00 }
+    { id: 'chevre', name: 'Chèvre', price: 2.00 },
+    { id: 'lardon', name: 'Lardons', price: 2.00 },
+    { id: 'chevre_miel', name: 'Chèvre Miel', price: 2.50 },
+    { id: 'raclette', name: 'Raclette', price: 2.00 },
+    { id: 'olive', name: 'Olive', price: 2.00 },
+    { id: 'cheddar', name: 'Cheddar', price: 2.00 },
+    { id: 'poivron', name: 'Poivron', price: 2.00 }
 ];
 
 const SUPPLEMENTS = [
@@ -99,6 +113,7 @@ const RETRAITS_TACOS = [
 
 // Catégories
 const CATEGORIES = [
+    { id: 'menu_etudiant', name: 'Menu Étudiant', image: '../assets/common/logo.png' },
     { id: 'buckets', name: 'Buckets', image: '../assets/buckets/bucket_1.png' },
     { id: 'bowls', name: 'Bowls', image: '../assets/bowls/bowl_classique.png' },
     { id: 'salades', name: 'Salades', image: '../assets/salades/salade.png' },
@@ -108,6 +123,7 @@ const CATEGORIES = [
     { id: 'wraps', name: 'Wraps', image: '../assets/sandwichs/sandwich_galette.png' },
     { id: 'burgers', name: 'Burgers', image: '../assets/burgers/smash_burger.png' },
     { id: 'paninis', name: 'Paninis', image: '../assets/common/logo.png' },
+    { id: 'boxes', name: 'Boxes', image: '../assets/common/logo.png' },
     { id: 'poutines', name: 'Poutines', image: '../assets/poutines/poutine.png' },
     { id: 'frites', name: 'Frites', image: '../assets/frites/frite_boisson.png' },
     { id: 'assiettes', name: 'Assiettes', image: '../assets/common/assiette.png' },
@@ -126,7 +142,7 @@ const PRODUCTS = [
         id: 'bucket_classic',
         category: 'buckets',
         name: 'Classic',
-        description: '3 Wings + 3 Tenders + Frites + Boisson 33cl',
+        description: '3 Wings + 2 Tenders + Frites + Boisson 33cl',
         image: '../assets/buckets/bucket_1.png',
         price: 7.90,
         type: 'bucket',
@@ -182,7 +198,7 @@ const PRODUCTS = [
         type: 'bowl',
         hasBuilder: true,
         sizes: [
-            { id: 'normal', name: 'Normal', price: 8.90 },
+            { id: 'normal', name: 'Normal', price: 8.50 },
             { id: 'xl', name: 'XL', price: 10.90 }
         ]
     },
@@ -252,15 +268,15 @@ const PRODUCTS = [
         id: 'salade_cesar',
         category: 'salades',
         name: 'César',
-        description: 'Poulet pané, légumes, œuf',
+        description: 'Poulet pané, légumes, boursin, œuf',
         image: '../assets/salades/salade.png',
         price: 7.50
     },
     {
-        id: 'salade_honey',
+        id: 'salade_nems',
         category: 'salades',
-        name: 'Honey',
-        description: 'Nem au poulet, légumes, œuf',
+        name: 'Salade Nems',
+        description: 'Nems, légumes, boursin, œuf',
         image: '../assets/salades/salade.png',
         price: 7.50
     },
@@ -268,7 +284,7 @@ const PRODUCTS = [
         id: 'salade_indienne',
         category: 'salades',
         name: 'Indienne',
-        description: 'Chicken Tikka, légumes, œuf',
+        description: 'Chicken Tikka, légumes, boursin, œuf',
         image: '../assets/salades/salade.png',
         price: 7.50
     },
@@ -427,6 +443,7 @@ const PRODUCTS = [
         image: '../assets/sandwichs/sandwich.png',
         price: 7.00,
         menuPrice: 9.00,
+        megaPrice: 11.00,
         type: 'sandwich',
         hasBuilder: true
     },
@@ -532,7 +549,7 @@ const PRODUCTS = [
         id: 'burger_delice',
         category: 'burgers',
         name: 'Délice Burger',
-        description: '2 Steaks, Pomme de terre, Œuf, Crudités, Cheddar',
+        description: 'Steak, Pomme de terre, Œuf, Raclette, Cheddar, Bacon, Crudités',
         image: '../assets/burgers/delices_smash.png',
         price: 9.00,
         menuPrice: 11.00,
@@ -551,63 +568,14 @@ const PRODUCTS = [
 
     // ==================== PANINIS ====================
     {
-        id: 'panini_kebab',
+        id: 'panini_composer',
         category: 'paninis',
-        name: 'Panini Kebab',
-        description: 'Kebab grillé',
+        name: 'Panini à Composer',
+        description: '1 viande & sauce au choix',
         image: '../assets/common/logo.png',
         price: 6.00,
         menuPrice: 8.00,
-        hasBuilder: true
-    },
-    {
-        id: 'panini_tikka',
-        category: 'paninis',
-        name: 'Panini Chicken Tikka',
-        description: 'Chicken Tikka épicé',
-        image: '../assets/common/logo.png',
-        price: 6.00,
-        menuPrice: 8.00,
-        hasBuilder: true
-    },
-    {
-        id: 'panini_cordon_bleu',
-        category: 'paninis',
-        name: 'Panini Cordon Bleu',
-        description: 'Cordon Bleu croustillant',
-        image: '../assets/common/logo.png',
-        price: 6.00,
-        menuPrice: 8.00,
-        hasBuilder: true
-    },
-    {
-        id: 'panini_merguez',
-        category: 'paninis',
-        name: 'Panini Merguez',
-        description: 'Merguez grillée',
-        image: '../assets/common/logo.png',
-        price: 6.00,
-        menuPrice: 8.00,
-        hasBuilder: true
-    },
-    {
-        id: 'panini_tenders',
-        category: 'paninis',
-        name: 'Panini Tenders',
-        description: 'Tenders croustillants',
-        image: '../assets/common/logo.png',
-        price: 6.00,
-        menuPrice: 8.00,
-        hasBuilder: true
-    },
-    {
-        id: 'panini_kefta',
-        category: 'paninis',
-        name: 'Panini Kefta',
-        description: 'Kefta épicée',
-        image: '../assets/common/logo.png',
-        price: 6.00,
-        menuPrice: 8.00,
+        type: 'panini',
         hasBuilder: true
     },
     {
@@ -749,7 +717,8 @@ const PRODUCTS = [
         description: 'Portion de frites',
         image: '../assets/frites/frite_boisson.png',
         sizes: [
-            { id: 'normal', name: 'Normal', price: 2.00 },
+            { id: 'petite', name: 'Petite', price: 1.00 },
+            { id: 'normal', name: 'Moyenne', price: 2.00 },
             { id: 'grande', name: 'Grande', price: 3.00 }
         ]
     },
@@ -856,10 +825,10 @@ const PRODUCTS = [
         price: 5.00
     },
     {
-        id: 'nuggets_5',
+        id: 'nuggets_6',
         category: 'tex_mex',
-        name: 'Nuggets x5',
-        description: '5 nuggets croustillants',
+        name: 'Nuggets x6',
+        description: '6 nuggets croustillants',
         image: '../assets/common/logo.png',
         price: 5.00
     },
@@ -872,17 +841,17 @@ const PRODUCTS = [
         price: 5.00
     },
     {
-        id: 'mozza_5',
+        id: 'mozza_6',
         category: 'tex_mex',
-        name: 'Mozza Sticks x5',
+        name: 'Mozza Sticks x6',
         description: 'Bâtonnets de mozzarella',
         image: '../assets/common/logo.png',
         price: 5.00
     },
     {
-        id: 'camembert_5',
+        id: 'camembert_6',
         category: 'tex_mex',
-        name: 'Camembert x5',
+        name: 'Camembert x6',
         description: 'Camembert pané',
         image: '../assets/common/logo.png',
         price: 5.00
@@ -904,12 +873,12 @@ const PRODUCTS = [
         price: 6.00
     },
     {
-        id: 'oignons_rings_8',
+        id: 'oignons_rings_7',
         category: 'tex_mex',
-        name: 'Oignons Rings x8',
+        name: 'Oignons Rings x7',
         description: 'Onion rings croustillants',
         image: '../assets/common/logo.png',
-        price: 6.00
+        price: 5.00
     },
     {
         id: 'nems_5',
@@ -946,7 +915,7 @@ const PRODUCTS = [
         name: 'Panini Nutella',
         description: 'Panini Fondant',
         image: '../assets/desserts/panini_nutella.png',
-        price: 3.50
+        price: 3.90
     },
     {
         id: 'tarte_daim',
@@ -954,7 +923,7 @@ const PRODUCTS = [
         name: 'Tarte Daim',
         description: 'Croustillant',
         image: '../assets/desserts/tarte_daim.png',
-        price: 3.00
+        price: 2.50
     },
 
     // ==================== BOISSONS ====================
@@ -964,24 +933,164 @@ const PRODUCTS = [
         name: 'Boisson 33cl',
         description: 'Au choix',
         image: '../assets/frites/frite_boisson.png',
-        price: 1.70,
+        price: 1.50,
         type: 'boisson_seule',
         hasBuilder: true
     },
     {
-        id: 'bouteille_150',
+        id: 'redbull',
         category: 'boissons',
-        name: 'Bouteille 1.5L',
-        description: 'Pepsi, Oasis ou Eau',
+        name: 'Red Bull',
+        description: '',
         image: '../assets/frites/frite_boisson.png',
-        price: 4.00
+        price: 2.50
     },
     {
-        id: 'eau_150',
+        id: 'coca_150',
         category: 'boissons',
-        name: 'Eau 1.5L',
+        name: 'Coca Cola 1.5L',
         description: '',
         image: '../assets/frites/frite_boisson.png',
         price: 3.50
+    },
+    {
+        id: 'hawai_150',
+        category: 'boissons',
+        name: 'Hawaï 1.5L',
+        description: '',
+        image: '../assets/frites/frite_boisson.png',
+        price: 3.50
+    },
+    {
+        id: 'lipton_150',
+        category: 'boissons',
+        name: 'Lipton Ice Tea Pêche 1.5L',
+        description: '',
+        image: '../assets/frites/frite_boisson.png',
+        price: 3.50
+    },
+    {
+        id: 'orangina_150',
+        category: 'boissons',
+        name: 'Orangina 1.5L',
+        description: '',
+        image: '../assets/frites/frite_boisson.png',
+        price: 3.50
+    },
+    {
+        id: 'oasis_2l',
+        category: 'boissons',
+        name: 'Oasis Tropical 2L',
+        description: '',
+        image: '../assets/frites/frite_boisson.png',
+        price: 4.00
+    },
+
+    // ==================== ACCOMPAGNEMENTS ====================
+    {
+        id: 'naan_nature',
+        category: 'frites',
+        name: 'Naan Nature',
+        description: '',
+        image: '../assets/common/logo.png',
+        price: 1.00
+    },
+    {
+        id: 'naan_fromage',
+        category: 'frites',
+        name: 'Naan Fromage',
+        description: '',
+        image: '../assets/common/logo.png',
+        price: 2.00
+    },
+
+    // ==================== BOXES ====================
+    {
+        id: 'box_viande',
+        category: 'boxes',
+        name: 'BOX Viande',
+        description: 'Taille au choix',
+        image: '../assets/common/logo.png',
+        price: 6.00,
+        type: 'box',
+        hasBuilder: true
+    },
+
+    // ==================== BOX DEAL 9.90€ ====================
+    {
+        id: 'box_deal',
+        category: 'boxes',
+        name: 'BOX Deal',
+        description: '5 Wings coréennes OU 5 Tenders coréens OU 1 Burger (poulet ou steak) + Frites',
+        image: '../assets/common/logo.png',
+        price: 9.90,
+        type: 'box_deal',
+        hasBuilder: true
+    },
+
+    // ==================== MENU ÉTUDIANT ====================
+    // Disponible en semaine jusqu'à 15h - Sur présentation carte étudiante
+    {
+        id: 'etudiant_tacos',
+        category: 'menu_etudiant',
+        name: 'Tacos Étudiant',
+        description: 'Tacos + Frites + Boisson',
+        image: '../assets/tacos/tacos.png',
+        type: 'etudiant_tacos',
+        hasBuilder: true,
+        includesFrites: true,
+        includesBoisson: true,
+        sizes: [
+            { id: '1v', name: '1 Viande', price: 6.50, meatCount: 1 },
+            { id: '2v', name: '2 Viandes', price: 7.50, meatCount: 2 },
+            { id: '3v', name: '3 Viandes', price: 9.50, meatCount: 3 },
+            { id: 'xl', name: 'XL (4 Viandes)', price: 11.50, meatCount: 4 }
+        ]
+    },
+    {
+        id: 'etudiant_crousty_bowl',
+        category: 'menu_etudiant',
+        name: 'Crousty Bowl',
+        description: 'Riz + Poulet croustillant + Boisson',
+        image: '../assets/bowls/bowl_crousty.png',
+        price: 8.00,
+        type: 'etudiant_simple',
+        hasBuilder: true,
+        includesBoisson: true
+    },
+    {
+        id: 'etudiant_poutine',
+        category: 'menu_etudiant',
+        name: 'Poutine Étudiant',
+        description: 'Frites + Sauce + Fromage fondu gratiné + Boisson',
+        image: '../assets/poutines/poutine.png',
+        price: 6.50,
+        type: 'etudiant_poutine',
+        hasBuilder: true,
+        includesBoisson: true
+    },
+    {
+        id: 'etudiant_galette',
+        category: 'menu_etudiant',
+        name: 'Galette Étudiant',
+        description: '1 viande au choix + Frites + Boisson',
+        image: '../assets/sandwichs/sandwich_galette.png',
+        price: 6.50,
+        type: 'etudiant_sandwich',
+        hasBuilder: true,
+        includesFrites: true,
+        includesBoisson: true
+    },
+    {
+        id: 'etudiant_cheeseburger',
+        category: 'menu_etudiant',
+        name: 'Cheese Burger Étudiant',
+        description: 'Cheese Burger + Frites + Boisson',
+        image: '../assets/burgers/smash_burger.png',
+        price: 6.50,
+        type: 'etudiant_simple',
+        hasBuilder: true,
+        includesFrites: true,
+        includesBoisson: true
     }
 ];

@@ -1877,6 +1877,14 @@
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '';
 
+            // Bannière Menu Étudiant
+            if (categoryId === 'menu_etudiant') {
+                const banner = document.createElement('div');
+                banner.style.cssText = 'grid-column:1/-1;background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #FFD700;border-radius:15px;padding:15px 20px;text-align:center;margin-bottom:10px;';
+                banner.innerHTML = '<div style="color:#FFD700;font-size:clamp(16px,2.5vw,22px);font-weight:700;">⚠ MENU ÉTUDIANT</div><div style="color:#ccc;font-size:clamp(12px,1.8vw,16px);margin-top:5px;">Sur présentation de la carte étudiante • En semaine jusqu\'à 15h</div>';
+                grid.appendChild(banner);
+            }
+
             const products = PRODUCTS.filter(p => p.category === categoryId);
 
             products.forEach(product => {
@@ -1963,10 +1971,16 @@
             else if (product.type === 'poutine') buildPoutineBuilder(content, product);
             else if (product.type === 'assiette') buildAssietteBuilder(content, product);
             else if (product.type === 'box') buildBoxBuilder(content, product);
+            else if (product.type === 'box_deal') buildBoxDealBuilder(content, product);
             else if (product.type === 'bucket') buildBucketBuilder(content, product);
             else if (product.type === 'boisson_seule') buildBoissonBuilder(content, product);
             else if (product.type === 'enfant') buildEnfantBuilder(content, product);
             else if (product.type === 'frites') buildFritesBuilder(content, product);
+            else if (product.type === 'etudiant_tacos') buildEtudiantTacosBuilder(content, product);
+            else if (product.type === 'etudiant_simple') buildEtudiantSimpleBuilder(content, product);
+            else if (product.type === 'etudiant_poutine') buildEtudiantPoutineBuilder(content, product);
+            else if (product.type === 'etudiant_sandwich') buildEtudiantSandwichBuilder(content, product);
+            else if (product.type === 'panini') buildPaniniBuilder(content, product);
             else if (product.menuUpgrade) buildBurgerBuilder(content, product);
 
             processBuilderSteps();
@@ -2227,8 +2241,8 @@
 
             // Formule (Classique ou Mega XL - pas de boisson incluse)
             html += `<div class="step-title">Formule</div><div class="options-grid big">
-                <div class="option-btn selected" onclick="selectOption('formula', 'classique', this)" data-price="7.9">CLASSIQUE <span class="option-price">7.90€</span></div>
-                <div class="option-btn" onclick="selectOption('formula', 'mega', this)" data-price="11">MÉGA XL <span class="option-price">11€</span></div>
+                <div class="option-btn selected" onclick="selectOption('formula', 'classique', this)" data-price="7">CLASSIQUE <span class="option-price">7.00€</span></div>
+                <div class="option-btn" onclick="selectOption('formula', 'mega', this)" data-price="11">MÉGA XL <span class="option-price">11.00€</span></div>
             </div>`;
 
             // Pain
@@ -2286,7 +2300,7 @@
             </div>`;
 
             content.innerHTML = html;
-            state.builderSelections.formula = { id: 'classique', price: 7.9, meatCount: 1 };
+            state.builderSelections.formula = { id: 'classique', price: 7, meatCount: 1 };
             state.builderSelections.bread = PAINS[0];
             state.builderSelections.meat = VIANDES[0];
             state.builderSelections.sauces = [];
@@ -2376,8 +2390,8 @@
 
             // Type d'assiette
             html += `<div class="step-title">Type d'assiette</div><div class="options-grid big">
-                <div class="option-btn selected" onclick="selectAssietteType('1viande', this)" data-price="11">1 VIANDE <span class="option-price">11€</span></div>
-                <div class="option-btn" onclick="selectAssietteType('3viandes', this)" data-price="14.5">3 VIANDES <span class="option-price">14.50€</span></div>
+                <div class="option-btn selected" onclick="selectAssietteType('1viande', this)" data-price="10">1 VIANDE <span class="option-price">10.00€</span></div>
+                <div class="option-btn" onclick="selectAssietteType('3viandes', this)" data-price="13.5">3 VIANDES <span class="option-price">13.50€</span></div>
             </div>`;
 
             // Viande(s) - dynamique selon le type
@@ -2397,11 +2411,17 @@
             // Options
             html += `<div class="step-title">Options</div><div class="options-grid big">
                 <div class="option-btn" onclick="toggleOption('naanFromage', this)" data-price="1">Naan Fromage <span class="option-price">+1€</span></div>
-                <div class="option-btn" onclick="toggleOption('boisson', this)" data-price="1">Boisson <span class="option-price">+1€</span></div>
+                <div class="option-btn" onclick="toggleAssiettBoisson(this)" data-price="1">Boisson <span class="option-price">+1€</span></div>
+            </div>`;
+            html += `<div id="assiette-drink-section" style="display:none; margin-top: 15px;">
+                <div class="builder-subtitle">Choix de la boisson</div>
+                <div class="options-grid">
+                    ${getBoissonsHtml()}
+                </div>
             </div>`;
 
             content.innerHTML = html;
-            state.builderSelections.type = { id: '1viande', price: 11 };
+            state.builderSelections.type = { id: '1viande', price: 10 };
             state.builderSelections.meats = [VIANDES[0]]; // Utiliser un tableau pour supporter 1 ou 3 viandes
             state.builderSelections.sauce = SAUCES[0];
             state.builderSelections.naanFromage = false;
@@ -2413,8 +2433,8 @@
             element.classList.add('selected');
 
             state.builderSelections.type = typeId === '1viande'
-                ? { id: '1viande', price: 11 }
-                : { id: '3viandes', price: 14.5 };
+                ? { id: '1viande', price: 10 }
+                : { id: '3viandes', price: 13.5 };
 
             // Mettre à jour le titre
             const title = document.getElementById('assiette-viande-title');
@@ -2485,12 +2505,10 @@
             });
             html += '</div>';
 
-            // Option boisson supplémentaire uniquement pour bucket 4 (qui n'inclut pas de boisson)
-            if (product.id === 'bucket_4') {
-                html += `<div class="step-title">Ajouter une Boisson ?</div><div class="options-grid big">
-                    <div class="option-btn selected" onclick="selectOption('boisson', false, this)">SANS BOISSON</div>
-                    <div class="option-btn" onclick="selectOption('boisson', '33cl', this)" data-price="2">BOISSON 33cl <span class="option-price">+2€</span></div>
-                    <div class="option-btn" onclick="selectOption('boisson', '1.5L', this)" data-price="4">BOISSON 1.5L <span class="option-price">+4€</span></div>
+            // Choix de la boisson incluse (tous les buckets incluent une boisson)
+            if (product.includesBoisson) {
+                html += `<div class="step-title">Choix de la boisson</div><div class="options-grid">
+                    ${getBoissonsHtml()}
                 </div>`;
             }
 
@@ -2505,8 +2523,155 @@
             state.builderSelections.bucketSauces = [];
             state.builderSelections.fritesSupp = 'non';
             state.builderSelections.boisson = false;
+            if (product.includesBoisson) state.builderSelections.menuBoisson = BOISSONS_33[0].name;
             state.builderSelections.basePrice = product.price;
             state.builderSelections.maxSauces = maxSauces;
+        }
+
+        // ==================== BOX DEAL BUILDER ====================
+        function buildBoxDealBuilder(content, product) {
+            let html = `<div class="step-title">Votre choix</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('boxChoice', 'wings', this)">5 Wings Coréennes</div>
+                <div class="option-btn" onclick="selectOption('boxChoice', 'tenders', this)">5 Tenders Coréens</div>
+                <div class="option-btn" onclick="selectOption('boxChoice', 'burger', this)">1 Burger</div>
+            </div>`;
+            html += `<div id="box-burger-type" style="display:none;">
+                <div class="step-title">Type de burger</div><div class="options-grid big">
+                    <div class="option-btn selected" onclick="selectOption('burgerType', 'poulet', this)">Poulet</div>
+                    <div class="option-btn" onclick="selectOption('burgerType', 'steak', this)">Steak</div>
+                </div>
+            </div>`;
+            html += `<div class="step-title">Boisson (+1€) ?</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('boisson1e', false, this)">SANS BOISSON</div>
+                <div class="option-btn" onclick="selectOption('boisson1e', true, this)" data-price="1">AVEC BOISSON <span class="option-price">+1€</span></div>
+            </div>`;
+            html += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                <div class="builder-subtitle">Choix de la boisson</div>
+                <div class="options-grid">
+                    ${getBoissonsHtml()}
+                </div>
+            </div>`;
+            content.innerHTML = html;
+            state.builderSelections.boxChoice = 'wings';
+            state.builderSelections.burgerType = 'poulet';
+            state.builderSelections.boisson1e = false;
+            state.builderSelections.basePrice = product.price;
+        }
+
+        // ==================== PANINI COMPOSER BUILDER ====================
+        function buildPaniniBuilder(content, product) {
+            let html = '';
+            html += `<div class="step-title">Viande</div><div class="options-grid">`;
+            VIANDES.forEach((v, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">Sauce</div><div class="options-grid">`;
+            SAUCES.forEach((s, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('sauce', '${s.id}', this)">${s.name}</div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">En menu ?</div><div class="options-grid big">
+                <div class="option-btn selected" onclick="selectOption('menu', false, this)">SEUL <span class="option-price">${product.price.toFixed(2)}€</span></div>
+                <div class="option-btn" onclick="selectOption('menu', true, this)" data-price="2">MENU <span class="option-price">+2€</span></div>
+            </div>`;
+            html += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+                <div class="builder-subtitle">Choix de la boisson</div>
+                <div class="options-grid">
+                    ${getBoissonsHtml()}
+                </div>
+            </div>`;
+            content.innerHTML = html;
+            state.builderSelections.meat = VIANDES[0];
+            state.builderSelections.sauce = SAUCES[0];
+            state.builderSelections.menu = false;
+            state.builderSelections.basePrice = product.price;
+        }
+
+        // ==================== MENU ÉTUDIANT BUILDERS ====================
+        function buildEtudiantTacosBuilder(content, product) {
+            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — En semaine jusqu'à 15h</div>`;
+            html += `<div class="step-title">Taille</div><div class="options-grid big">`;
+            product.sizes.forEach((size, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('size', '${size.id}', this)" data-price="${size.price}">
+                    ${size.name} <span class="option-price">${size.price.toFixed(2)}€</span>
+                </div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">Viande(s)</div><div class="options-grid">`;
+            VIANDES.forEach(v => {
+                html += `<div class="option-btn" onclick="toggleMeat('${v.id}', this)">${v.name}</div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">Sauces (3 max)</div><div class="options-grid">`;
+            SAUCES.forEach(s => {
+                html += `<div class="option-btn" onclick="toggleSauce('${s.id}', this)">${s.name}</div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">Gratiné (+2€) ?</div><div class="options-grid">
+                <div class="option-btn selected" onclick="selectOption('gratin', 'none', this)">Sans gratin</div>`;
+            GRATINS.forEach(g => {
+                html += `<div class="option-btn" onclick="selectOption('gratin', '${g.id}', this)">${g.name} <span class="option-price">+2.00€</span></div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">Choix de la boisson</div><div class="options-grid">
+                ${getBoissonsHtml()}
+            </div>`;
+            content.innerHTML = html;
+            state.builderSelections.size = product.sizes[0];
+            state.builderSelections.meats = [];
+            state.builderSelections.sauces = [];
+            state.builderSelections.gratin = null;
+            state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+            state.builderSelections.basePrice = 0;
+        }
+
+        function buildEtudiantSimpleBuilder(content, product) {
+            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — En semaine jusqu'à 15h</div>`;
+            html += `<div class="step-title">Choix de la boisson</div><div class="options-grid">
+                ${getBoissonsHtml()}
+            </div>`;
+            content.innerHTML = html;
+            state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+            state.builderSelections.basePrice = product.price;
+        }
+
+        function buildEtudiantPoutineBuilder(content, product) {
+            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — En semaine jusqu'à 15h</div>`;
+            html += `<div class="step-title">Viande</div><div class="options-grid">`;
+            VIANDES.forEach((v, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">Choix de la boisson</div><div class="options-grid">
+                ${getBoissonsHtml()}
+            </div>`;
+            content.innerHTML = html;
+            state.builderSelections.meat = VIANDES[0];
+            state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+            state.builderSelections.basePrice = product.price;
+        }
+
+        function buildEtudiantSandwichBuilder(content, product) {
+            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — En semaine jusqu'à 15h</div>`;
+            html += `<div class="step-title">Viande</div><div class="options-grid">`;
+            VIANDES.forEach((v, i) => {
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">Sauces (3 max)</div><div class="options-grid">`;
+            SAUCES.forEach(s => {
+                html += `<div class="option-btn" onclick="toggleSauce('${s.id}', this)">${s.name}</div>`;
+            });
+            html += '</div>';
+            html += `<div class="step-title">Choix de la boisson</div><div class="options-grid">
+                ${getBoissonsHtml()}
+            </div>`;
+            content.innerHTML = html;
+            state.builderSelections.meat = VIANDES[0];
+            state.builderSelections.sauces = [];
+            state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+            state.builderSelections.basePrice = product.price;
         }
 
         function buildBoissonBuilder(content, product) {
@@ -2548,12 +2713,18 @@
 
             } else if (type === 'formula') {
                 // Pour sandwichs: Classique ou Mega (pas de boisson incluse)
-                if (value === 'classique') state.builderSelections.formula = { id: 'classique', price: 7.9, meatCount: 1 };
+                if (value === 'classique') state.builderSelections.formula = { id: 'classique', price: 7, meatCount: 1 };
                 else if (value === 'mega') state.builderSelections.formula = { id: 'mega', price: 11, meatCount: 2 };
                 else state.builderSelections.formula = { id: value, price: parseFloat(element.dataset.price) || 0 };
                 // NE PAS afficher la boisson ici - c'est géré par menuOpt
             } else if (type === 'type') {
-                state.builderSelections.type = value === '1viande' ? { id: '1viande', price: 11 } : { id: '3viandes', price: 14.5 };
+                state.builderSelections.type = value === '1viande' ? { id: '1viande', price: 10 } : { id: '3viandes', price: 13.5 };
+            } else if (type === 'boxChoice') {
+                state.builderSelections.boxChoice = value;
+                const burgerSection = document.getElementById('box-burger-type');
+                if (burgerSection) burgerSection.style.display = value === 'burger' ? 'block' : 'none';
+            } else if (type === 'burgerType') {
+                state.builderSelections.burgerType = value;
             } else if (type === 'gratin') {
                 state.builderSelections.gratin = value === 'none' ? null : GRATINS.find(g => g.id === value);
             } else if (type === 'sauce') {
@@ -2622,6 +2793,17 @@
         function toggleOption(optionId, element) {
             element.classList.toggle('selected');
             state.builderSelections[optionId] = !state.builderSelections[optionId];
+            updateBuilderPrice();
+        }
+
+        function toggleAssiettBoisson(element) {
+            element.classList.toggle('selected');
+            state.builderSelections.boisson = !state.builderSelections.boisson;
+            const drinkSection = document.getElementById('assiette-drink-section');
+            if (drinkSection) drinkSection.style.display = state.builderSelections.boisson ? 'block' : 'none';
+            if (state.builderSelections.boisson && !state.builderSelections.menuBoisson) {
+                state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+            }
             updateBuilderPrice();
         }
 
@@ -2719,7 +2901,7 @@
             } else if (product.type === 'naan') {
                 price = (sel.basePrice || product.price) + (sel.formula?.price || 0);
             } else if (product.type === 'sandwich') {
-                price = sel.formula?.price || 7.9;
+                price = sel.formula?.price || 7;
                 if (sel.menuOpt) price += 2;
             } else if (product.type === 'bowl') {
                 // Produits avec sizes (comme Crousty Bowl promo)
@@ -2734,22 +2916,29 @@
             } else if (product.type === 'frites') {
                 price = sel.size?.price || product.sizes[0].price;
             } else if (product.type === 'assiette') {
-                price = sel.type?.price || 11;
+                price = sel.type?.price || 10;
                 if (sel.naanFromage) price += 1;
                 if (sel.boisson) price += 1;
             } else if (product.type === 'box') {
+                price = sel.basePrice || product.price;
+                if (sel.boisson1e) price += 1;
+            } else if (product.type === 'box_deal') {
                 price = sel.basePrice || product.price;
                 if (sel.boisson1e) price += 1;
             } else if (product.type === 'boisson_seule' || product.type === 'enfant') {
                 price = sel.basePrice || product.price;
             } else if (product.type === 'bucket') {
                 price = sel.basePrice || product.price;
-                // Frites supplémentaires
                 if (sel.fritesSupp === 'M') price += 2.5;
                 else if (sel.fritesSupp === 'XL') price += 3.5;
-                // Boisson (uniquement pour bucket 4)
-                if (sel.boisson === '33cl') price += 2;
-                else if (sel.boisson === '1.5L') price += 4;
+            } else if (product.type === 'etudiant_tacos') {
+                price = sel.size?.price || product.sizes[0].price;
+                if (sel.gratin && sel.gratin.id !== 'none') price += 2;
+            } else if (product.type === 'etudiant_simple' || product.type === 'etudiant_poutine' || product.type === 'etudiant_sandwich') {
+                price = sel.basePrice || product.price;
+            } else if (product.type === 'panini') {
+                price = sel.basePrice || product.price;
+                if (sel.menu) price += 2;
             } else if (product.menuUpgrade) {
                 price = sel.basePrice || product.price;
                 if (sel.menu) price += 2;
@@ -2864,23 +3053,44 @@
                 // Sauce
                 if (sel.sauce?.name) details.push('Sauce ' + sel.sauce.name);
                 if (sel.naanFromage) details.push('Naan Fromage');
-                if (sel.boisson) details.push('Boisson');
+                if (sel.boisson) details.push('Boisson: ' + (sel.menuBoisson || 'Boisson'));
             } else if (product.type === 'box') {
                 details.push(sel.meat === 'poulet' ? 'Poulet' : 'Steak');
                 if (sel.boisson1e) details.push('+ Boisson ' + (sel.menuBoisson || BOISSONS_33[0].name));
             } else if (product.type === 'bucket') {
-                // Sauces choisies
                 if (sel.bucketSauces?.length) {
                     details.push('Sauces: ' + sel.bucketSauces.map(s => s.name).join(', '));
                 }
-                // Frites supplémentaires
                 if (sel.fritesSupp && sel.fritesSupp !== 'non') {
                     details.push('+Frites ' + sel.fritesSupp);
                 }
-                // Boisson (bucket 4 uniquement)
-                if (sel.boisson) {
-                    details.push('Boisson ' + sel.boisson);
+                if (sel.menuBoisson) {
+                    details.push('Boisson: ' + sel.menuBoisson);
                 }
+            } else if (product.type === 'box_deal') {
+                const choiceNames = { wings: '5 Wings Coréennes', tenders: '5 Tenders Coréens', burger: '1 Burger' };
+                details.push(choiceNames[sel.boxChoice] || sel.boxChoice);
+                if (sel.boxChoice === 'burger') details.push(sel.burgerType === 'steak' ? 'Steak' : 'Poulet');
+                if (sel.boisson1e) details.push('+ Boisson ' + (sel.menuBoisson || BOISSONS_33[0].name));
+            } else if (product.type === 'panini') {
+                if (sel.meat?.name) details.push(sel.meat.name);
+                if (sel.sauce?.name) details.push('Sauce ' + sel.sauce.name);
+                if (sel.menu) details.push('MENU (Frites + ' + (sel.menuBoisson || 'Boisson') + ')');
+            } else if (product.type === 'etudiant_tacos') {
+                cartName = 'Étudiant Tacos ' + (sel.size?.name || '1 Viande');
+                if (sel.meats?.length) details.push(sel.meats.map(m => m.name).join(', '));
+                if (sel.sauces?.length) details.push(sel.sauces.map(s => s.name).join(', '));
+                if (sel.gratin && sel.gratin.id !== 'none') details.push('Gratin ' + sel.gratin.name);
+                if (sel.menuBoisson) details.push('Boisson: ' + sel.menuBoisson);
+            } else if (product.type === 'etudiant_simple') {
+                if (sel.menuBoisson) details.push('Boisson: ' + sel.menuBoisson);
+            } else if (product.type === 'etudiant_poutine') {
+                if (sel.meat?.name) details.push(sel.meat.name);
+                if (sel.menuBoisson) details.push('Boisson: ' + sel.menuBoisson);
+            } else if (product.type === 'etudiant_sandwich') {
+                if (sel.meat?.name) details.push(sel.meat.name);
+                if (sel.sauces?.length) details.push(sel.sauces.map(s => s.name).join(', '));
+                if (sel.menuBoisson) details.push('Boisson: ' + sel.menuBoisson);
             } else if (product.type === 'boisson_seule' || product.type === 'enfant') {
                 if (sel.menuBoisson) details.push(sel.menuBoisson);
             } else if (product.menuUpgrade && sel.menu) {
@@ -2994,7 +3204,13 @@
             else if (item.product.type === 'poutine') buildPoutineBuilder(content, item.product);
             else if (item.product.type === 'assiette') buildAssietteBuilder(content, item.product);
             else if (item.product.type === 'box') buildBoxBuilder(content, item.product);
+            else if (item.product.type === 'box_deal') buildBoxDealBuilder(content, item.product);
             else if (item.product.type === 'bucket') buildBucketBuilder(content, item.product);
+            else if (item.product.type === 'panini') buildPaniniBuilder(content, item.product);
+            else if (item.product.type === 'etudiant_tacos') buildEtudiantTacosBuilder(content, item.product);
+            else if (item.product.type === 'etudiant_simple') buildEtudiantSimpleBuilder(content, item.product);
+            else if (item.product.type === 'etudiant_poutine') buildEtudiantPoutineBuilder(content, item.product);
+            else if (item.product.type === 'etudiant_sandwich') buildEtudiantSandwichBuilder(content, item.product);
             else if (item.product.menuUpgrade) buildBurgerBuilder(content, item.product);
 
             processBuilderSteps();
