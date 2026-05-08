@@ -17,11 +17,13 @@
             align-items: center;
             text-align: center;
             padding: 40px;
+            user-select: none;
         }
         h1 {
             font-size: 3em;
             color: #FFC000;
             margin-bottom: 30px;
+            letter-spacing: 3px;
         }
         p {
             font-size: 1.5em;
@@ -41,41 +43,86 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .status {
+            font-size: 1.2em;
+            color: #FFC000;
+            margin-top: 30px;
+            min-height: 40px;
+        }
         .countdown {
             font-size: 4em;
             color: #FFC000;
             font-weight: bold;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>🔄 MISE À JOUR</h1>
+    <h1>MISE À JOUR</h1>
     <div class="spinner"></div>
-    <p>Fermeture de la borne...</p>
-    <p>Redémarrage automatique dans</p>
-    <div class="countdown" id="countdown">5</div>
+    <p>Téléchargement des dernières modifications...</p>
+    <p class="status" id="status">Connexion au serveur de mise à jour...</p>
+    <div class="countdown" id="countdown"></div>
     <p style="margin-top: 40px; font-size: 1em; color: rgba(255,255,255,0.5);">
-        Le batch va télécharger les mises à jour et relancer la borne.
+        La borne va redémarrer automatiquement.
     </p>
 
     <script>
-        let count = 5;
+        const status = document.getElementById('status');
         const countdownEl = document.getElementById('countdown');
 
-        const interval = setInterval(() => {
-            count--;
-            countdownEl.textContent = count;
+        function tryServerUpdate() {
+            // Tentative 1 : si le serveur PowerShell tourne, l'API fait git pull + relance
+            return fetch('/api/update', {
+                method: 'GET',
+                cache: 'no-cache'
+            }).then(response => {
+                if (!response.ok) throw new Error('Server not OK');
+                status.textContent = 'Mise à jour réussie ! Redémarrage en cours...';
+                return true;
+            });
+        }
 
-            if (count <= 0) {
-                clearInterval(interval);
-                // Fermer la fenêtre - le batch devra être relancé
-                window.close();
-                // Si window.close ne marche pas, rediriger vers blank
-                setTimeout(() => {
-                    window.location.href = 'about:blank';
-                }, 500);
+        function fallbackClose() {
+            // Tentative 2 : pas de serveur — on ferme Chrome
+            // Le launcher .bat doit boucler et relancer après git pull
+            status.textContent = 'Fermeture de la borne pour mise à jour...';
+            countdownEl.style.display = 'block';
+            let count = 5;
+            countdownEl.textContent = count;
+            const interval = setInterval(() => {
+                count--;
+                countdownEl.textContent = count;
+                if (count <= 0) {
+                    clearInterval(interval);
+                    // Multiple méthodes pour fermer la borne :
+                    // 1. window.close() - marche si la page a été ouverte par script
+                    try { window.close(); } catch(e) {}
+                    // 2. Naviguer vers about:blank
+                    setTimeout(() => {
+                        try { window.location.href = 'about:blank'; } catch(e) {}
+                    }, 200);
+                    // 3. Forcer la fermeture via location
+                    setTimeout(() => {
+                        try { window.open('', '_self').close(); } catch(e) {}
+                    }, 400);
+                }
+            }, 1000);
+        }
+
+        // Tenter d'abord le serveur, fallback sur fermeture
+        tryServerUpdate()
+            .catch(() => {
+                // Pas de serveur disponible, fallback fermeture
+                fallbackClose();
+            });
+
+        // Sécurité : après 10 secondes, force la fermeture
+        setTimeout(() => {
+            if (countdownEl.style.display !== 'block') {
+                fallbackClose();
             }
-        }, 1000);
+        }, 10000);
     </script>
 </body>
 </html>

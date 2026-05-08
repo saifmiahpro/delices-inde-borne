@@ -4980,18 +4980,22 @@
         }
 
         function adminUpdateRestart() {
-            if (confirm('Mettre à jour et redémarrer ?')) {
+            if (confirm('Mettre à jour et redémarrer ?\n\nLa borne va se fermer puis se relancer automatiquement avec les dernières modifications.')) {
                 closeAdminModal();
-                showToast('Mise à jour en cours...');
-                // Appeler le serveur pour git pull et relancer
-                fetch('/api/update')
-                    .then(() => {
-                        showToast('Redémarrage...');
-                    })
-                    .catch(() => {
-                        // Fallback: fermer la fenêtre
-                        window.close();
-                    });
+                // Afficher overlay "Mise à jour en cours..."
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:#0a0a0a;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#FFC000;font-family:Anton,sans-serif;';
+                overlay.innerHTML = `
+                    <div style="font-size:42px;letter-spacing:2px;margin-bottom:20px;">MISE À JOUR EN COURS</div>
+                    <div style="font-size:20px;color:#aaa;margin-bottom:30px;">Téléchargement des dernières modifications...</div>
+                    <div style="width:60px;height:60px;border:4px solid #333;border-top-color:#FFC000;border-radius:50%;animation:spin 1s linear infinite;"></div>
+                    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+                `;
+                document.body.appendChild(overlay);
+                // Naviguer vers maj.html qui déclenche la mise à jour côté launcher
+                setTimeout(() => {
+                    window.location.href = 'maj.html';
+                }, 1500);
             }
         }
 
@@ -5073,14 +5077,15 @@
             resetScreensaverTimer();
 
             // Ajouter le listener sur tous les logos (click ET touch pour écran tactile)
-            document.querySelectorAll('.logo-big, .sidebar-header img').forEach(logo => {
+            document.querySelectorAll('.logo-big, .sidebar-header img, .top-bar-logo, .screensaver-logo').forEach(logo => {
+                logo.style.cursor = 'pointer';
                 logo.addEventListener('click', handleSecretClick);
                 logo.addEventListener('touchend', function(e) {
                     e.preventDefault();
                     handleSecretClick();
                 });
             });
-            console.log('Listeners logos ajoutés');
+            console.log('Listeners logos ajoutés sur ' + document.querySelectorAll('.logo-big, .top-bar-logo').length + ' logos');
 
             // Relancer le timer du screensaver à chaque interaction sur l'écran prénom
             document.getElementById('screen-prenom').addEventListener('click', resetScreensaverTimer);
