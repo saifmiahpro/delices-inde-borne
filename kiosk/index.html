@@ -469,18 +469,32 @@
             }
         }
 
-        /* === PORTRAIT : tabs horizontales === */
+        /* === PORTRAIT : tabs horizontales BIG ============ */
         @media (orientation: portrait) {
             .nav-categories {
                 display: flex;
                 flex-direction: row;
                 overflow-x: auto;
                 overflow-y: hidden;
-                padding: 14px 16px;
-                gap: 12px;
-                border-bottom: 1px solid var(--border);
+                padding: 16px 18px 18px;
+                gap: 14px;
+                background: linear-gradient(180deg, #060606 0%, #0a0a0a 100%);
                 scroll-snap-type: x mandatory;
                 -webkit-overflow-scrolling: touch;
+                position: relative;
+            }
+
+            /* Fade dégradé droit pour suggérer qu'il y a plus de tabs à scroller */
+            .nav-categories::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 60px;
+                background: linear-gradient(90deg, transparent, #0a0a0a);
+                pointer-events: none;
+                z-index: 2;
             }
 
             .nav-item {
@@ -488,21 +502,22 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 8px;
-                padding: 14px 18px;
+                gap: 10px;
+                padding: 18px 22px;
                 cursor: pointer;
-                font-size: clamp(13px, 1.4vw, 16px);
+                font-size: clamp(18px, 2vw, 22px);
                 font-weight: 700;
                 color: var(--text-dim);
-                background: linear-gradient(180deg, #161616, #0c0c0c);
+                background: linear-gradient(180deg, #181818, #0d0d0d);
                 border: 2px solid var(--border);
-                border-radius: 18px;
-                min-width: 110px;
+                border-radius: 20px;
+                min-width: 150px;
                 flex-shrink: 0;
                 scroll-snap-align: start;
-                transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+                transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
                 text-align: center;
                 line-height: 1.1;
+                letter-spacing: 0.5px;
             }
 
             .nav-item:active {
@@ -510,17 +525,24 @@
             }
 
             .nav-item.active {
-                background: linear-gradient(180deg, rgba(255, 192, 0, 0.18), rgba(255, 192, 0, 0.06));
+                background: linear-gradient(180deg, rgba(255, 192, 0, 0.22), rgba(255, 192, 0, 0.08));
                 border-color: var(--yellow);
                 color: var(--yellow);
-                box-shadow: 0 8px 24px rgba(255, 192, 0, 0.25);
+                box-shadow: 0 10px 28px rgba(255, 192, 0, 0.35), inset 0 1px 0 rgba(255, 192, 0, 0.3);
+                transform: translateY(-2px);
             }
 
             .nav-item img {
-                width: 56px;
-                height: 56px;
+                width: 80px;
+                height: 80px;
                 object-fit: contain;
-                filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+                filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.6));
+                transition: transform 0.25s ease;
+            }
+
+            .nav-item.active img {
+                transform: scale(1.05);
+                filter: drop-shadow(0 8px 18px rgba(255, 192, 0, 0.4));
             }
         }
 
@@ -682,37 +704,50 @@
         .main-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
         /* ============ SECTIONS DE CATÉGORIES (scroll-spy) ============ */
+        .main-body {
+            background: #0a0a0a;
+        }
+
         .products-grid {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 18px;
             padding-bottom: 6vh;
         }
 
         .category-section {
-            scroll-margin-top: 8px;
+            scroll-margin-top: 0;
         }
 
+        .category-section + .category-section {
+            margin-top: 8px;
+        }
+
+        /* Header de section — gros et impactant, collé aux tabs */
         .category-section-header {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 4px 14px;
-            position: sticky;
-            top: 0;
-            background: linear-gradient(180deg, rgba(10, 10, 10, 0.95), rgba(10, 10, 10, 0.85));
-            backdrop-filter: blur(8px);
-            z-index: 4;
+            align-items: baseline;
+            gap: 16px;
+            padding: 18px 4px 14px;
+            position: relative;
         }
 
         .category-section-header h2 {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(22px, 3vw, 36px);
+            font-size: clamp(28px, 3.6vw, 44px);
             background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .category-section-header .section-count {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(14px, 1.6vw, 18px);
+            color: var(--text-faint);
+            letter-spacing: 1px;
         }
 
         .category-section-header::after {
@@ -720,6 +755,7 @@
             flex: 1;
             height: 2px;
             background: linear-gradient(90deg, rgba(255, 192, 0, 0.4), transparent);
+            margin-left: 8px;
         }
 
         /* Bannière dans une section */
@@ -2779,10 +2815,22 @@
                 section.id = 'section-' + cat.id;
                 section.dataset.categoryId = cat.id;
 
-                // Header de section
+                // Calculer le nombre de produits
+                let sectionProducts;
+                if (cat.id === 'offres') {
+                    sectionProducts = PRODUCTS.filter(p => p.featured)
+                        .sort((a, b) => (a.featuredPriority || 99) - (b.featuredPriority || 99));
+                } else {
+                    sectionProducts = PRODUCTS.filter(p => p.category === cat.id);
+                }
+
+                // Header de section avec compteur
                 const header = document.createElement('div');
                 header.className = 'category-section-header';
-                header.innerHTML = `<h2>${cat.name.toUpperCase()}</h2>`;
+                header.innerHTML = `
+                    <h2>${cat.name.toUpperCase()}</h2>
+                    <span class="section-count">${sectionProducts.length} produit${sectionProducts.length > 1 ? 's' : ''}</span>
+                `;
                 section.appendChild(header);
 
                 // Bannière spéciale pour Menu Étudiant
@@ -2805,15 +2853,7 @@
                 const sectionGrid = document.createElement('div');
                 sectionGrid.className = 'section-products-grid';
 
-                let products;
-                if (cat.id === 'offres') {
-                    products = PRODUCTS.filter(p => p.featured)
-                        .sort((a, b) => (a.featuredPriority || 99) - (b.featuredPriority || 99));
-                } else {
-                    products = PRODUCTS.filter(p => p.category === cat.id);
-                }
-
-                products.forEach(product => {
+                sectionProducts.forEach(product => {
                     sectionGrid.appendChild(createProductCard(product));
                 });
 
