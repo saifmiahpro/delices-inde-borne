@@ -57,7 +57,8 @@ const BOISSONS_33 = [
 ];
 
 const PAINS = [
-    { id: 'naan', name: 'Naan' },
+    { id: 'naan_nature', name: 'Naan Nature' },
+    { id: 'naan_fromage', name: 'Naan Fromage', extraPrice: 1.00 },
     { id: 'pain_rond', name: 'Pain Rond' },
     { id: 'galette', name: 'Galette' }
 ];

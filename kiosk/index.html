@@ -1445,6 +1445,7 @@
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: var(--border) transparent;
+            background: #050505;
         }
 
         .modal-content::-webkit-scrollbar { width: 8px; }
@@ -1654,13 +1655,10 @@
         .builder-step {
             display: none;
             animation: fadeIn 0.3s ease;
-            height: 100%;
         }
 
         .builder-step.active {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -3017,6 +3015,10 @@
                 step.classList.toggle('active', index === (stepNum - 1));
             });
 
+            // Reset scroll au top du modal-content lors du changement de step
+            const content = document.getElementById('builder-content');
+            if (content) content.scrollTop = 0;
+
             const prevBtn = document.getElementById('btn-builder-prev');
             const nextBtn = document.getElementById('btn-builder-next');
 
@@ -3248,7 +3250,9 @@
             // Pain
             html += `<div class="step-title">Pain</div><div class="options-grid big">`;
             PAINS.forEach((p, i) => {
-                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('bread', '${p.id}', this)">${p.name}</div>`;
+                const priceLabel = p.extraPrice ? `<span class="option-price">+${p.extraPrice.toFixed(2)}€</span>` : '';
+                const dataPrice = p.extraPrice ? `data-price="${p.extraPrice}"` : '';
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('bread', '${p.id}', this)" ${dataPrice}>${p.name} ${priceLabel}</div>`;
             });
             html += '</div>';
 
@@ -3901,6 +3905,7 @@
             } else if (product.type === 'sandwich') {
                 price = sel.formula?.price || 7;
                 if (sel.menuOpt) price += 2;
+                if (sel.bread?.extraPrice) price += sel.bread.extraPrice;
             } else if (product.type === 'bowl') {
                 // Produits avec sizes (comme Crousty Bowl promo)
                 if (product.sizes && sel.size?.price !== undefined) {
