@@ -295,7 +295,7 @@
             box-shadow: none;
         }
 
-        /* ============ LAYOUT PRINCIPAL AVEC SIDEBAR ============ */
+        /* ============ LAYOUT PRINCIPAL ADAPTATIF (Win10 portrait + Win7 landscape) ============ */
         .app-layout {
             display: none;
             width: 100%;
@@ -304,205 +304,321 @@
         }
 
         .app-layout.active {
-            display: flex;
-            flex-direction: row;
+            display: grid;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            min-width: 200px;
-            max-width: 320px;
-            height: 100%;
-            background: linear-gradient(180deg, #050505 0%, #0a0a0a 100%);
-            border-right: 1px solid var(--border);
+        /* === LANDSCAPE (Win7 4:3) === */
+        @media (orientation: landscape) {
+            .app-layout.active {
+                grid-template-columns: 260px 1fr;
+                grid-template-rows: auto 1fr auto;
+                grid-template-areas:
+                    "topbar topbar"
+                    "nav    main"
+                    "cart   main";
+            }
+        }
+
+        /* === PORTRAIT (Win10 vertical) === */
+        @media (orientation: portrait) {
+            .app-layout.active {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+                grid-template-areas:
+                    "topbar"
+                    "nav"
+                    "main"
+                    "cart";
+            }
+        }
+
+        /* ============ TOP BAR (logo + nom + abandonner) ============ */
+        .top-bar {
+            grid-area: topbar;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            background: linear-gradient(180deg, #060606 0%, #0e0e0e 100%);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            z-index: 5;
+        }
+
+        .top-bar-logo {
+            height: clamp(48px, 7vh, 70px);
+            width: auto;
+            filter: drop-shadow(0 4px 12px rgba(255, 192, 0, 0.3));
             flex-shrink: 0;
-            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.4);
         }
 
-        .sidebar-header {
-            padding: 2vh 1.5vw;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
+        .top-bar-info {
+            flex: 1;
+            min-width: 0;
         }
 
-        .sidebar-header img {
-            height: clamp(40px, 6vh, 70px);
-            filter: drop-shadow(0 4px 12px rgba(255, 192, 0, 0.2));
-        }
-
-        .sidebar-mode {
-            padding: 1.5vh 1vw;
-            text-align: center;
-            background: linear-gradient(180deg, rgba(255, 192, 0, 0.05), transparent);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .sidebar-mode .client-name {
+        .top-bar-info .client-name {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(16px, 2vw, 22px);
+            font-size: clamp(20px, 2.6vw, 30px);
             color: var(--yellow);
+            letter-spacing: 1.5px;
+            line-height: 1;
+            text-shadow: 0 2px 10px rgba(255, 192, 0, 0.25);
+        }
+
+        .top-bar-info .order-mode {
+            font-size: clamp(12px, 1.4vw, 15px);
+            color: var(--text-dim);
+            margin-top: 4px;
+            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .sidebar-mode .order-mode {
-            font-size: clamp(12px, 1.5vw, 16px);
-            color: var(--text-dim);
-            margin-top: 2px;
+        .abandon-btn {
+            background: rgba(255, 51, 51, 0.08);
+            color: #ff5555;
+            border: 1px solid rgba(255, 51, 51, 0.4);
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(12px, 1.4vw, 16px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+            flex-shrink: 0;
         }
 
-        /* Navigation catégories */
+        .abandon-btn:hover {
+            background: rgba(255, 51, 51, 0.18);
+            border-color: #ff5555;
+        }
+
+        .abandon-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ============ NAV CATEGORIES ============ */
         .nav-categories {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1vh 0;
+            grid-area: nav;
+            background: linear-gradient(180deg, #050505 0%, #0a0a0a 100%);
             scrollbar-width: thin;
             scrollbar-color: var(--border) transparent;
         }
 
-        .nav-categories::-webkit-scrollbar { width: 6px; }
+        .nav-categories::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
         .nav-categories::-webkit-scrollbar-track { background: transparent; }
         .nav-categories::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: clamp(13px, 1.8vh, 20px) clamp(18px, 2vw, 30px);
-            cursor: pointer;
-            border-left: 4px solid transparent;
-            font-size: clamp(17px, 2.1vw, 24px);
-            font-weight: 600;
-            color: var(--text-dim);
-            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-            position: relative;
+        /* === LANDSCAPE : sidebar verticale === */
+        @media (orientation: landscape) {
+            .nav-categories {
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 6px 0;
+                border-right: 1px solid var(--border);
+            }
+
+            .nav-item {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 14px;
+                padding: 14px 22px;
+                cursor: pointer;
+                border-left: 4px solid transparent;
+                font-size: clamp(16px, 1.8vw, 22px);
+                font-weight: 600;
+                color: var(--text-dim);
+                transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            .nav-item.active {
+                background: linear-gradient(90deg, rgba(255, 192, 0, 0.15) 0%, transparent 100%);
+                border-left-color: var(--yellow);
+                color: var(--yellow);
+            }
+
+            .nav-item.active::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 0;
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-right: 8px solid var(--card-bg);
+            }
+
+            .nav-item img {
+                width: clamp(36px, 4vw, 50px);
+                height: clamp(36px, 4vw, 50px);
+                object-fit: contain;
+                filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+            }
         }
 
-        .nav-item:hover {
-            background: var(--glass-light);
-            color: var(--text);
+        /* === PORTRAIT : tabs horizontales === */
+        @media (orientation: portrait) {
+            .nav-categories {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 14px 16px;
+                gap: 12px;
+                border-bottom: 1px solid var(--border);
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 14px 18px;
+                cursor: pointer;
+                font-size: clamp(13px, 1.4vw, 16px);
+                font-weight: 700;
+                color: var(--text-dim);
+                background: linear-gradient(180deg, #161616, #0c0c0c);
+                border: 2px solid var(--border);
+                border-radius: 18px;
+                min-width: 110px;
+                flex-shrink: 0;
+                scroll-snap-align: start;
+                transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+                text-align: center;
+                line-height: 1.1;
+            }
+
+            .nav-item:active {
+                transform: scale(0.96);
+            }
+
+            .nav-item.active {
+                background: linear-gradient(180deg, rgba(255, 192, 0, 0.18), rgba(255, 192, 0, 0.06));
+                border-color: var(--yellow);
+                color: var(--yellow);
+                box-shadow: 0 8px 24px rgba(255, 192, 0, 0.25);
+            }
+
+            .nav-item img {
+                width: 56px;
+                height: 56px;
+                object-fit: contain;
+                filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+            }
         }
 
-        .nav-item.active {
-            background: linear-gradient(90deg, rgba(255, 192, 0, 0.15) 0%, transparent 100%);
-            border-left-color: var(--yellow);
-            color: var(--yellow);
-        }
-
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-right: 8px solid var(--card-bg);
-        }
-
-        .nav-item img {
-            width: clamp(40px, 5vw, 60px);
-            height: clamp(40px, 5vw, 60px);
-            object-fit: contain;
-            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
-        }
-
-        /* Bouton panier sidebar */
-        .sidebar-cart {
-            padding: 2vh 1vw;
+        /* ============ CART BAR (sticky bottom en portrait, sidebar bottom en landscape) ============ */
+        .cart-bar {
+            grid-area: cart;
+            padding: 10px 14px;
+            background: linear-gradient(180deg, #050505 0%, #0a0a0a 100%);
             border-top: 1px solid var(--border);
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5);
         }
 
-        .cart-btn-sidebar {
+        @media (orientation: landscape) {
+            .cart-bar {
+                border-right: 1px solid var(--border);
+            }
+        }
+
+        .cart-btn-main {
             width: 100%;
             background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
             color: var(--dark);
             border: none;
-            border-radius: 14px;
-            padding: clamp(14px, 2.2vh, 22px);
+            border-radius: 16px;
+            padding: clamp(14px, 2.2vh, 22px) 18px;
             font-family: 'Anton', sans-serif;
-            font-size: clamp(16px, 2vw, 22px);
+            font-size: clamp(16px, 2.2vw, 22px);
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            letter-spacing: 1.5px;
-            box-shadow: 0 8px 24px rgba(255, 192, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            gap: 12px;
+            letter-spacing: 1.2px;
+            box-shadow: 0 8px 24px rgba(255, 192, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .cart-btn-sidebar:hover {
+        .cart-btn-main:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(255, 192, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            box-shadow: 0 12px 32px rgba(255, 192, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
 
-        .cart-btn-sidebar:active {
-            transform: translateY(0);
+        .cart-btn-main:active { transform: translateY(0); }
+
+        .cart-btn-main svg { flex-shrink: 0; }
+
+        .cart-btn-main .cart-btn-text {
+            flex: 0 0 auto;
         }
 
-        .cart-btn-sidebar .count {
+        .cart-btn-main .count {
             background: var(--dark);
             color: var(--yellow);
-            padding: 4px 12px;
+            padding: 4px 11px;
             border-radius: 999px;
-            font-size: clamp(14px, 1.5vw, 18px);
+            font-size: clamp(13px, 1.4vw, 16px);
             min-width: 28px;
             text-align: center;
         }
 
-        .cart-btn-sidebar.has-items {
+        .cart-btn-main .cart-total-bar {
+            margin-left: auto;
+            font-size: clamp(18px, 2.4vw, 26px);
+            color: var(--dark);
+            background: rgba(0, 0, 0, 0.15);
+            padding: 4px 14px;
+            border-radius: 999px;
+        }
+
+        .cart-btn-main.pulse {
             animation: cartPulse 0.5s ease;
         }
 
         @keyframes cartPulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.04); }
+            40% { transform: scale(1.04); box-shadow: 0 16px 44px rgba(255, 192, 0, 0.65); }
         }
 
-        .cancel-btn-sidebar {
-            width: 100%;
-            background: rgba(255, 51, 51, 0.08);
-            color: #ff5555;
-            border: 1px solid rgba(255, 51, 51, 0.4);
-            border-radius: 14px;
-            padding: clamp(10px, 1.6vh, 16px);
-            font-family: 'Anton', sans-serif;
-            font-size: clamp(14px, 1.8vw, 20px);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 1vh;
-            letter-spacing: 1px;
-            transition: background 0.2s ease, border-color 0.2s ease;
-        }
-
-        .cancel-btn-sidebar:hover {
-            background: rgba(255, 51, 51, 0.18);
-            border-color: #ff5555;
-        }
-
-        .cancel-btn-sidebar:active {
-            background: #ff3333;
-            color: white;
+        /* En landscape, on cache le total dans le bouton (espace limité dans la sidebar) */
+        @media (orientation: landscape) {
+            .cart-btn-main .cart-total-bar {
+                display: none;
+            }
+            .cart-btn-main {
+                justify-content: center;
+                font-size: clamp(15px, 1.7vw, 19px);
+                padding: 14px;
+            }
         }
 
         /* Zone principale */
         .main-content {
-            flex: 1;
+            grid-area: main;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            height: 100vh;
-            max-height: 100vh;
+            min-height: 0;
         }
 
         #products-view {
@@ -510,34 +626,45 @@
             flex-direction: column;
             flex: 1;
             min-height: 0;
-            height: 100%;
             overflow: hidden;
         }
 
         .main-header {
-            padding: 2vh 2vw;
-            background: var(--darker);
-            border-bottom: 1px solid var(--border);
+            padding: 14px 22px;
+            background: linear-gradient(180deg, #0a0a0a 0%, transparent 100%);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
 
         .main-header h1 {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(28px, 4vw, 44px);
-            color: var(--yellow);
+            font-size: clamp(26px, 3.4vw, 40px);
+            background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1.5px;
+            text-shadow: 0 2px 12px rgba(255, 192, 0, 0.2);
         }
 
         .main-header .back-btn {
-            background: var(--glass);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            padding: 1vh 2vw;
-            font-size: clamp(14px, 1.8vw, 20px);
-            font-weight: 600;
+            background: linear-gradient(180deg, #1a1a1a, #0e0e0e);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 10px 20px;
+            font-size: clamp(13px, 1.6vw, 17px);
+            font-weight: 700;
             cursor: pointer;
             color: var(--text);
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 1px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .main-header .back-btn:hover {
+            border-color: var(--yellow);
         }
 
         .main-body {
@@ -546,166 +673,255 @@
             max-height: 100%;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 2vh 2vw;
+            padding: 6px 18px 18px;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Grille produits */
+        .main-body::-webkit-scrollbar { width: 8px; }
+        .main-body::-webkit-scrollbar-track { background: transparent; }
+        .main-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* ============ GRILLE PRODUITS PHOTO-FIRST ============ */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 22px;
-            padding-bottom: 5vh;
+            gap: 18px;
+            padding-bottom: 4vh;
         }
 
+        /* Portrait (Win10) : 2 colonnes plein cadre */
+        @media (orientation: portrait) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+
+        /* Landscape (Win7) : 3 colonnes */
+        @media (orientation: landscape) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 18px;
+            }
+        }
+
+        /* Carte produit moderne avec photo en grand */
         .product-card {
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: var(--radius-card);
-            padding: 18px 18px 22px;
-            text-align: center;
+            background: linear-gradient(180deg, #181818 0%, #0d0d0d 100%);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            text-align: left;
             position: relative;
             overflow: hidden;
-            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.25s ease, box-shadow 0.3s ease;
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            box-shadow: var(--shadow-card);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
 
-        .product-card::before {
+        /* Container photo - prend la grande partie haute */
+        .product-card .img-wrap {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 80%);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        @media (orientation: portrait) {
+            .product-card .img-wrap {
+                aspect-ratio: 1 / 1;
+                min-height: 200px;
+            }
+        }
+
+        @media (orientation: landscape) {
+            .product-card .img-wrap {
+                height: clamp(180px, 28vh, 280px);
+            }
+        }
+
+        .product-card .img-wrap::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60%;
-            background: radial-gradient(ellipse at 50% 0%, rgba(255, 192, 0, 0.08), transparent 70%);
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.5), transparent 60%);
             pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .product-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-active);
-            background: var(--card-bg-hover);
-            box-shadow: var(--shadow-card-hover);
-        }
-
-        .product-card:hover::before {
-            opacity: 1;
-        }
-
-        .product-card:active {
-            transform: translateY(-2px) scale(0.99);
-            border-color: var(--yellow);
-        }
-
-        .product-card.compose-card {
-            grid-column: 1 / -1;
-            flex-direction: row;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 30px;
-            padding: 26px 32px;
-            background: linear-gradient(135deg, #1a1308 0%, #0a0a0a 60%, rgba(255, 192, 0, 0.12) 100%);
-            border: 2px solid var(--yellow);
-            border-left: 6px solid var(--yellow);
-            min-height: 150px;
-            box-shadow: 0 4px 30px rgba(255, 192, 0, 0.15);
-        }
-
-        .product-card.compose-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 40px rgba(255, 192, 0, 0.3);
-            border-color: var(--yellow);
-        }
-
-        .product-card.compose-card img {
-            height: clamp(100px, 13vw, 150px);
-            width: auto;
-            margin-bottom: 0;
-            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
-        }
-
-        .product-card.compose-card .compose-text {
-            flex: 1;
-            text-align: left;
-        }
-
-        .product-card.compose-card h4 {
-            font-size: clamp(24px, 3.2vw, 36px);
-            margin-bottom: 6px;
-            color: var(--yellow);
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-        }
-
-        .product-card.compose-card .desc {
-            font-size: clamp(13px, 1.6vw, 17px);
-            margin-bottom: 0;
-            color: var(--text-dim);
-        }
-
-        .product-card.compose-card .price {
-            font-size: clamp(22px, 2.7vw, 30px);
-            background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         .product-card img {
             width: 100%;
-            height: clamp(220px, 32vh, 400px);
+            height: 100%;
             object-fit: contain;
-            margin-bottom: 1.2vh;
-            transition: transform 0.4s ease;
-            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
+            padding: 16px;
+            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6));
+            position: relative;
+            z-index: 1;
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-active);
+            box-shadow: 0 16px 50px rgba(255, 192, 0, 0.18);
         }
 
         .product-card:hover img {
-            transform: scale(1.04) translateY(-2px);
+            transform: scale(1.06);
+        }
+
+        .product-card:active {
+            transform: translateY(-3px) scale(0.99);
+            border-color: var(--yellow);
+        }
+
+        /* Section info en bas */
+        .product-card .info-wrap {
+            padding: 16px 18px 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 8px;
         }
 
         .product-card h4 {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(22px, 2.7vw, 32px);
+            font-size: clamp(20px, 2.3vw, 28px);
             color: var(--text);
-            margin-bottom: 0.4vh;
             letter-spacing: 0.5px;
+            line-height: 1.1;
         }
 
         .product-card .desc {
-            font-size: clamp(13px, 1.6vw, 18px);
+            font-size: clamp(12px, 1.4vw, 15px);
             color: var(--text-dim);
-            margin-bottom: 1.2vh;
-            flex: 1;
-            line-height: 1.35;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .product-card .price {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(26px, 3.3vw, 38px);
-            color: var(--yellow);
+            font-size: clamp(22px, 2.6vw, 30px);
+            background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: 0.5px;
+            margin-top: 4px;
         }
 
-        .product-card .badge {
+        /* Badge corner — POPULAIRE / NOUVEAU / ÉPICÉ / etc */
+        .product-card .badge,
+        .product-card [class^="badge"] {
             position: absolute;
             top: 12px;
-            right: 12px;
-            background: var(--orange);
+            left: 12px;
             color: white;
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 999px;
-            font-size: clamp(10px, 1.2vw, 13px);
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            font-size: clamp(11px, 1.2vw, 14px);
+            font-family: 'Anton', sans-serif;
+            font-weight: 800;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4);
-            z-index: 2;
+            z-index: 3;
+            line-height: 1;
+        }
+
+        /* MEILLEUR DEAL — orange/rouge */
+        .badge-meilleur-deal {
+            background: linear-gradient(135deg, #FF6B35, #C8102E);
+            box-shadow: 0 4px 14px rgba(255, 87, 34, 0.5);
+        }
+
+        /* POPULAIRE — or */
+        .badge-populaire {
+            background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+            color: var(--dark);
+            box-shadow: 0 4px 14px rgba(255, 192, 0, 0.5);
+        }
+
+        /* ÉPICÉ — rouge feu */
+        .badge-épicé,
+        .badge-epice {
+            background: linear-gradient(135deg, #FF4500, #8B0000);
+            box-shadow: 0 4px 14px rgba(255, 69, 0, 0.5);
+        }
+
+        /* FAMILLE — vert/bleu */
+        .badge-famille {
+            background: linear-gradient(135deg, #2E7D32, #1B5E20);
+            box-shadow: 0 4px 14px rgba(46, 125, 50, 0.5);
+        }
+
+        /* NOUVEAU — bleu */
+        .badge-nouveau {
+            background: linear-gradient(135deg, #1976D2, #0D47A1);
+            box-shadow: 0 4px 14px rgba(25, 118, 210, 0.5);
+        }
+
+        /* PROMO — rouge */
+        .badge-promo {
+            background: linear-gradient(135deg, #ff3333, #cc0000);
+            box-shadow: 0 4px 14px rgba(255, 51, 51, 0.5);
+        }
+
+        /* COMPOSER — or subtil */
+        .badge-composer {
+            background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+            color: var(--dark);
+            box-shadow: 0 4px 14px rgba(255, 192, 0, 0.4);
+        }
+
+        /* Carte "Compose" — featured plein largeur en portrait */
+        .product-card.compose-card {
+            grid-column: 1 / -1;
+            flex-direction: row;
+            align-items: stretch;
+            min-height: 180px;
+            background: linear-gradient(135deg, #1a1308 0%, #0a0a0a 50%, rgba(255, 192, 0, 0.15) 100%);
+            border: 2px solid var(--yellow);
+            box-shadow: 0 8px 32px rgba(255, 192, 0, 0.2);
+            padding: 0;
+        }
+
+        .product-card.compose-card .img-wrap {
+            width: 40%;
+            min-height: 100%;
+            aspect-ratio: auto;
+        }
+
+        .product-card.compose-card .info-wrap {
+            flex: 1;
+            justify-content: center;
+            padding: 20px 24px;
+        }
+
+        .product-card.compose-card h4 {
+            font-size: clamp(24px, 3vw, 36px);
+            color: var(--yellow);
+            text-shadow: 0 2px 12px rgba(255, 192, 0, 0.3);
+            margin-bottom: 6px;
+        }
+
+        .product-card.compose-card .desc {
+            color: var(--text-dim);
+            -webkit-line-clamp: 3;
+        }
+
+        .product-card.compose-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 50px rgba(255, 192, 0, 0.3);
+        }
+
+        @media (orientation: portrait) {
+            .product-card.compose-card {
+                min-height: 200px;
+            }
         }
 
         /* ============ PANIER ============ */
@@ -966,45 +1182,157 @@
         }
 
         .modal-header {
-            padding: 2vh 3vw;
-            background: linear-gradient(180deg, #0c0c0c 0%, #060606 100%);
+            padding: 14px 18px;
+            background: linear-gradient(180deg, rgba(12, 12, 12, 0.95) 0%, rgba(6, 6, 6, 0.95) 100%);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 5;
         }
 
         .modal-header h2 {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(22px, 3vw, 36px);
-            color: var(--yellow);
+            font-size: clamp(18px, 2.4vw, 26px);
+            color: var(--text);
             letter-spacing: 1px;
-            text-shadow: 0 2px 10px rgba(255, 192, 0, 0.3);
+            text-align: center;
+            flex: 1;
         }
 
-        .modal-close {
-            min-width: clamp(100px, 15vw, 160px);
-            height: clamp(50px, 7vw, 70px);
-            border-radius: 14px;
+        .modal-close-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a1a1a, #0e0e0e);
+            color: var(--text);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .modal-close-icon:hover {
             background: linear-gradient(135deg, #ff3333, #cc0000);
             color: white;
-            border: none;
-            font-size: clamp(18px, 2.5vw, 26px);
+            border-color: #ff3333;
+        }
+
+        .modal-close-icon:active {
+            transform: scale(0.92);
+        }
+
+        /* Hero image dans le builder (photo XXL en haut) */
+        .builder-hero {
+            position: relative;
+            width: 100%;
+            background: radial-gradient(ellipse at center, #1a1a1a 0%, #050505 80%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        @media (orientation: portrait) {
+            .builder-hero {
+                min-height: 380px;
+                padding: 18px;
+            }
+        }
+
+        @media (orientation: landscape) {
+            .builder-hero {
+                min-height: 200px;
+                padding: 12px;
+            }
+        }
+
+        .builder-hero::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 30%;
+            width: 60%;
+            height: 80%;
+            background: radial-gradient(ellipse at center, rgba(255, 192, 0, 0.15), transparent 60%);
+            pointer-events: none;
+        }
+
+        .builder-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+            pointer-events: none;
+        }
+
+        .builder-hero img {
+            max-height: 100%;
+            max-width: 60%;
+            object-fit: contain;
+            filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.7));
+            position: relative;
+            z-index: 1;
+            animation: heroFloat 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes heroFloat {
+            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .builder-hero-info {
+            position: absolute;
+            bottom: 20px;
+            left: 24px;
+            right: 24px;
+            z-index: 2;
+            text-align: left;
+            pointer-events: none;
+        }
+
+        .builder-hero-info h3 {
             font-family: 'Anton', sans-serif;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(255, 51, 51, 0.4);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            font-size: clamp(24px, 3.2vw, 38px);
+            color: var(--yellow);
             letter-spacing: 1px;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+            line-height: 1.05;
+            margin-bottom: 4px;
         }
 
-        .modal-close:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(255, 51, 51, 0.55);
+        .builder-hero-info p {
+            font-size: clamp(13px, 1.6vw, 17px);
+            color: var(--text-dim);
+            line-height: 1.3;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .modal-close:active {
-            transform: scale(0.97);
+        @media (orientation: landscape) {
+            .builder-hero-info {
+                bottom: 12px;
+                left: 18px;
+                right: 18px;
+            }
+            .builder-hero-info h3 {
+                font-size: clamp(18px, 2.4vw, 24px);
+            }
+            .builder-hero-info p {
+                font-size: clamp(12px, 1.4vw, 14px);
+            }
         }
 
         .modal-content {
@@ -1020,23 +1348,51 @@
         .modal-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
         .modal-footer {
-            padding: 2vh 3vw;
-            background: linear-gradient(180deg, #060606 0%, #0c0c0c 100%);
+            padding: 14px 18px;
+            background: linear-gradient(180deg, rgba(6, 6, 6, 0.95) 0%, rgba(12, 12, 12, 0.95) 100%);
+            backdrop-filter: blur(12px);
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+        .modal-footer .btn-secondary,
+        .modal-footer .btn-primary {
+            padding: 14px 24px;
+            font-size: clamp(14px, 1.6vw, 18px);
+            border-radius: 14px;
+            min-width: 120px;
+            margin-top: 0;
+            font-family: 'Anton', sans-serif;
+            cursor: pointer;
+            border: none;
+            letter-spacing: 1px;
+        }
+
+        .modal-footer .btn-secondary {
+            background: linear-gradient(180deg, #1a1a1a, #0e0e0e);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .modal-footer .btn-secondary:hover {
+            border-color: var(--yellow);
         }
 
         .modal-price {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(30px, 4.2vw, 46px);
+            font-size: clamp(26px, 3.4vw, 38px);
             background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: 1px;
+            flex: 1;
+            text-align: center;
         }
 
         .step-title {
@@ -1576,28 +1932,25 @@
 
     <!-- ============ LAYOUT PRINCIPAL ============ -->
     <div class="app-layout" id="app-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="../assets/common/logo.png" alt="Chickenzz">
-            </div>
-            <div class="sidebar-mode">
+        <!-- Top bar : logo + nom client + mode + abandonner -->
+        <header class="top-bar">
+            <img class="top-bar-logo" src="../assets/common/logo.png" alt="Délice de l'Inde">
+            <div class="top-bar-info">
                 <div class="client-name" id="sidebar-name">SAIF</div>
                 <div class="order-mode" id="sidebar-mode">SUR PLACE</div>
             </div>
-            <nav class="nav-categories" id="nav-categories">
-                <!-- Généré par JS -->
-            </nav>
-            <div class="sidebar-cart">
-                <button class="cart-btn-sidebar" onclick="showCart()">
-                    🛒 <span>PANIER</span>
-                    <span class="count" id="cart-count">0</span>
-                </button>
-                <button class="cancel-btn-sidebar" onclick="showCancelModal()">
-                    ✕ <span>ABANDONNER</span>
-                </button>
-            </div>
-        </aside>
+            <button class="abandon-btn" onclick="showCancelModal()">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M6 6 L18 18 M18 6 L6 18" />
+                </svg>
+                <span>ABANDONNER</span>
+            </button>
+        </header>
+
+        <!-- Navigation catégories (sidebar verticale en landscape, tabs horizontales en portrait) -->
+        <nav class="nav-categories" id="nav-categories">
+            <!-- Généré par JS -->
+        </nav>
 
         <!-- Zone principale -->
         <main class="main-content">
@@ -1635,21 +1988,43 @@
                 </div>
             </div>
         </main>
+
+        <!-- Cart bar (sticky en bas en portrait, sidebar bottom en landscape) -->
+        <footer class="cart-bar">
+            <button class="cart-btn-main" onclick="showCart()">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 4 L5 4 L7 16 M7 16 L20 16 L22 7 L7 7 M9 21 a1 1 0 1 0 0-2 a1 1 0 0 0 0 2 M18 21 a1 1 0 1 0 0-2 a1 1 0 0 0 0 2" />
+                </svg>
+                <span class="cart-btn-text">MON PANIER</span>
+                <span class="count" id="cart-count">0</span>
+                <span class="cart-total-bar" id="cart-total-bar">0.00€</span>
+            </button>
+        </footer>
     </div>
 
     <!-- ============ MODAL BUILDER ============ -->
     <div class="modal" id="builder-modal">
         <div class="modal-header">
+            <button class="modal-close-icon" onclick="closeBuilder()" aria-label="Fermer">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M6 6 L18 18 M18 6 L6 18" />
+                </svg>
+            </button>
             <h2 id="builder-title">Personnaliser</h2>
-            <button class="modal-close" onclick="closeBuilder()">FERMER</button>
+            <div style="width: 44px;"></div>
+        </div>
+        <div class="builder-hero" id="builder-hero">
+            <img id="builder-hero-img" src="" alt="">
+            <div class="builder-hero-info">
+                <h3 id="builder-hero-name"></h3>
+                <p id="builder-hero-desc"></p>
+            </div>
         </div>
         <div class="modal-content" id="builder-content"></div>
-        <div class="modal-footer" style="display: flex; gap: 15px;">
-            <button class="btn-secondary" id="btn-builder-prev" onclick="prevBuilderStep()"
-                style="padding: 10px 20px; font-size: clamp(16px, 2vw, 24px); border-radius: 10px; min-width: 120px;">RETOUR</button>
-            <div class="modal-price" id="builder-price" style="flex: 1; text-align: center;">0.00€</div>
-            <button class="btn-primary" id="btn-builder-next" onclick="nextBuilderStep()"
-                style="margin-top: 0; padding: 10px 20px; font-size: clamp(16px, 2vw, 24px); border-radius: 10px; min-width: 120px;">SUIVANT</button>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="btn-builder-prev" onclick="prevBuilderStep()">RETOUR</button>
+            <div class="modal-price" id="builder-price">0.00€</div>
+            <button class="btn-primary" id="btn-builder-next" onclick="nextBuilderStep()">SUIVANT</button>
         </div>
     </div>
 
@@ -2307,36 +2682,46 @@
 
                 const displayName = product.displayName || product.name;
 
-                // Carte spéciale "Compose" en haut
+                // Badge prioritaire : badge custom > promo > COMPOSER
+                let badgeHtml = '';
+                if (product.badge) {
+                    const badgeClass = 'badge badge-' + product.badge.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                    badgeHtml = `<div class="${badgeClass}">${product.badge}</div>`;
+                } else if (product.isPromo && product.promoLabel) {
+                    badgeHtml = `<div class="badge badge-promo">${product.promoLabel}</div>`;
+                } else if (product.hasBuilder && !product.isCustom) {
+                    badgeHtml = `<div class="badge badge-composer">COMPOSER</div>`;
+                }
+
                 if (product.isCustom) {
                     card.className = 'product-card compose-card';
                     card.innerHTML = `
-                        <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
-                        <div class="compose-text">
-                            <h4>${displayName}</h4>
-                            <p class="desc">${product.description || ''}</p>
+                        ${badgeHtml}
+                        <div class="img-wrap">
+                            <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
                         </div>
-                        <div class="price">${priceDisplay}</div>
+                        <div class="info-wrap">
+                            <div>
+                                <h4>${displayName}</h4>
+                                <p class="desc">${product.description || ''}</p>
+                            </div>
+                            <div class="price">${priceDisplay}</div>
+                        </div>
                     `;
                 } else {
                     card.className = 'product-card';
-
-                    // Badge: custom > promo > MEILLEUR DEAL > composer
-                    let badgeHtml = '';
-                    if (product.badge) {
-                        badgeHtml = `<div class="badge" style="background:linear-gradient(135deg,#FF6B35,#8B1538);color:white;font-weight:900;">${product.badge}</div>`;
-                    } else if (product.isPromo && product.promoLabel) {
-                        badgeHtml = `<div class="badge" style="background:#ff3333;">${product.promoLabel}</div>`;
-                    } else if (product.hasBuilder) {
-                        badgeHtml = '<div class="badge">COMPOSER</div>';
-                    }
-
                     card.innerHTML = `
                         ${badgeHtml}
-                        <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
-                        <h4>${displayName}</h4>
-                        <p class="desc">${product.description || ''}</p>
-                        <div class="price">${priceDisplay}</div>
+                        <div class="img-wrap">
+                            <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
+                        </div>
+                        <div class="info-wrap">
+                            <div>
+                                <h4>${displayName}</h4>
+                                <p class="desc">${product.description || ''}</p>
+                            </div>
+                            <div class="price">${priceDisplay}</div>
+                        </div>
                     `;
                 }
                 grid.appendChild(card);
@@ -2371,7 +2756,19 @@
         // ============ BUILDER ============
         function openBuilder(product) {
             state.builderSelections = {};
-            document.getElementById('builder-title').textContent = product.name;
+            const displayName = product.displayName || product.name;
+            document.getElementById('builder-title').textContent = displayName;
+
+            // Hero image + nom + description
+            const heroImg = document.getElementById('builder-hero-img');
+            const heroName = document.getElementById('builder-hero-name');
+            const heroDesc = document.getElementById('builder-hero-desc');
+            if (heroImg) {
+                heroImg.src = product.image || '../assets/common/logo.png';
+                heroImg.onerror = function() { this.src = '../assets/common/logo.png'; };
+            }
+            if (heroName) heroName.textContent = displayName;
+            if (heroDesc) heroDesc.textContent = product.description || '';
 
             const content = document.getElementById('builder-content');
             content.innerHTML = '';
@@ -3544,7 +3941,19 @@
         // ============ PANIER ============
         function updateCartCount() {
             const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             document.getElementById('cart-count').textContent = count;
+            const totalBar = document.getElementById('cart-total-bar');
+            if (totalBar) totalBar.textContent = total.toFixed(2) + '€';
+            const cartBtn = document.querySelector('.cart-btn-main');
+            if (cartBtn) {
+                cartBtn.classList.toggle('has-items', count > 0);
+                if (count > 0) {
+                    cartBtn.classList.remove('pulse');
+                    void cartBtn.offsetWidth;
+                    cartBtn.classList.add('pulse');
+                }
+            }
         }
 
         function showCart() {
