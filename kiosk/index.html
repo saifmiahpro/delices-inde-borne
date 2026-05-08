@@ -2000,6 +2000,8 @@
             else if (product.type === 'etudiant_sandwich') buildEtudiantSandwichBuilder(content, product);
             else if (product.type === 'panini') buildPaniniBuilder(content, product);
             else if (product.menuUpgrade) buildBurgerBuilder(content, product);
+            // Fallback : tout produit hasBuilder avec menuPrice → builder Seul/Menu (burgers, wraps, paninis simples)
+            else if (product.hasBuilder && product.menuPrice) buildBurgerBuilder(content, product);
 
             processBuilderSteps();
             updateBuilderPrice();
@@ -2084,15 +2086,21 @@
         function buildTacosBuilder(content, product) {
             let html = '';
 
-            // TACOS SPÉCIAL : Taille + Modifications + Viande supp + Menu
+            // TACOS SPÉCIAL : Taille (upgrades) + Modifications + Viande supp + Menu
             if (product.isSpecial) {
-                // Taille
+                // Taille : Standard (prix de base) + upgrades Large/XL
                 html += `<div class="step-title">Taille</div><div class="options-grid big">`;
-                product.sizes.forEach((size, i) => {
-                    html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('size', '${size.id}', this)" data-price="${size.price}">
-                        ${size.name} <span class="option-price">${size.price.toFixed(2)}€</span>
-                    </div>`;
-                });
+                html += `<div class="option-btn selected" onclick="selectOption('size', 'standard', this)" data-price="${product.price}">
+                    Standard <span class="option-price">${product.price.toFixed(2)}€</span>
+                </div>`;
+                if (product.upgrades) {
+                    product.upgrades.forEach(up => {
+                        const fullPrice = product.price + up.extraPrice;
+                        html += `<div class="option-btn" onclick="selectOption('size', '${up.id}', this)" data-price="${fullPrice}">
+                            ${up.name} <span class="option-price">+${up.extraPrice.toFixed(2)}€</span>
+                        </div>`;
+                    });
+                }
                 html += '</div>';
 
                 // Modifier la recette (retirer des éléments) - TACOS = sauce fromagère uniquement
@@ -2122,7 +2130,7 @@
                 </div>`;
 
                 content.innerHTML = html;
-                state.builderSelections.size = product.sizes[0];
+                state.builderSelections.size = { id: 'standard', name: 'Standard', price: product.price };
                 state.builderSelections.menu = false;
                 state.builderSelections.retraits = [];
                 state.builderSelections.viandesSupp = [];
@@ -2960,6 +2968,10 @@
             } else if (product.menuUpgrade) {
                 price = sel.basePrice || product.price;
                 if (sel.menu) price += 2;
+            } else if (product.hasBuilder && product.menuPrice) {
+                // Fallback pour produits avec menuPrice (burgers, wraps, paninis simples)
+                price = sel.basePrice || product.price;
+                if (sel.menu) price += 2;
             }
 
             // Add Supplements
@@ -3113,6 +3125,8 @@
                 if (sel.menuBoisson) details.push(sel.menuBoisson);
             } else if (product.menuUpgrade && sel.menu) {
                 details.push('MENU (Frites + ' + (sel.menuBoisson || BOISSONS_33[0].name) + ')');
+            } else if (product.hasBuilder && product.menuPrice && sel.menu) {
+                details.push('MENU (Frites + ' + (sel.menuBoisson || BOISSONS_33[0].name) + ')');
             }
 
             // Sauvegarder les sélections pour pouvoir modifier plus tard
@@ -3231,6 +3245,7 @@
             else if (item.product.type === 'etudiant_poutine') buildEtudiantPoutineBuilder(content, item.product);
             else if (item.product.type === 'etudiant_sandwich') buildEtudiantSandwichBuilder(content, item.product);
             else if (item.product.menuUpgrade) buildBurgerBuilder(content, item.product);
+            else if (item.product.hasBuilder && item.product.menuPrice) buildBurgerBuilder(content, item.product);
 
             processBuilderSteps();
             updateBuilderPrice();
