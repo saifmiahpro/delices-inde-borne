@@ -681,26 +681,99 @@
         .main-body::-webkit-scrollbar-track { background: transparent; }
         .main-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-        /* ============ GRILLE PRODUITS PHOTO-FIRST ============ */
+        /* ============ SECTIONS DE CATÉGORIES (scroll-spy) ============ */
         .products-grid {
-            display: grid;
-            gap: 18px;
-            padding-bottom: 4vh;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            padding-bottom: 6vh;
         }
 
-        /* Portrait (Win10) : 2 colonnes plein cadre */
+        .category-section {
+            scroll-margin-top: 8px;
+        }
+
+        .category-section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 4px 14px;
+            position: sticky;
+            top: 0;
+            background: linear-gradient(180deg, rgba(10, 10, 10, 0.95), rgba(10, 10, 10, 0.85));
+            backdrop-filter: blur(8px);
+            z-index: 4;
+        }
+
+        .category-section-header h2 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(22px, 3vw, 36px);
+            background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1.5px;
+        }
+
+        .category-section-header::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255, 192, 0, 0.4), transparent);
+        }
+
+        /* Bannière dans une section */
+        .section-banner {
+            border-radius: 18px;
+            padding: 16px 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .section-banner-etudiant {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid #FFD700;
+        }
+
+        .section-banner-offres {
+            background: linear-gradient(135deg, #8B1538, #FF6B35);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .section-banner .banner-title {
+            font-family: 'Anton', sans-serif;
+            color: white;
+            font-size: clamp(18px, 2.4vw, 24px);
+            letter-spacing: 1.5px;
+        }
+
+        .section-banner-etudiant .banner-title {
+            color: #FFD700;
+        }
+
+        .section-banner .banner-subtitle {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: clamp(12px, 1.5vw, 15px);
+            margin-top: 4px;
+        }
+
+        /* Grille produits dans une section */
+        .section-products-grid {
+            display: grid;
+            gap: 18px;
+        }
+
         @media (orientation: portrait) {
-            .products-grid {
+            .section-products-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 16px;
             }
         }
 
-        /* Landscape (Win7) : 3 colonnes */
         @media (orientation: landscape) {
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-                gap: 18px;
+            .section-products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 16px;
             }
         }
 
@@ -1232,7 +1305,6 @@
         /* Hero image dans le builder (photo XXL en haut) */
         .builder-hero {
             position: relative;
-            width: 100%;
             background: radial-gradient(ellipse at center, #1a1a1a 0%, #050505 80%);
             display: flex;
             align-items: center;
@@ -1242,17 +1314,76 @@
             border-bottom: 1px solid var(--border);
         }
 
+        /* PORTRAIT (Win10) : hero gros en haut */
         @media (orientation: portrait) {
             .builder-hero {
-                min-height: 380px;
+                width: 100%;
+                min-height: 320px;
                 padding: 18px;
+            }
+            .builder-hero img {
+                max-height: 100%;
+                max-width: 60%;
+                object-fit: contain;
+            }
+            .builder-hero-info {
+                position: absolute;
+                bottom: 20px;
+                left: 24px;
+                right: 24px;
+                z-index: 2;
+                text-align: left;
+                pointer-events: none;
+            }
+            .builder-hero-info h3 {
+                font-size: clamp(24px, 3.2vw, 38px);
+            }
+            .builder-hero-info p {
+                font-size: clamp(13px, 1.6vw, 17px);
+            }
+            .builder-hero::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+                pointer-events: none;
             }
         }
 
+        /* LANDSCAPE (Win7) : hero compact à gauche, garde de la place pour options */
         @media (orientation: landscape) {
             .builder-hero {
-                min-height: 200px;
-                padding: 12px;
+                width: 100%;
+                min-height: 110px;
+                max-height: 150px;
+                padding: 8px 16px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 16px;
+            }
+            .builder-hero img {
+                height: 110px;
+                width: 130px;
+                object-fit: contain;
+                flex-shrink: 0;
+            }
+            .builder-hero-info {
+                flex: 1;
+                text-align: left;
+                position: static;
+                pointer-events: none;
+                min-width: 0;
+            }
+            .builder-hero-info h3 {
+                font-size: clamp(18px, 2.2vw, 24px);
+                line-height: 1.1;
+                margin-bottom: 4px;
+            }
+            .builder-hero-info p {
+                font-size: clamp(12px, 1.4vw, 15px);
+                line-height: 1.3;
             }
         }
 
@@ -1267,19 +1398,8 @@
             pointer-events: none;
         }
 
-        .builder-hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
-            pointer-events: none;
-        }
-
         .builder-hero img {
-            max-height: 100%;
-            max-width: 60%;
-            object-fit: contain;
-            filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.7));
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.7));
             position: relative;
             z-index: 1;
             animation: heroFloat 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -1290,19 +1410,8 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .builder-hero-info {
-            position: absolute;
-            bottom: 20px;
-            left: 24px;
-            right: 24px;
-            z-index: 2;
-            text-align: left;
-            pointer-events: none;
-        }
-
         .builder-hero-info h3 {
             font-family: 'Anton', sans-serif;
-            font-size: clamp(24px, 3.2vw, 38px);
             color: var(--yellow);
             letter-spacing: 1px;
             text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
@@ -1311,7 +1420,6 @@
         }
 
         .builder-hero-info p {
-            font-size: clamp(13px, 1.6vw, 17px);
             color: var(--text-dim);
             line-height: 1.3;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
@@ -1319,20 +1427,6 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-        }
-
-        @media (orientation: landscape) {
-            .builder-hero-info {
-                bottom: 12px;
-                left: 18px;
-                right: 18px;
-            }
-            .builder-hero-info h3 {
-                font-size: clamp(18px, 2.4vw, 24px);
-            }
-            .builder-hero-info p {
-                font-size: clamp(12px, 1.4vw, 14px);
-            }
         }
 
         .modal-content {
@@ -1956,12 +2050,9 @@
         <main class="main-content">
             <!-- Vue produits -->
             <div id="products-view">
-                <div class="main-header">
-                    <h1 id="category-title">TACOS</h1>
-                </div>
                 <div class="main-body">
                     <div class="products-grid" id="products-grid">
-                        <!-- Généré par JS -->
+                        <!-- Généré par JS : sections empilées -->
                     </div>
                 </div>
             </div>
@@ -2629,103 +2720,185 @@
 
         function selectCategory(categoryId) {
             state.currentCategory = categoryId;
+            // Si le menu n'est pas encore rendu, rendu initial
+            const grid = document.getElementById('products-grid');
+            if (!grid.dataset.rendered) {
+                renderAllProducts();
+            }
+            // Quitter le panier si actif
+            hideCart();
+            // Scroll vers la section
+            scrollToCategorySection(categoryId);
+            // Update active nav (sera aussi confirmé par le scroll-spy)
+            setActiveNavItem(categoryId);
+        }
 
-            // MAJ nav active
+        function setActiveNavItem(categoryId) {
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.toggle('active', item.dataset.id === categoryId);
             });
+            // En portrait, scroll la nav-item active dans la vue (tabs horizontales)
+            const active = document.querySelector('.nav-item.active');
+            if (active) {
+                active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
 
-            const category = CATEGORIES.find(c => c.id === categoryId);
-            document.getElementById('category-title').textContent = category.name.toUpperCase();
-
-            renderProducts(categoryId);
-            hideCart();
+        function scrollToCategorySection(categoryId) {
+            const section = document.getElementById('section-' + categoryId);
+            const body = document.querySelector('.main-body');
+            if (!section || !body) return;
+            // Désactiver temporairement le scroll-spy pour éviter conflits
+            window.__scrollSpyDisabled = true;
+            const offsetTop = section.offsetTop - body.offsetTop;
+            body.scrollTo({ top: offsetTop - 8, behavior: 'smooth' });
+            // Réactiver après l'animation
+            clearTimeout(window.__scrollSpyTimeout);
+            window.__scrollSpyTimeout = setTimeout(() => {
+                window.__scrollSpyDisabled = false;
+            }, 800);
         }
 
         // ============ PRODUITS ============
-        function renderProducts(categoryId) {
+        // Rend TOUTES les catégories en sections empilées (pour scroll-spy)
+        function renderAllProducts() {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '';
+            grid.dataset.rendered = 'true';
 
-            // Bannière Menu Étudiant
-            if (categoryId === 'menu_etudiant') {
-                const banner = document.createElement('div');
-                banner.style.cssText = 'grid-column:1/-1;background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #FFD700;border-radius:15px;padding:15px 20px;text-align:center;margin-bottom:10px;';
-                banner.innerHTML = '<div style="color:#FFD700;font-size:clamp(16px,2.5vw,22px);font-weight:700;">⚠ MENU ÉTUDIANT</div><div style="color:#ccc;font-size:clamp(12px,1.8vw,16px);margin-top:5px;">Sur présentation de la carte étudiante • En semaine jusqu\'à 15h</div>';
-                grid.appendChild(banner);
-            }
+            CATEGORIES.forEach(cat => {
+                const section = document.createElement('section');
+                section.className = 'category-section';
+                section.id = 'section-' + cat.id;
+                section.dataset.categoryId = cat.id;
 
-            // Bannière Nos Offres
-            if (categoryId === 'offres') {
-                const banner = document.createElement('div');
-                banner.style.cssText = 'grid-column:1/-1;background:linear-gradient(135deg,#8B1538,#FF6B35);border-radius:15px;padding:20px;text-align:center;margin-bottom:15px;box-shadow:0 4px 20px rgba(255,107,53,0.3);';
-                banner.innerHTML = '<div style="color:white;font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:1px;">🔥 NOS OFFRES DU MOMENT</div><div style="color:#fff;opacity:0.95;margin-top:5px;font-size:clamp(12px,1.8vw,16px);">Découvrez nos spécialités et nos meilleurs deals</div>';
-                grid.appendChild(banner);
-            }
+                // Header de section
+                const header = document.createElement('div');
+                header.className = 'category-section-header';
+                header.innerHTML = `<h2>${cat.name.toUpperCase()}</h2>`;
+                section.appendChild(header);
 
-            // Sélection des produits à afficher
-            let products;
-            if (categoryId === 'offres') {
-                products = PRODUCTS.filter(p => p.featured)
-                    .sort((a, b) => (a.featuredPriority || 99) - (b.featuredPriority || 99));
-            } else {
-                products = PRODUCTS.filter(p => p.category === categoryId);
-            }
-
-            products.forEach(product => {
-                const card = document.createElement('div');
-                card.onclick = () => handleProductClick(product);
-
-                const priceDisplay = product.sizes ?
-                    `À partir de ${product.sizes[0].price.toFixed(2)}€` :
-                    `${product.price.toFixed(2)}€`;
-
-                const displayName = product.displayName || product.name;
-
-                // Badge prioritaire : badge custom > promo > COMPOSER
-                let badgeHtml = '';
-                if (product.badge) {
-                    const badgeClass = 'badge badge-' + product.badge.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                    badgeHtml = `<div class="${badgeClass}">${product.badge}</div>`;
-                } else if (product.isPromo && product.promoLabel) {
-                    badgeHtml = `<div class="badge badge-promo">${product.promoLabel}</div>`;
-                } else if (product.hasBuilder && !product.isCustom) {
-                    badgeHtml = `<div class="badge badge-composer">COMPOSER</div>`;
+                // Bannière spéciale pour Menu Étudiant
+                if (cat.id === 'menu_etudiant') {
+                    const banner = document.createElement('div');
+                    banner.className = 'section-banner section-banner-etudiant';
+                    banner.innerHTML = '<div class="banner-title">MENU ÉTUDIANT</div><div class="banner-subtitle">Sur présentation de la carte étudiante &middot; En semaine jusqu\'à 15h</div>';
+                    section.appendChild(banner);
                 }
 
-                if (product.isCustom) {
-                    card.className = 'product-card compose-card';
-                    card.innerHTML = `
-                        ${badgeHtml}
-                        <div class="img-wrap">
-                            <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
-                        </div>
-                        <div class="info-wrap">
-                            <div>
-                                <h4>${displayName}</h4>
-                                <p class="desc">${product.description || ''}</p>
-                            </div>
-                            <div class="price">${priceDisplay}</div>
-                        </div>
-                    `;
+                // Bannière spéciale pour Nos Offres
+                if (cat.id === 'offres') {
+                    const banner = document.createElement('div');
+                    banner.className = 'section-banner section-banner-offres';
+                    banner.innerHTML = '<div class="banner-title">NOS OFFRES DU MOMENT</div><div class="banner-subtitle">Découvrez nos spécialités et nos meilleurs deals</div>';
+                    section.appendChild(banner);
+                }
+
+                // Grille de produits dans cette section
+                const sectionGrid = document.createElement('div');
+                sectionGrid.className = 'section-products-grid';
+
+                let products;
+                if (cat.id === 'offres') {
+                    products = PRODUCTS.filter(p => p.featured)
+                        .sort((a, b) => (a.featuredPriority || 99) - (b.featuredPriority || 99));
                 } else {
-                    card.className = 'product-card';
-                    card.innerHTML = `
-                        ${badgeHtml}
-                        <div class="img-wrap">
-                            <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
-                        </div>
-                        <div class="info-wrap">
-                            <div>
-                                <h4>${displayName}</h4>
-                                <p class="desc">${product.description || ''}</p>
-                            </div>
-                            <div class="price">${priceDisplay}</div>
-                        </div>
-                    `;
+                    products = PRODUCTS.filter(p => p.category === cat.id);
                 }
-                grid.appendChild(card);
+
+                products.forEach(product => {
+                    sectionGrid.appendChild(createProductCard(product));
+                });
+
+                section.appendChild(sectionGrid);
+                grid.appendChild(section);
             });
+
+            // Démarrer le scroll-spy après render
+            setupScrollSpy();
+        }
+
+        // Configurer l'IntersectionObserver pour scroll-spy
+        function setupScrollSpy() {
+            const body = document.querySelector('.main-body');
+            const sections = document.querySelectorAll('.category-section');
+            if (!body || !sections.length) return;
+
+            // Cleanup observer existant
+            if (window.__scrollSpyObserver) {
+                window.__scrollSpyObserver.disconnect();
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                if (window.__scrollSpyDisabled) return;
+                // Trouver la première section qui entre dans le viewport
+                const visible = entries
+                    .filter(e => e.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                if (visible.length > 0) {
+                    const catId = visible[0].target.dataset.categoryId;
+                    if (catId && state.currentCategory !== catId) {
+                        state.currentCategory = catId;
+                        setActiveNavItem(catId);
+                    }
+                }
+            }, {
+                root: body,
+                rootMargin: '-20% 0px -60% 0px',
+                threshold: 0
+            });
+
+            sections.forEach(s => observer.observe(s));
+            window.__scrollSpyObserver = observer;
+        }
+
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.onclick = () => handleProductClick(product);
+
+            const priceDisplay = product.sizes ?
+                `À partir de ${product.sizes[0].price.toFixed(2)}€` :
+                `${product.price.toFixed(2)}€`;
+
+            const displayName = product.displayName || product.name;
+
+            let badgeHtml = '';
+            if (product.badge) {
+                const badgeClass = 'badge badge-' + product.badge.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                badgeHtml = `<div class="${badgeClass}">${product.badge}</div>`;
+            } else if (product.isPromo && product.promoLabel) {
+                badgeHtml = `<div class="badge badge-promo">${product.promoLabel}</div>`;
+            } else if (product.hasBuilder && !product.isCustom) {
+                badgeHtml = `<div class="badge badge-composer">COMPOSER</div>`;
+            }
+
+            if (product.isCustom) {
+                card.className = 'product-card compose-card';
+            } else {
+                card.className = 'product-card';
+            }
+            card.innerHTML = `
+                ${badgeHtml}
+                <div class="img-wrap">
+                    <img src="${product.image}" alt="${displayName}" onerror="this.src='../assets/common/logo.png'">
+                </div>
+                <div class="info-wrap">
+                    <div>
+                        <h4>${displayName}</h4>
+                        <p class="desc">${product.description || ''}</p>
+                    </div>
+                    <div class="price">${priceDisplay}</div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Wrapper pour compat (juste re-render dans la même structure)
+        function renderProducts(categoryId) {
+            // Au cas où — render all et scroll
+            const grid = document.getElementById('products-grid');
+            if (!grid.dataset.rendered) renderAllProducts();
+            scrollToCategorySection(categoryId);
         }
 
         function handleProductClick(product) {
