@@ -113,7 +113,7 @@ const RETRAITS_TACOS = [
 
 // Catégories
 const CATEGORIES = [
-    { id: 'menu_etudiant', name: 'Menu Étudiant', image: '../assets/common/logo.png' },
+    { id: 'offres', name: 'Nos Offres', image: '../assets/common/logo.png' },
     { id: 'buckets', name: 'Buckets', image: '../assets/buckets/bucket_1.png' },
     { id: 'bowls', name: 'Bowls', image: '../assets/bowls/bowl_classique.png' },
     { id: 'salades', name: 'Salades', image: '../assets/salades/salade.png' },
@@ -128,6 +128,7 @@ const CATEGORIES = [
     { id: 'frites', name: 'Frites', image: '../assets/frites/frite_boisson.png' },
     { id: 'assiettes', name: 'Assiettes', image: '../assets/common/assiette.png' },
     { id: 'enfant', name: 'Menu Enfant', image: '../assets/common/logo.png' },
+    { id: 'menu_etudiant', name: 'Menu Étudiant', image: '../assets/common/logo.png' },
     { id: 'tex_mex', name: 'Tex Mex', image: '../assets/common/logo.png' },
     { id: 'desserts', name: 'Desserts', image: '../assets/desserts/tiramisu.png' },
     { id: 'boissons', name: 'Boissons', image: '../assets/frites/frite_boisson.png' }
@@ -141,7 +142,7 @@ const PRODUCTS = [
     {
         id: 'bucket_classic',
         category: 'buckets',
-        name: 'Classic',
+        name: 'Bucket Classic',
         description: '3 Wings + 2 Tenders + Frites + Boisson 33cl',
         image: '../assets/buckets/bucket_1.png',
         price: 7.90,
@@ -153,14 +154,16 @@ const PRODUCTS = [
     {
         id: 'bucket_delice',
         category: 'buckets',
-        name: 'Délice',
+        name: 'Bucket Délice',
         description: '5 Wings + 3 Tenders + Frites + Boisson 33cl',
         image: '../assets/buckets/bucket_2.png',
         price: 9.90,
         type: 'bucket',
         hasBuilder: true,
         includesFrites: true,
-        includesBoisson: true
+        includesBoisson: true,
+        featured: true,
+        featuredPriority: 4
     },
     {
         id: 'bucket_mixte',
@@ -215,7 +218,9 @@ const PRODUCTS = [
         sizes: [
             { id: 'normal', name: 'Normal', price: 9.90 },
             { id: 'xl', name: 'XL', price: 14.90 }
-        ]
+        ],
+        featured: true,
+        featuredPriority: 7
     },
     {
         id: 'bowl_crispy',
@@ -301,6 +306,8 @@ const PRODUCTS = [
         type: 'tacos',
         hasBuilder: true,
         isCustom: true,
+        featured: true,
+        featuredPriority: 1,
         sizes: [
             { id: 'S', name: 'Small', price: 6.00, menuPrice: 8.00, meatCount: 1 },
             { id: 'M', name: 'Medium', price: 7.00, menuPrice: 9.00, meatCount: 2 },
@@ -373,6 +380,8 @@ const PRODUCTS = [
         defaultIngredients: '2 Viandes • Oignons, Poivrons • Bacon • Sauce Cheddar',
         price: 10.50,
         menuPrice: 12.50,
+        featured: true,
+        featuredPriority: 5,
         upgrades: [
             { id: 'large', name: 'Large', extraPrice: 3.00 },
             { id: 'xl', name: 'XL', extraPrice: 6.00 }
@@ -391,7 +400,9 @@ const PRODUCTS = [
         type: 'naan',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Chicken Tikka, Tenders • Sauce Cheddar • Oignon Frit'
+        defaultIngredients: 'Chicken Tikka, Tenders • Sauce Cheddar • Oignon Frit',
+        featured: true,
+        featuredPriority: 6
     },
     {
         id: 'naan_cheesy',
@@ -439,13 +450,16 @@ const PRODUCTS = [
         id: 'sandwich_naan',
         category: 'sandwichs',
         name: 'Naan',
+        displayName: 'Compose ton Sandwich',
         description: '1 viande au choix',
         image: '../assets/sandwichs/sandwich.png',
         price: 7.00,
         menuPrice: 9.00,
         megaPrice: 11.00,
         type: 'sandwich',
-        hasBuilder: true
+        hasBuilder: true,
+        featured: true,
+        featuredPriority: 2
     },
     {
         id: 'sandwich_pain_rond',
@@ -543,7 +557,9 @@ const PRODUCTS = [
         image: '../assets/burgers/delices_smash.png',
         price: 8.50,
         menuPrice: 10.50,
-        hasBuilder: true
+        hasBuilder: true,
+        featured: true,
+        featuredPriority: 8
     },
     {
         id: 'burger_delice',
@@ -613,7 +629,9 @@ const PRODUCTS = [
             { id: 'small', name: 'Small', price: 6.90 },
             { id: 'medium', name: 'Medium', price: 8.50 },
             { id: 'xl', name: 'XL', price: 10.90 }
-        ]
+        ],
+        featured: true,
+        featuredPriority: 9
     },
     {
         id: 'poutine_chevre_miel',
@@ -892,8 +910,10 @@ const PRODUCTS = [
         id: 'barquette_viande_normal',
         category: 'tex_mex',
         name: 'Barquette Viande',
-        description: 'Viande seule',
+        description: 'Viande au choix',
         image: '../assets/common/logo.png',
+        type: 'barquette_viande',
+        hasBuilder: true,
         sizes: [
             { id: 'normal', name: 'Normal', price: 6.00 },
             { id: 'grande', name: 'Grande', price: 8.50 }
@@ -1004,28 +1024,75 @@ const PRODUCTS = [
         price: 2.00
     },
 
-    // ==================== BOXES ====================
+    // ==================== BOXES 9.90€ ====================
+    // 6 Boxes "Le Meilleur Deal"
     {
-        id: 'box_viande',
+        id: 'box_wings_classic',
         category: 'boxes',
-        name: 'BOX Viande',
-        description: 'Taille au choix',
-        image: '../assets/common/logo.png',
-        price: 6.00,
-        type: 'box',
-        hasBuilder: true
-    },
-
-    // ==================== BOX DEAL 9.90€ ====================
-    {
-        id: 'box_deal',
-        category: 'boxes',
-        name: 'BOX Deal',
-        description: '5 Wings coréennes OU 5 Tenders coréens OU 1 Burger (poulet ou steak) + Frites',
-        image: '../assets/common/logo.png',
+        name: 'BOX Wings Classic',
+        description: '5 Wings Coréennes Classic + Frites',
+        image: '../assets/boxes/box_wings_classic.png',
         price: 9.90,
-        type: 'box_deal',
-        hasBuilder: true
+        type: 'box_simple',
+        hasBuilder: true,
+        badge: 'MEILLEUR DEAL',
+        featured: true,
+        featuredPriority: 3
+    },
+    {
+        id: 'box_wings_spicy',
+        category: 'boxes',
+        name: 'BOX Wings Spicy',
+        description: '5 Wings Coréennes Spicy + Frites',
+        image: '../assets/boxes/box_wings_spicy.png',
+        price: 9.90,
+        type: 'box_simple',
+        hasBuilder: true,
+        badge: 'MEILLEUR DEAL'
+    },
+    {
+        id: 'box_tenders_classic',
+        category: 'boxes',
+        name: 'BOX Tenders Classic',
+        description: '5 Tenders Classic + Frites',
+        image: '../assets/boxes/box_tenders_classic.png',
+        price: 9.90,
+        type: 'box_simple',
+        hasBuilder: true,
+        badge: 'MEILLEUR DEAL'
+    },
+    {
+        id: 'box_tenders_spicy',
+        category: 'boxes',
+        name: 'BOX Tenders Spicy',
+        description: '5 Tenders Coréens Spicy + Frites',
+        image: '../assets/boxes/box_tenders_spicy.png',
+        price: 9.90,
+        type: 'box_simple',
+        hasBuilder: true,
+        badge: 'MEILLEUR DEAL'
+    },
+    {
+        id: 'box_burger_steak',
+        category: 'boxes',
+        name: 'BOX Burger Steak',
+        description: '1 Burger Steak + Frites',
+        image: '../assets/boxes/box_burger_steak.png',
+        price: 9.90,
+        type: 'box_simple',
+        hasBuilder: true,
+        badge: 'MEILLEUR DEAL'
+    },
+    {
+        id: 'box_burger_poulet',
+        category: 'boxes',
+        name: 'BOX Burger Poulet',
+        description: '1 Burger Poulet + Frites',
+        image: '../assets/boxes/box_burger_poulet.png',
+        price: 9.90,
+        type: 'box_simple',
+        hasBuilder: true,
+        badge: 'MEILLEUR DEAL'
     },
 
     // ==================== MENU ÉTUDIANT ====================
@@ -1040,6 +1107,8 @@ const PRODUCTS = [
         hasBuilder: true,
         includesFrites: true,
         includesBoisson: true,
+        featured: true,
+        featuredPriority: 10,
         sizes: [
             { id: '1v', name: '1 Viande', price: 6.50, meatCount: 1 },
             { id: '2v', name: '2 Viandes', price: 7.50, meatCount: 2 },
