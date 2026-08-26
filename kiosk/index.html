@@ -3014,7 +3014,9 @@
                 name: product.name,
                 price: price,
                 quantity: 1,
-                details: '',
+                // Composition fixe du produit (ex : menu enfant = Frites + Capri-Sun + Kinder)
+                // pour que la cuisine sache quoi préparer même sans étape de personnalisation.
+                details: product.defaultIngredients || '',
                 image: product.image
             };
             state.cart.push(cartItem);

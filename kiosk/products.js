@@ -816,7 +816,7 @@ const PRODUCTS = [
         image: '../assets/common/logo.png',
         price: 7.00,
         type: 'enfant',
-        hasBuilder: true,
+        defaultIngredients: 'Frites + Capri-Sun + Kinder',
         includesFrites: true,
         includesBoisson: true,
         includesSurprise: true
@@ -829,7 +829,7 @@ const PRODUCTS = [
         image: '../assets/common/logo.png',
         price: 7.00,
         type: 'enfant',
-        hasBuilder: true,
+        defaultIngredients: 'Frites + Capri-Sun + Kinder',
         includesFrites: true,
         includesBoisson: true,
         includesSurprise: true
@@ -842,7 +842,7 @@ const PRODUCTS = [
         image: '../assets/common/logo.png',
         price: 7.00,
         type: 'enfant',
-        hasBuilder: true,
+        defaultIngredients: 'Frites + Capri-Sun + Kinder',
         includesFrites: true,
         includesBoisson: true,
         includesSurprise: true
@@ -855,7 +855,7 @@ const PRODUCTS = [
         image: '../assets/common/logo.png',
         price: 7.00,
         type: 'enfant',
-        hasBuilder: true,
+        defaultIngredients: 'Frites + Capri-Sun + Kinder',
         includesFrites: true,
         includesBoisson: true,
         includesSurprise: true
