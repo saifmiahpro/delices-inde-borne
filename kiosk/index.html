@@ -3042,27 +3042,7 @@
             const content = document.getElementById('builder-content');
             content.innerHTML = '';
 
-            if (product.type === 'tacos') buildTacosBuilder(content, product);
-            else if (product.type === 'naan') buildNaanBuilder(content, product);
-            else if (product.type === 'sandwich') buildSandwichBuilder(content, product);
-            else if (product.type === 'bowl') buildBowlBuilder(content, product);
-            else if (product.type === 'poutine') buildPoutineBuilder(content, product);
-            else if (product.type === 'assiette') buildAssietteBuilder(content, product);
-            else if (product.type === 'box') buildBoxBuilder(content, product);
-            else if (product.type === 'box_simple') buildBoxSimpleBuilder(content, product);
-            else if (product.type === 'barquette_viande') buildBarquetteViandeBuilder(content, product);
-            else if (product.type === 'bucket') buildBucketBuilder(content, product);
-            else if (product.type === 'boisson_seule') buildBoissonBuilder(content, product);
-            else if (product.type === 'enfant') buildEnfantBuilder(content, product);
-            else if (product.type === 'frites') buildFritesBuilder(content, product);
-            else if (product.type === 'etudiant_tacos') buildEtudiantTacosBuilder(content, product);
-            else if (product.type === 'etudiant_simple') buildEtudiantSimpleBuilder(content, product);
-            else if (product.type === 'etudiant_poutine') buildEtudiantPoutineBuilder(content, product);
-            else if (product.type === 'etudiant_sandwich') buildEtudiantSandwichBuilder(content, product);
-            else if (product.type === 'panini') buildPaniniBuilder(content, product);
-            else if (product.menuUpgrade) buildBurgerBuilder(content, product);
-            // Fallback : tout produit hasBuilder avec menuPrice → builder Seul/Menu (burgers, wraps, paninis simples)
-            else if (product.hasBuilder && product.menuPrice) buildBurgerBuilder(content, product);
+            routeBuilder(content, product);
 
             processBuilderSteps();
             updateBuilderPrice();
@@ -3177,6 +3157,50 @@
             if (!sel.sauces || !sel.sauces.length) return 0;
             const payantes = sel.sauces.length - SAUCES_INCLUSES;
             return payantes > 0 ? payantes * PRIX_SAUCE_SUPP : 0;
+        }
+
+        // ROUTAGE UNIQUE VERS LE BON BUILDER.
+        // Utilisé à la fois par openBuilder() (ajout) et editCartItem() (modification).
+        // Avant, les deux avaient leur propre liste et celle de la modification était
+        // incomplète : sur les frites, potatoes, menus enfant et boisson 33cl, cliquer
+        // "✎ Modifier" ouvrait une fenêtre vide et bloquée.
+        function routeBuilder(content, product) {
+            const t = product.type;
+            if (t === 'tacos') buildTacosBuilder(content, product);
+            else if (t === 'naan') buildNaanBuilder(content, product);
+            else if (t === 'sandwich') buildSandwichBuilder(content, product);
+            else if (t === 'bowl') buildBowlBuilder(content, product);
+            else if (t === 'poutine') buildPoutineBuilder(content, product);
+            else if (t === 'assiette') buildAssietteBuilder(content, product);
+            else if (t === 'box') buildBoxBuilder(content, product);
+            else if (t === 'box_simple') buildBoxSimpleBuilder(content, product);
+            else if (t === 'barquette_viande') buildBarquetteViandeBuilder(content, product);
+            else if (t === 'bucket') buildBucketBuilder(content, product);
+            else if (t === 'boisson_seule') buildBoissonBuilder(content, product);
+            else if (t === 'enfant') buildEnfantBuilder(content, product);
+            else if (t === 'frites') buildFritesBuilder(content, product);
+            else if (t === 'etudiant_tacos') buildEtudiantTacosBuilder(content, product);
+            else if (t === 'etudiant_simple') buildEtudiantSimpleBuilder(content, product);
+            else if (t === 'etudiant_poutine') buildEtudiantPoutineBuilder(content, product);
+            else if (t === 'etudiant_sandwich') buildEtudiantSandwichBuilder(content, product);
+            else if (t === 'panini') buildPaniniBuilder(content, product);
+            else if (product.menuUpgrade) buildBurgerBuilder(content, product);
+            // Repli : tout produit hasBuilder avec menuPrice (burgers, wraps, paninis simples)
+            else if (product.hasBuilder && product.menuPrice) buildBurgerBuilder(content, product);
+            else return false;
+            return true;
+        }
+
+        // Le gratin coûte 2.50€ sur les grandes tailles de tacos, 2.00€ sinon.
+        // Les identifiants diffèrent selon le produit :
+        //  - tacos custom   : S / M / L / XXL   (products.js)
+        //  - tacos spéciaux : large / xl        (upgrades)
+        // L'ancien code ne testait que 'L' et 'XL' : un tacos XXL gratiné
+        // était donc facturé 2.00€ au lieu de 2.50€.
+        function estGrandeTailleTacos(sizeId) {
+            if (!sizeId) return false;
+            const id = String(sizeId).toUpperCase();
+            return id === 'L' || id === 'XL' || id === 'XXL' || id === 'LARGE';
         }
 
         // Libellé de l'étape sauces, cohérent avec la règle de tarification
@@ -3890,26 +3914,59 @@
             const product = state.currentProduct;
 
             if (type === 'size') {
+                const prixBouton = parseFloat(element.dataset.price) || 0;
                 if (product.sizes) {
-                    state.builderSelections.size = product.sizes.find(s => s.id === value) || { id: value, price: parseFloat(element.dataset.price) || 0 };
+                    state.builderSelections.size = product.sizes.find(s => s.id === value) || { id: value, name: value, price: prixBouton };
+                } else if (product.upgrades) {
+                    // Tacos spéciaux : les tailles viennent de `upgrades`, pas de `sizes`.
+                    // Sans le nom, le ticket cuisine retombait sur "M" et la cuisine
+                    // préparait un tacos Medium alors que le client payait un Large/XL.
+                    const up = product.upgrades.find(u => u.id === value);
+                    state.builderSelections.size = up
+                        ? { id: up.id, name: up.name, price: prixBouton }
+                        : { id: 'standard', name: 'Standard', price: prixBouton };
                 } else {
-                    state.builderSelections.size = { id: value, price: parseFloat(element.dataset.price) || 0 };
+                    state.builderSelections.size = { id: value, name: value, price: prixBouton };
                 }
 
-                // Mettre à jour les prix des gratins affichés en direct dynamiquement
+                // Mettre à jour les prix des gratins affichés en direct dynamiquement.
+                // Les vraies tailles des tacos custom sont S / M / L / XXL (products.js) :
+                // tester 'XL' ne correspondait à rien, donc le gratin d'un XXL était
+                // facturé 2.00€ au lieu de 2.50€.
                 if (state.currentProduct && state.currentProduct.type === 'tacos') {
-                    const dynamicGratinPrice = (value === 'L' || value === 'XL') ? 2.50 : 2.00;
+                    const dynamicGratinPrice = estGrandeTailleTacos(value) ? 2.50 : 2.00;
                     document.querySelectorAll('.gratin-price-display').forEach(span => {
                         span.textContent = `+${dynamicGratinPrice.toFixed(2)}€`;
                     });
                 }
 
             } else if (type === 'formula') {
-                // Pour sandwichs: Classique ou Mega (pas de boisson incluse)
-                if (value === 'classique') state.builderSelections.formula = { id: 'classique', price: 7, meatCount: 1 };
-                else if (value === 'mega') state.builderSelections.formula = { id: 'mega', price: 11, meatCount: 2 };
-                else state.builderSelections.formula = { id: value, price: parseFloat(element.dataset.price) || 0 };
-                // NE PAS afficher la boisson ici - c'est géré par menuOpt
+                // ATTENTION : 'formula' recouvre DEUX logiques différentes.
+                //  - SANDWICHS : 'classique'/'mega' sont des PRIX ABSOLUS (7€ / 11€)
+                //  - NAANS     : 'seul'/'menu'/'mega' sont des SUPPLÉMENTS (0 / +2€ / +3.50€)
+                // Avant, le cas 'mega' appliquait le prix absolu du sandwich (11€) même
+                // sur un naan : un Naan Royal "MÉGA XL +3.50€" était facturé 9+11 = 20,00€
+                // au lieu de 12,50€, soit 7,50€ de trop AU DÉTRIMENT DU CLIENT.
+                if (product.type === 'sandwich') {
+                    if (value === 'classique') state.builderSelections.formula = { id: 'classique', price: 7, meatCount: 1 };
+                    else if (value === 'mega') state.builderSelections.formula = { id: 'mega', price: 11, meatCount: 2 };
+                    else state.builderSelections.formula = { id: value, price: parseFloat(element.dataset.price) || 0 };
+                } else {
+                    // Naans (et tout autre produit) : le supplément est celui affiché sur le bouton
+                    state.builderSelections.formula = { id: value, price: parseFloat(element.dataset.price) || 0 };
+                }
+
+                // Formule incluant une boisson : dévoiler le choix de la boisson.
+                // (Avant, la section restait masquée : le client ne choisissait jamais
+                //  et le ticket cuisine n'indiquait que "Boisson".)
+                const drinkSec = document.getElementById('menu-drink-section');
+                if (drinkSec && product.type !== 'sandwich') {
+                    const avecBoisson = (value === 'menu' || value === 'mega');
+                    drinkSec.style.display = avecBoisson ? 'block' : 'none';
+                    if (avecBoisson && !state.builderSelections.menuBoisson) {
+                        state.builderSelections.menuBoisson = BOISSONS_33[0].name;
+                    }
+                }
             } else if (type === 'type') {
                 state.builderSelections.type = value === '1viande' ? { id: '1viande', price: 10 } : { id: '3viandes', price: 13.5 };
             } else if (type === 'gratin') {
@@ -4097,13 +4154,9 @@
             if (product.type === 'tacos') {
                 price = sel.size?.price || 0;
 
-                // Gratin price depends on size
+                // Le gratin est plus cher sur les grandes tailles (voir estGrandeTailleTacos)
                 if (sel.gratin && sel.gratin.id !== 'none') {
-                    if (sel.size?.id === 'L' || sel.size?.id === 'XL') {
-                        price += 2.50;
-                    } else {
-                        price += 2.00; // S or M
-                    }
+                    price += estGrandeTailleTacos(sel.size?.id) ? 2.50 : 2.00;
                 }
 
                 if (sel.menu) price += 2;
@@ -4260,6 +4313,12 @@
                 if (sel.meat?.name) viandesSauces.push(sel.meat.name);
                 if (sel.sauces?.length) viandesSauces.push(sel.sauces.map(s => s.name).join(', '));
                 if (viandesSauces.length) details.push(viandesSauces.join(' • '));
+                // Retraits demandés par le client (Sans Salade / Sans Tomate / Sans Oignon).
+                // Le bouton s'allumait à l'écran mais l'info n'était imprimée nulle part :
+                // le client recevait ce qu'il avait justement refusé.
+                if (sel.retraits?.length) {
+                    details.push(sel.retraits.map(r => r.name).join(', '));
+                }
                 // Viandes supplémentaires
                 if (sel.viandesSupp?.length) {
                     details.push('+' + sel.viandesSupp.map(v => v.name).join(', +'));
@@ -4456,23 +4515,9 @@
             const content = document.getElementById('builder-content');
             content.innerHTML = '';
 
-            if (item.product.type === 'tacos') buildTacosBuilder(content, item.product);
-            else if (item.product.type === 'naan') buildNaanBuilder(content, item.product);
-            else if (item.product.type === 'sandwich') buildSandwichBuilder(content, item.product);
-            else if (item.product.type === 'bowl') buildBowlBuilder(content, item.product);
-            else if (item.product.type === 'poutine') buildPoutineBuilder(content, item.product);
-            else if (item.product.type === 'assiette') buildAssietteBuilder(content, item.product);
-            else if (item.product.type === 'box') buildBoxBuilder(content, item.product);
-            else if (item.product.type === 'box_simple') buildBoxSimpleBuilder(content, item.product);
-            else if (item.product.type === 'barquette_viande') buildBarquetteViandeBuilder(content, item.product);
-            else if (item.product.type === 'bucket') buildBucketBuilder(content, item.product);
-            else if (item.product.type === 'panini') buildPaniniBuilder(content, item.product);
-            else if (item.product.type === 'etudiant_tacos') buildEtudiantTacosBuilder(content, item.product);
-            else if (item.product.type === 'etudiant_simple') buildEtudiantSimpleBuilder(content, item.product);
-            else if (item.product.type === 'etudiant_poutine') buildEtudiantPoutineBuilder(content, item.product);
-            else if (item.product.type === 'etudiant_sandwich') buildEtudiantSandwichBuilder(content, item.product);
-            else if (item.product.menuUpgrade) buildBurgerBuilder(content, item.product);
-            else if (item.product.hasBuilder && item.product.menuPrice) buildBurgerBuilder(content, item.product);
+            // Même routage que l'ouverture normale : c'est la MÊME fonction, donc
+            // "Modifier" ne peut plus ouvrir une fenêtre vide sur certains produits.
+            routeBuilder(content, item.product);
 
             processBuilderSteps();
             updateBuilderPrice();
@@ -4484,10 +4529,22 @@
             const item = state.cart.find(i => i.id === itemId);
             if (!item) return;
 
+            // Conserver la quantité : modifier un article ne doit pas le ramener à 1.
+            // (Avant : un client avec 3 tacos qui cliquait "Modifier" repartait avec 1
+            //  seul tacos, sans que lui ni la caisse ne le remarquent.)
+            const quantitePrecedente = item.quantity || 1;
+
             // Supprimer l'ancien et ajouter le nouveau
             removeFromCart(itemId);
             state.editingCartItemId = null;
             addToCartFromBuilder();
+
+            const nouvel = state.cart[state.cart.length - 1];
+            if (nouvel && quantitePrecedente > 1) {
+                nouvel.quantity = quantitePrecedente;
+                updateCartCount();
+                renderCart();
+            }
         }
 
         // ============ VALIDATION & RESET ============
@@ -4518,6 +4575,12 @@
 
         // ============ HISTORIQUE DES COMMANDES ============
         function saveOrderToHistory() {
+            // L'historique est un CONFORT (menu admin), pas une fonction vitale.
+            // Il est appelé juste avant l'impression : si localStorage est plein,
+            // corrompu ou inaccessible, une exception ici empêcherait l'impression
+            // de toutes les commandes suivantes -> service à l'arrêt.
+            // On isole donc totalement cette étape.
+            try {
             const now = new Date();
             const order = {
                 id: Date.now(),
@@ -4530,7 +4593,14 @@
             };
 
             // Récupérer l'historique existant
-            let history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+            let history = [];
+            try {
+                history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+                if (!Array.isArray(history)) history = [];
+            } catch (e) {
+                console.warn('[borne] historique illisible, réinitialisé');
+                history = [];
+            }
 
             // Ajouter la nouvelle commande au début
             history.unshift(order);
@@ -4540,12 +4610,26 @@
 
             // Sauvegarder
             localStorage.setItem('delices_inde_orders', JSON.stringify(history));
+            } catch (e) {
+                // On n'interrompt JAMAIS la commande pour un problème d'historique.
+                console.warn('[borne] historique non enregistré :', e && e.message);
+            }
+        }
+
+        function lireHistorique() {
+            try {
+                const h = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+                return Array.isArray(h) ? h : [];
+            } catch (e) {
+                console.warn('[borne] historique illisible');
+                return [];
+            }
         }
 
         function showOrderHistory() {
             closeAdminModal();
 
-            const history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+            const history = lireHistorique();
             const content = document.getElementById('history-content');
 
             if (history.length === 0) {
@@ -4586,7 +4670,7 @@
         }
 
         function reprintLastOrder() {
-            const history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+            const history = lireHistorique();
             if (history.length === 0) {
                 showToast('Aucune commande à réimprimer');
                 return;
@@ -4595,7 +4679,7 @@
         }
 
         function reprintOrder(orderId) {
-            const history = JSON.parse(localStorage.getItem('delices_inde_orders') || '[]');
+            const history = lireHistorique();
             const order = history.find(o => o.id === orderId);
 
             if (!order) {
