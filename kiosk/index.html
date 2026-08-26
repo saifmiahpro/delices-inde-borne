@@ -2958,12 +2958,39 @@
             }
         }
 
+        // Identifiant unique et strictement croissant pour les lignes du panier.
+        // (Date.now() seul pouvait produire 2 ids identiques sur 2 ajouts rapprochés,
+        //  ce qui faisait modifier/supprimer la mauvaise ligne.)
+        let __cartSeq = 0;
+        function newCartItemId() {
+            __cartSeq++;
+            return Date.now() * 1000 + (__cartSeq % 1000);
+        }
+
+        // Filet de sécurité prix : un prix invalide ne doit JAMAIS atteindre le panier
+        // ni le ticket (sinon le total devient NaN et la caisse ne peut plus encaisser).
+        function safePrice(product, computed) {
+            if (typeof computed === 'number' && !isNaN(computed) && computed > 0) return computed;
+            if (typeof product.price === 'number' && !isNaN(product.price)) return product.price;
+            if (product.sizes && product.sizes.length && typeof product.sizes[0].price === 'number') {
+                console.warn('[borne] prix manquant pour ' + product.id + ' — repli sur la 1re taille');
+                return product.sizes[0].price;
+            }
+            console.error('[borne] prix introuvable pour ' + product.id);
+            return null;
+        }
+
         function addSimpleToCart(product) {
+            const price = safePrice(product, undefined);
+            if (price === null) {
+                showToast('Produit momentanément indisponible');
+                return;
+            }
             const cartItem = {
-                id: Date.now(),
+                id: newCartItemId(),
                 product: product,
                 name: product.name,
-                price: product.price,
+                price: price,
                 quantity: 1,
                 details: '',
                 image: product.image
@@ -3094,9 +3121,45 @@
         function getBoissonsHtml() {
             let html = '';
             BOISSONS_33.forEach((b, i) => {
-                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('menuBoisson', '${b.name}', this)">${b.name}</div>`;
+                // Boisson premium (Red Bull) : le supplément est affiché sur le bouton
+                const extra = b.extra ? ` <span class="option-price">+${b.extra.toFixed(2)}€</span>` : '';
+                html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('menuBoisson', '${b.name}', this)">${b.name}${extra}</div>`;
             });
             return html;
+        }
+
+        // La boisson choisie est-elle réellement incluse dans la commande ?
+        // (évite de facturer un Red Bull que le client a finalement décoché)
+        function boissonEstPrise(product, sel) {
+            const t = product.type;
+            if (t === 'bucket' || t === 'enfant' || t === 'boisson_seule'
+                || t === 'etudiant_tacos' || t === 'etudiant_simple'
+                || t === 'etudiant_poutine' || t === 'etudiant_sandwich') return true;
+            if (t === 'naan') return !!(sel.formula && (sel.formula.id === 'menu' || sel.formula.id === 'mega'));
+            if (t === 'sandwich') return !!sel.menuOpt;
+            if (t === 'box' || t === 'box_simple') return !!sel.boisson1e;
+            if (t === 'assiette') return !!sel.boisson;
+            return !!sel.menu;
+        }
+
+        // Supplément à ajouter si le client a choisi une boisson premium
+        function supplementBoisson(product, sel) {
+            if (!sel.menuBoisson) return 0;
+            const b = BOISSONS_33.find(x => x.name === sel.menuBoisson);
+            if (!b || !b.extra) return 0;
+            return boissonEstPrise(product, sel) ? b.extra : 0;
+        }
+
+        // Sauces facturées au-delà du forfait inclus
+        function supplementSauces(sel) {
+            if (!sel.sauces || !sel.sauces.length) return 0;
+            const payantes = sel.sauces.length - SAUCES_INCLUSES;
+            return payantes > 0 ? payantes * PRIX_SAUCE_SUPP : 0;
+        }
+
+        // Libellé de l'étape sauces, cohérent avec la règle de tarification
+        function titreSauces() {
+            return `Sauces <span style="font-size:0.55em;letter-spacing:0;opacity:0.75;">(${SAUCES_INCLUSES} incluses, +${PRIX_SAUCE_SUPP.toFixed(2)}€ ensuite)</span>`;
         }
 
         function buildTacosBuilder(content, product) {
@@ -3171,7 +3234,7 @@
                 html += `<div class="option-btn" onclick="toggleMeat('${v.id}', this)">${v.name}</div>`;
             });
             html += '</div>';
-            html += `<div class="builder-subtitle" style="margin-top:15px;">Sauces (3 max)</div><div class="options-grid">`;
+            html += `<div class="builder-subtitle" style="margin-top:15px;">Sauces <span style="font-size:0.7em;opacity:0.75;">(${SAUCES_INCLUSES} incluses, +${PRIX_SAUCE_SUPP.toFixed(2)}€ ensuite)</span></div><div class="options-grid">`;
             SAUCES.forEach(s => {
                 html += `<div class="option-btn" onclick="toggleSauce('${s.id}', this)">${s.name}</div>`;
             });
@@ -3304,7 +3367,7 @@
             html += '</div>';
 
             // Sauces
-            html += `<div class="step-title">Sauces (3 max)</div><div class="options-grid">`;
+            html += `<div class="step-title">${titreSauces()}</div><div class="options-grid">`;
             SAUCES.forEach(s => {
                 html += `<div class="option-btn" onclick="toggleSauce('${s.id}', this)">${s.name}</div>`;
             });
@@ -3380,8 +3443,12 @@
                 state.builderSelections.basePrice = product.price;
             }
 
-            // Seulement Dynamite Bowl a le choix de viande (Crousty = Tenders fixe)
-            if (product.id === 'bowl_dynamite') {
+            // Les bowls "spéciaux" ont une recette fixe (Tenders, Chicken Tikka...).
+            // Les autres sont annoncés "Viande au choix" : il FAUT la demander,
+            // sinon la cuisine ne sait pas quoi préparer.
+            // (Avant : le test portait sur 'bowl_dynamite', un id qui n'existe pas
+            //  dans products.js — donc aucun bowl ne demandait la viande.)
+            if (!product.isSpecial) {
                 html += `<div class="step-title">Viande</div><div class="options-grid">`;
                 VIANDES.forEach((v, i) => {
                     html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
@@ -3409,9 +3476,20 @@
                 <div class="option-btn" onclick="selectOption('base', 'riz', this)">RIZ</div>
             </div>`;
 
+            // Les poutines spéciales ont leurs viandes imposées (Tenders/Steak, Kefta...).
+            // La poutine classique est annoncée "Viande au choix" : on la demande.
+            if (!product.isSpecial) {
+                html += `<div class="step-title">Viande</div><div class="options-grid">`;
+                VIANDES.forEach((v, i) => {
+                    html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
+                });
+                html += '</div>';
+            }
+
             content.innerHTML = html;
             state.builderSelections.size = product.sizes[0];
             state.builderSelections.base = 'frites';
+            if (!product.isSpecial) state.builderSelections.meat = VIANDES[0];
         }
 
         function buildFritesBuilder(content, product) {
@@ -3429,17 +3507,32 @@
             state.builderSelections.size = product.sizes[0];
         }
 
+        // Prix des 2 formules d'assiette, lus depuis products.js (plus de valeurs en dur)
+        function assiettePrices() {
+            const p1 = PRODUCTS.find(x => x.id === 'assiette_simple');
+            const p3 = PRODUCTS.find(x => x.id === 'assiette_special_delice');
+            return {
+                un: (p1 && typeof p1.price === 'number') ? p1.price : 10,
+                trois: (p3 && typeof p3.price === 'number') ? p3.price : 13.5
+            };
+        }
+
         function buildAssietteBuilder(content, product) {
             let html = '';
+            const AP = assiettePrices();
+            // La formule pré-sélectionnée suit le produit sur lequel le client a cliqué.
+            // (Avant : toujours "1 viande" à 10€, même en cliquant l'Assiette Spécial Délice
+            //  affichée à 13.50€ sur la carte -> 3.50€ perdus à chaque commande.)
+            const is3 = !!product.isSpecial;
 
             // Type d'assiette
             html += `<div class="step-title">Type d'assiette</div><div class="options-grid big">
-                <div class="option-btn selected" onclick="selectAssietteType('1viande', this)" data-price="10">1 VIANDE <span class="option-price">10.00€</span></div>
-                <div class="option-btn" onclick="selectAssietteType('3viandes', this)" data-price="13.5">3 VIANDES <span class="option-price">13.50€</span></div>
+                <div class="option-btn ${is3 ? '' : 'selected'}" onclick="selectAssietteType('1viande', this)" data-price="${AP.un}">1 VIANDE <span class="option-price">${AP.un.toFixed(2)}€</span></div>
+                <div class="option-btn ${is3 ? 'selected' : ''}" onclick="selectAssietteType('3viandes', this)" data-price="${AP.trois}">3 VIANDES <span class="option-price">${AP.trois.toFixed(2)}€</span></div>
             </div>`;
 
             // Viande(s) - dynamique selon le type
-            html += `<div class="step-title" id="assiette-viande-title">Viande</div><div class="options-grid" id="assiette-viandes-grid">`;
+            html += `<div class="step-title" id="assiette-viande-title">${is3 ? 'Viandes (choisissez 3)' : 'Viande'}</div><div class="options-grid" id="assiette-viandes-grid">`;
             VIANDES.forEach((v, i) => {
                 html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="toggleAssietteViande('${v.id}', this)">${v.name}</div>`;
             });
@@ -3465,7 +3558,9 @@
             </div>`;
 
             content.innerHTML = html;
-            state.builderSelections.type = { id: '1viande', price: 10 };
+            state.builderSelections.type = is3
+                ? { id: '3viandes', price: AP.trois }
+                : { id: '1viande', price: AP.un };
             state.builderSelections.meats = [VIANDES[0]]; // Utiliser un tableau pour supporter 1 ou 3 viandes
             state.builderSelections.sauce = SAUCES[0];
             state.builderSelections.naanFromage = false;
@@ -3476,9 +3571,10 @@
             element.parentElement.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
             element.classList.add('selected');
 
+            const AP = assiettePrices();
             state.builderSelections.type = typeId === '1viande'
-                ? { id: '1viande', price: 10 }
-                : { id: '3viandes', price: 13.5 };
+                ? { id: '1viande', price: AP.un }
+                : { id: '3viandes', price: AP.trois };
 
             // Mettre à jour le titre
             const title = document.getElementById('assiette-viande-title');
@@ -3520,16 +3616,42 @@
         }
 
         function buildBurgerBuilder(content, product) {
-            content.innerHTML = `<div class="step-title">En menu ?</div><div class="options-grid big">
+            let html = '';
+
+            // Les wraps sont annoncés "Viande au choix" sur la carte : on la demande,
+            // sinon la cuisine ne sait pas quelle viande mettre.
+            if (product.type === 'wrap') {
+                html += `<div class="step-title">Viande</div><div class="options-grid">`;
+                VIANDES.forEach((v, i) => {
+                    html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
+                });
+                html += '</div>';
+                state.builderSelections.meat = VIANDES[0];
+            }
+
+            // Les burgers sont annoncés "Sauce au choix" sur la carte.
+            if (product.category === 'burgers') {
+                html += `<div class="step-title">Sauce</div><div class="options-grid">`;
+                SAUCES.forEach((s, i) => {
+                    html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('sauce', '${s.id}', this)">${s.name}</div>`;
+                });
+                html += '</div>';
+                state.builderSelections.sauce = SAUCES[0];
+            }
+
+            // La formule vient en dernier : le client compose d'abord, puis décide.
+            html += `<div class="step-title">En menu ?</div><div class="options-grid big">
                 <div class="option-btn selected" onclick="selectOption('menu', false, this)">SEUL <span class="option-price">${product.price.toFixed(2)}€</span></div>
                 <div class="option-btn" onclick="selectOption('menu', true, this)" data-price="2">MENU <span class="option-price">+2€</span></div>
             </div>`;
-            content.innerHTML += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
+            html += `<div id="menu-drink-section" style="display:none; margin-top: 15px;">
                 <div class="builder-subtitle">Choix de la boisson</div>
                 <div class="options-grid">
                     ${getBoissonsHtml()}
                 </div>
             </div>`;
+
+            content.innerHTML = html;
             state.builderSelections.menu = false;
             state.builderSelections.basePrice = product.price;
         }
@@ -3537,10 +3659,11 @@
         function buildBucketBuilder(content, product) {
             let html = '';
 
-            // Nombre de sauces selon le bucket (bucket 1-2 = 1 sauce, bucket 3 = 2, bucket 4 = 3)
-            let maxSauces = 1;
-            if (product.id === 'bucket_3') maxSauces = 2;
-            else if (product.id === 'bucket_4') maxSauces = 3;
+            // Nombre de sauces offertes, défini par bucket dans products.js (sauceCount).
+            // (Avant : le test portait sur 'bucket_3'/'bucket_4', des ids inexistants —
+            //  résultat, TOUS les buckets étaient limités à 1 seule sauce, y compris
+            //  le Bucket Family à 26.90€.)
+            let maxSauces = product.sauceCount || 1;
 
             // Choix des sauces
             html += `<div class="step-title">Choisissez vos sauces (${maxSauces} max)</div><div class="options-grid">`;
@@ -3651,7 +3774,7 @@
                 html += `<div class="option-btn" onclick="toggleMeat('${v.id}', this)">${v.name}</div>`;
             });
             html += '</div>';
-            html += `<div class="step-title">Sauces (3 max)</div><div class="options-grid">`;
+            html += `<div class="step-title">${titreSauces()}</div><div class="options-grid">`;
             SAUCES.forEach(s => {
                 html += `<div class="option-btn" onclick="toggleSauce('${s.id}', this)">${s.name}</div>`;
             });
@@ -3707,7 +3830,7 @@
                 html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
             });
             html += '</div>';
-            html += `<div class="step-title">Sauces (3 max)</div><div class="options-grid">`;
+            html += `<div class="step-title">${titreSauces()}</div><div class="options-grid">`;
             SAUCES.forEach(s => {
                 html += `<div class="option-btn" onclick="toggleSauce('${s.id}', this)">${s.name}</div>`;
             });
@@ -3805,15 +3928,37 @@
         }
 
         function toggleSauce(sauceId, element) {
-            const maxSauces = 3;
+            if (!state.builderSelections.sauces) state.builderSelections.sauces = [];
 
             if (element.classList.contains('selected')) {
                 element.classList.remove('selected');
                 state.builderSelections.sauces = state.builderSelections.sauces.filter(s => s.id !== sauceId);
-            } else if (state.builderSelections.sauces.length < maxSauces) {
+            } else if (state.builderSelections.sauces.length < SAUCES_MAX) {
                 element.classList.add('selected');
                 state.builderSelections.sauces.push(SAUCES.find(s => s.id === sauceId));
+            } else {
+                showToast(`${SAUCES_MAX} sauces maximum`);
+                return;
             }
+
+            // Marquer visuellement les sauces payantes (au-delà du forfait inclus)
+            const grid = element.parentElement;
+            if (grid) {
+                let rang = 0;
+                grid.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.querySelectorAll('.sauce-supp-tag').forEach(t => t.remove());
+                    if (btn.classList.contains('selected')) {
+                        rang++;
+                        if (rang > SAUCES_INCLUSES) {
+                            const tag = document.createElement('span');
+                            tag.className = 'option-price sauce-supp-tag';
+                            tag.textContent = `+${PRIX_SAUCE_SUPP.toFixed(2)}€`;
+                            btn.appendChild(tag);
+                        }
+                    }
+                });
+            }
+
             updateBuilderPrice();
         }
 
@@ -4007,6 +4152,18 @@
                 });
             }
 
+            // Sauces au-delà du forfait inclus
+            price += supplementSauces(sel);
+
+            // Boisson premium (Red Bull) réellement prise dans la commande
+            price += supplementBoisson(product, sel);
+
+            // Sécurité : un prix invalide ne doit jamais s'afficher ni partir en caisse
+            if (typeof price !== 'number' || isNaN(price)) {
+                console.error('[borne] prix calculé invalide pour ' + product.id);
+                price = safePrice(product, undefined) || 0;
+            }
+
             document.getElementById('builder-price').textContent = price.toFixed(2) + '€';
             state.builderSelections.totalPrice = price;
         }
@@ -4088,11 +4245,15 @@
                 if (sel.supplements?.length) details.push('+ ' + sel.supplements.map(s => s.name).join(', '));
                 if (sel.menuOpt) details.push('MENU (Frites + ' + (sel.menuBoisson || 'Boisson') + ')');
             } else if (product.type === 'bowl') {
-                if (sel.size?.id === 'xl') details.push('XL');
+                if (sel.size?.name) details.push(sel.size.name);
+                else if (sel.size?.id === 'xl') details.push('XL');
                 if (sel.meat?.name) details.push(sel.meat.name);
+                if (product.defaultIngredients) details.push(product.defaultIngredients);
             } else if (product.type === 'poutine') {
                 details.push(sel.size?.name || 'M');
                 details.push(sel.base === 'riz' ? 'Riz' : 'Frites');
+                if (sel.meat?.name) details.push(sel.meat.name);
+                if (product.defaultIngredients) details.push(product.defaultIngredients);
             } else if (product.type === 'assiette') {
                 details.push(sel.type?.id === '3viandes' ? '3 Viandes' : '1 Viande');
                 // Viande(s) - tableau maintenant
@@ -4121,6 +4282,9 @@
             } else if (product.type === 'barquette_viande') {
                 if (sel.size?.name) details.push(sel.size.name);
                 if (sel.meat?.name) details.push(sel.meat.name);
+            } else if (product.type === 'frites') {
+                // La cuisine doit savoir quelle taille servir
+                if (sel.size?.name) details.push(sel.size.name);
             } else if (product.type === 'panini') {
                 if (sel.meat?.name) details.push(sel.meat.name);
                 if (sel.sauce?.name) details.push('Sauce ' + sel.sauce.name);
@@ -4144,16 +4308,26 @@
                 if (sel.menuBoisson) details.push(sel.menuBoisson);
             } else if (product.menuUpgrade && sel.menu) {
                 details.push('MENU (Frites + ' + (sel.menuBoisson || BOISSONS_33[0].name) + ')');
-            } else if (product.hasBuilder && product.menuPrice && sel.menu) {
-                details.push('MENU (Frites + ' + (sel.menuBoisson || BOISSONS_33[0].name) + ')');
+            } else if (product.hasBuilder && product.menuPrice) {
+                // Burgers, wraps et paninis simples : la cuisine a besoin de la viande
+                // (wraps) et de la sauce (burgers) choisies par le client.
+                if (sel.meat?.name) details.push(sel.meat.name);
+                if (sel.sauce?.name) details.push('Sauce ' + sel.sauce.name);
+                if (sel.menu) details.push('MENU (Frites + ' + (sel.menuBoisson || BOISSONS_33[0].name) + ')');
             }
 
             // Sauvegarder les sélections pour pouvoir modifier plus tard
+            const itemPrice = safePrice(product, sel.totalPrice);
+            if (itemPrice === null) {
+                showToast('Erreur de prix — article non ajouté');
+                closeBuilder();
+                return;
+            }
             state.cart.push({
-                id: Date.now(),
+                id: newCartItemId(),
                 product: product,
                 name: cartName,
-                price: sel.totalPrice || product.price,
+                price: itemPrice,
                 quantity: 1,
                 details: details.join(' • '),
                 selections: JSON.parse(JSON.stringify(sel)),

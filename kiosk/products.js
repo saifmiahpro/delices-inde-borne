@@ -29,6 +29,14 @@ const SAUCES = [
     { id: 'brazil', name: 'Brazil' }
 ];
 
+// ============================================================
+//  RÈGLES DE TARIFICATION  (modifiables ici sans toucher au code)
+// ============================================================
+// Sauces : les N premières sont incluses, les suivantes sont facturées.
+const SAUCES_INCLUSES = 2;      // nombre de sauces offertes
+const PRIX_SAUCE_SUPP = 0.50;   // prix de chaque sauce au-delà
+const SAUCES_MAX = 5;           // plafond absolu (évite les abus)
+
 const BOISSONS_33 = [
     { id: 'coca_cola', name: 'Coca Cola' },
     { id: 'coca_cherry', name: 'Coca Cola Cherry' },
@@ -53,7 +61,9 @@ const BOISSONS_33 = [
     { id: 'dada_litchi', name: 'Dada Litchi' },
     { id: 'eau', name: 'Eau Cristalline 50cl' },
     { id: 'capri_sun', name: 'Capri-Sun' },
-    { id: 'redbull', name: 'Red Bull' }
+    // Boisson premium : facturée en supplément quand elle est choisie dans une
+    // formule (à la carte elle est à 2.50€ contre 1.50€ pour un soda).
+    { id: 'redbull', name: 'Red Bull', extra: 1.00 }
 ];
 
 const PAINS = [
@@ -148,6 +158,7 @@ const PRODUCTS = [
         image: '../assets/buckets/bucket_1.png',
         price: 7.90,
         type: 'bucket',
+        sauceCount: 1,
         hasBuilder: true,
         includesFrites: true,
         includesBoisson: true
@@ -160,6 +171,7 @@ const PRODUCTS = [
         image: '../assets/buckets/bucket_2.png',
         price: 9.90,
         type: 'bucket',
+        sauceCount: 2,
         hasBuilder: true,
         includesFrites: true,
         includesBoisson: true,
@@ -174,6 +186,7 @@ const PRODUCTS = [
         image: '../assets/buckets/bucket_3.png',
         price: 18.90,
         type: 'bucket',
+        sauceCount: 3,
         hasBuilder: true,
         includesFrites: true,
         includesBoisson: true
@@ -187,6 +200,7 @@ const PRODUCTS = [
         image: '../assets/buckets/bucket_4.png',
         price: 26.90,
         type: 'bucket',
+        sauceCount: 4,
         hasBuilder: true,
         includesFrites: true,
         includesBoisson: true
@@ -693,6 +707,7 @@ const PRODUCTS = [
         description: 'Frites sauce cheddar',
         image: '../assets/frites/frite_boisson.png',
         type: 'frites',
+        hasBuilder: true,
         sizes: [
             { id: 'medium', name: 'Medium', price: 3.50 },
             { id: 'xl', name: 'XL', price: 4.50 }
@@ -705,6 +720,7 @@ const PRODUCTS = [
         description: 'Frites cheddar & boursin',
         image: '../assets/frites/frite_boisson.png',
         type: 'frites',
+        hasBuilder: true,
         sizes: [
             { id: 'medium', name: 'Medium', price: 4.50 },
             { id: 'xl', name: 'XL', price: 5.50 }
@@ -717,6 +733,7 @@ const PRODUCTS = [
         description: 'Frites cheddar & lardons',
         image: '../assets/frites/frite_boisson.png',
         type: 'frites',
+        hasBuilder: true,
         sizes: [
             { id: 'medium', name: 'Medium', price: 4.50 },
             { id: 'xl', name: 'XL', price: 5.50 }
@@ -729,6 +746,7 @@ const PRODUCTS = [
         description: 'Frites cheddar & bacon',
         image: '../assets/frites/frite_boisson.png',
         type: 'frites',
+        hasBuilder: true,
         sizes: [
             { id: 'medium', name: 'Medium', price: 4.50 },
             { id: 'xl', name: 'XL', price: 5.50 }
@@ -740,6 +758,8 @@ const PRODUCTS = [
         name: 'Frites',
         description: 'Portion de frites',
         image: '../assets/frites/frite_boisson.png',
+        type: 'frites',
+        hasBuilder: true,
         sizes: [
             { id: 'petite', name: 'Petite', price: 1.00 },
             { id: 'normal', name: 'Moyenne', price: 2.00 },
@@ -752,6 +772,8 @@ const PRODUCTS = [
         name: 'Potatoes',
         description: 'Pommes de terre rôties',
         image: '../assets/frites/frite_boisson.png',
+        type: 'frites',
+        hasBuilder: true,
         sizes: [
             { id: 'normal', name: 'Normal', price: 2.50 },
             { id: 'grande', name: 'Grande', price: 3.50 }
