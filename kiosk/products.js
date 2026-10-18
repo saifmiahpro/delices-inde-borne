@@ -25,7 +25,7 @@ const SAUCES = [
     { id: 'sweet_chili', name: 'Sweet Chili' },
     { id: 'chili_thai', name: 'Chili Thaï' },
     { id: 'fromagere', name: 'Sauce Fromagère' },
-    { id: 'cheddar', name: 'Sauce Cheddar' },
+    // Sauce Cheddar : retirée le 18/10/2026, le restaurant ne la sert plus en sauce au choix.
     { id: 'brazil', name: 'Brazil' }
 ];
 
@@ -59,11 +59,18 @@ const BOISSONS_33 = [
     { id: 'dada_cerise', name: 'Dada Cerise' },
     { id: 'dada_melon', name: 'Dada Melon' },
     { id: 'dada_litchi', name: 'Dada Litchi' },
+    // L'eau reste au choix dans les formules ; à la carte elle a son propre produit (1,00 €).
     { id: 'eau', name: 'Eau Cristalline 50cl' },
-    { id: 'capri_sun', name: 'Capri-Sun' },
-    // Boisson premium : facturée en supplément quand elle est choisie dans une
-    // formule (à la carte elle est à 2.50€ contre 1.50€ pour un soda).
-    { id: 'redbull', name: 'Red Bull', extra: 1.00 }
+    { id: 'capri_sun', name: 'Capri-Sun' }
+    // Red Bull : retiré le 18/10/2026, le restaurant ne le vend plus.
+];
+
+// Bouteilles au choix du Bucket Family (1,5 L incluse)
+const BOUTEILLES_15L = [
+    { id: 'coca_150', name: 'Coca Cola 1.5L' },
+    { id: 'hawai_150', name: 'Hawaï 1.5L' },
+    { id: 'lipton_150', name: 'Lipton Ice Tea Pêche 1.5L' },
+    { id: 'orangina_150', name: 'Orangina 1.5L' }
 ];
 
 const PAINS = [
@@ -187,6 +194,7 @@ const PRODUCTS = [
         price: 18.90,
         type: 'bucket',
         sauceCount: 3,
+        nbBoissons: 2,
         hasBuilder: true,
         includesFrites: true,
         includesBoisson: true
@@ -201,6 +209,7 @@ const PRODUCTS = [
         price: 26.90,
         type: 'bucket',
         sauceCount: 4,
+        boissonBouteille: true,
         hasBuilder: true,
         includesFrites: true,
         includesBoisson: true
@@ -225,7 +234,7 @@ const PRODUCTS = [
         id: 'bowl_indien',
         category: 'bowls',
         name: 'Indien Bowl',
-        description: 'Chicken Tikka, oignon, poivron, œuf, sauce curry',
+        description: 'Chicken Tikka, oignon, poivron, concombre, œuf, sauce curry',
         image: '../assets/bowls/bowl_indian.png',
         type: 'bowl',
         hasBuilder: true,
@@ -986,12 +995,12 @@ const PRODUCTS = [
         hasBuilder: true
     },
     {
-        id: 'redbull',
+        id: 'eau_50',
         category: 'boissons',
-        name: 'Red Bull',
+        name: 'Eau Cristalline 50cl',
         description: '',
         image: '../assets/frites/frite_boisson.png',
-        price: 2.50
+        price: 1.00
     },
     {
         id: 'coca_150',

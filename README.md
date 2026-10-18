@@ -37,3 +37,17 @@ Les 2 tickets (cuisine + client) sortiront dessus séparément.
 ## Mise à jour à distance
 Le batch fait automatiquement `git pull` au démarrage.
 Pour forcer une MAJ : Menu Admin → Mise à jour
+
+## Refonte du 18/10/2026 — où est quoi
+
+| Fichier | Rôle |
+|---|---|
+| `kiosk/index.html` | La page de la borne (ouverte par le lanceur, comme avant) |
+| `kiosk/borne.js` / `kiosk/borne.css` | Nouvelle interface : carte, fiches produit, panier, prénom |
+| `kiosk/products.js` | La carte (produits, prix, sauces, boissons) — c'est ici qu'on change un prix |
+| `kiosk/tickets.js` | **Impression des tickets, historique, menu admin — NE PAS MODIFIER** (copie à l'identique de l'ancienne borne) |
+| `kiosk/index_ancienne.html` | Ancienne borne, gardée en secours : si la nouvelle ne démarre pas, la borne y bascule toute seule |
+| `kiosk/img/`, `kiosk/fonts/` | Photos allégées et polices (la borne marche même sans internet) |
+
+Les lanceurs `.bat`, `serveur.ps1`, `maj.html` et `index_win7.html` n'ont pas été touchés :
+la mise à jour se fait toujours par 5 clics sur le logo → MISE À JOUR.
