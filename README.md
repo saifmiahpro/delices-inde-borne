@@ -51,3 +51,12 @@ Pour forcer une MAJ : Menu Admin → Mise à jour
 
 Les lanceurs `.bat`, `serveur.ps1`, `maj.html` et `index_win7.html` n'ont pas été touchés :
 la mise à jour se fait toujours par 5 clics sur le logo → MISE À JOUR.
+
+Pour vérifier qu'une mise à jour est arrivée : 5 clics sur le logo, la version s'affiche en bas
+du menu admin (« Version de la borne : … », constante `VERSION_BORNE` en haut de `kiosk/borne.js`,
+à changer à chaque publication).
+
+Le logo est touchable sur l'accueil, l'écran sur place / à emporter, la carte et l'écran prénom.
+Si la nouvelle interface ne démarre pas correctement (fichier manquant, style non chargé,
+menu admin absent), la borne bascule seule sur `kiosk/index_ancienne.html`, qui a son propre
+menu admin et son bouton MISE À JOUR.

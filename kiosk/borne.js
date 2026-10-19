@@ -1286,16 +1286,16 @@ var B = (function () {
         // Menu admin caché : 5 touchers rapides sur le logo (handleSecretClick, tickets.js).
         // Sur l'accueil, un toucher isolé sur le logo lance quand même la commande.
         var attenteLogo = null;
-        var touchersLogo = 0;
+        var adminVu = false;
         $('logo-accueil').addEventListener('click', function (e) {
             e.stopPropagation();
             handleSecretClick();
-            touchersLogo++;
+            if ($('admin-modal').classList.contains('active')) adminVu = true;
             clearTimeout(attenteLogo);
             attenteLogo = setTimeout(function () {
-                // Moins de 5 touchers = un client : on lance la commande. 5 ou plus = l'équipe (menu admin).
-                if (touchersLogo < 5 && !$('admin-modal').classList.contains('active') && ecranCourant === 'accueil') commencer();
-                touchersLogo = 0;
+                // Le menu admin ne s'est pas ouvert = c'est un client : on lance la commande.
+                if (!adminVu && !$('admin-modal').classList.contains('active') && ecranCourant === 'accueil') commencer();
+                adminVu = false;
             }, 1700);
         });
         ['logo-mode', 'logo-tete', 'logo-prenom'].forEach(function (id) {
@@ -1306,7 +1306,7 @@ var B = (function () {
         var version = document.createElement('div');
         version.className = 'version-borne';
         version.textContent = 'Version de la borne : ' + VERSION_BORNE;
-        $('admin-modal').appendChild(version);
+        ($('admin-modal').firstElementChild || $('admin-modal')).appendChild(version);
 
         ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'wheel'].forEach(function (ev) {
             document.addEventListener(ev, geste, { passive: true, capture: true });
@@ -1327,7 +1327,12 @@ var B = (function () {
         // La borne n'est déclarée prête que si l'impression ET le menu admin (MISE À JOUR)
         // sont bien chargés. Sinon le filet de sécurité d'index.html bascule sur
         // l'ancienne borne, qui garde toujours son propre menu admin.
-        if (typeof validateOrder === 'function' && typeof generateTicketHTML === 'function' &&
+        // Même chose si la feuille de style n'a pas été appliquée (accueil pas en plein écran).
+        var accueil = $('accueil');
+        var styleOk = window.getComputedStyle(accueil).position === 'fixed' &&
+            accueil.offsetWidth >= window.innerWidth - 2 && accueil.offsetHeight >= window.innerHeight - 2;
+        if (styleOk &&
+            typeof validateOrder === 'function' && typeof generateTicketHTML === 'function' &&
             typeof handleSecretClick === 'function' && typeof adminUpdateRestart === 'function' &&
             $('admin-modal')) {
             window.BORNE_PRETE = true;
