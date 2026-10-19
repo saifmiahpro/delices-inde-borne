@@ -15,6 +15,9 @@
 
 const state = { prenom: '', mode: '', cart: [] };
 
+// Version affichée dans le menu admin (sert à vérifier qu'une mise à jour est bien arrivée)
+var VERSION_BORNE = '19/10/2026';
+
 var B = (function () {
     'use strict';
 
@@ -1283,17 +1286,27 @@ var B = (function () {
         // Menu admin caché : 5 touchers rapides sur le logo (handleSecretClick, tickets.js).
         // Sur l'accueil, un toucher isolé sur le logo lance quand même la commande.
         var attenteLogo = null;
+        var touchersLogo = 0;
         $('logo-accueil').addEventListener('click', function (e) {
             e.stopPropagation();
             handleSecretClick();
+            touchersLogo++;
             clearTimeout(attenteLogo);
             attenteLogo = setTimeout(function () {
-                if (!$('admin-modal').classList.contains('active') && ecranCourant === 'accueil') commencer();
+                // Moins de 5 touchers = un client : on lance la commande. 5 ou plus = l'équipe (menu admin).
+                if (touchersLogo < 5 && !$('admin-modal').classList.contains('active') && ecranCourant === 'accueil') commencer();
+                touchersLogo = 0;
             }, 1700);
         });
-        ['logo-mode', 'logo-tete'].forEach(function (id) {
+        ['logo-mode', 'logo-tete', 'logo-prenom'].forEach(function (id) {
             $(id).addEventListener('click', function () { handleSecretClick(); });
         });
+
+        // Numéro de version sous le menu admin
+        var version = document.createElement('div');
+        version.className = 'version-borne';
+        version.textContent = 'Version de la borne : ' + VERSION_BORNE;
+        $('admin-modal').appendChild(version);
 
         ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'wheel'].forEach(function (ev) {
             document.addEventListener(ev, geste, { passive: true, capture: true });
@@ -1311,7 +1324,14 @@ var B = (function () {
         setInterval(surveiller, 1000);
 
         afficher('accueil');
-        window.BORNE_PRETE = true;
+        // La borne n'est déclarée prête que si l'impression ET le menu admin (MISE À JOUR)
+        // sont bien chargés. Sinon le filet de sécurité d'index.html bascule sur
+        // l'ancienne borne, qui garde toujours son propre menu admin.
+        if (typeof validateOrder === 'function' && typeof generateTicketHTML === 'function' &&
+            typeof handleSecretClick === 'function' && typeof adminUpdateRestart === 'function' &&
+            $('admin-modal')) {
+            window.BORNE_PRETE = true;
+        }
     }
 
     return {

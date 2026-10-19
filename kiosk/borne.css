@@ -13,7 +13,8 @@
      transparent posé au-dessus de tout avalerait les touchers.
    - Pas d'emoji (Windows 7 n'a pas la police) : icônes en SVG.
    - Rien de plus récent que Chrome 109 (pas de :has, pas d'imbrication CSS,
-     pas de color-mix, pas de dvh).
+     pas de color-mix, pas de dvh). Et pas de « inset » (Chrome 87) : on écrit
+     top/right/bottom/left, pour rester utilisable même sur un vieux Chrome.
    ============================================================================ */
 
 @font-face { font-family: 'Anton'; src: url('fonts/anton-latin-400-normal.woff2') format('woff2'); font-weight: 400; font-display: swap; }
@@ -100,7 +101,10 @@ svg { display: block; }
    ============================================================================ */
 .ecran {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: none;
     flex-direction: column;
     background: var(--bg);
@@ -165,7 +169,10 @@ svg { display: block; }
 }
 #accueil video {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -173,7 +180,10 @@ svg { display: block; }
 }
 #accueil .voile {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     pointer-events: none;
     background:
         linear-gradient(180deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.15) 28%, rgba(0, 0, 0, 0.1) 52%, rgba(0, 0, 0, 0.88) 82%, #000 100%);
@@ -699,7 +709,10 @@ svg { display: block; }
    ============================================================================ */
 .calque {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 400;
     display: none;
     align-items: center;
@@ -1121,7 +1134,10 @@ svg { display: block; }
 
 .confirm-screen {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 600;
     display: none;
     flex-direction: column;
@@ -1133,6 +1149,7 @@ svg { display: block; }
     background: radial-gradient(100% 60% at 50% 30%, #2a2108 0%, var(--bg) 65%);
 }
 .confirm-screen.active { display: flex; }
+#prenom .logo-prenom { position: absolute; top: 1.2rem; left: 1.2rem; width: 4.6rem; height: 4.6rem; object-fit: contain; cursor: pointer; }
 .confirm-screen h1 { font-family: var(--titre); font-weight: 400; font-size: 3.6rem; text-transform: uppercase; line-height: 1.05; }
 .confirm-screen h1 span { color: var(--gold); }
 .confirm-screen p { font-size: 1.6rem; font-weight: 600; color: var(--dim); max-width: 40rem; }
@@ -1220,7 +1237,10 @@ svg { display: block; }
    ============================================================================ */
 .modal {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: none;
     flex-direction: column;
     background: rgba(0, 0, 0, 0.88);
@@ -1232,6 +1252,7 @@ svg { display: block; }
    on le rend défilable (centré quand il tient, collé en haut sinon). */
 .modal { justify-content: flex-start !important; overflow-y: auto; padding: 2vh 0; }
 .modal > div { margin: auto; flex: none; }
+.modal .version-borne { margin: 0 auto 1rem; font-family: var(--texte); font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, 0.55); text-align: center; }
 .modal h2 { font-weight: 400; }
 .modal button { font-family: 'Anton', sans-serif; }
 
