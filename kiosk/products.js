@@ -127,7 +127,7 @@ const RETRAITS_SANDWICH = [
 // Éléments qu'on peut retirer - TACOS (sauce fromagère et frites sont dans la recette)
 const RETRAITS_TACOS = [
     { id: 'sans_sauce_fromagere', name: 'Sans Sauce Fromagère' },
-    { id: 'sans_frites', name: 'Sans Frites' }
+    { id: 'sans_frites', name: 'Sans Frites dans le tacos' }
 ];
 
 // ============================================================
@@ -137,10 +137,12 @@ const RETRAITS_TACOS = [
 // ============================================================
 const RETRAITS = [
     { id: 'sans_sauce_fromagere', name: 'Sans Sauce Fromagère' },
-    { id: 'sans_frites', name: 'Sans Frites' },
+    { id: 'sans_frites', name: 'Sans Frites dans le tacos' },
     { id: 'sans_salade', name: 'Sans Salade' },
     { id: 'sans_tomate', name: 'Sans Tomate' },
     { id: 'sans_oignon', name: 'Sans Oignon' },
+    // « cru » quand le produit a AUSSI des oignons frits, pour que la cuisine sache lequel retirer
+    { id: 'sans_oignon_cru', name: 'Sans Oignon cru' },
     { id: 'sans_poivron', name: 'Sans Poivron' },
     { id: 'sans_concombre', name: 'Sans Concombre' },
     { id: 'sans_oignon_frit', name: 'Sans Oignons Frits' },
@@ -270,7 +272,7 @@ const PRODUCTS = [
         type: 'bowl',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Chicken Tikka • Oignon, Poivron • Œuf • Sauce Curry',
+        defaultIngredients: 'Chicken Tikka • Oignon, Poivron, Concombre • Œuf • Sauce Curry',
         sizes: [
             { id: 'normal', name: 'Normal', price: 9.90 },
             { id: 'xl', name: 'XL', price: 14.90 }
@@ -437,6 +439,7 @@ const PRODUCTS = [
     },
     {
         id: 'tacos_royal',
+        viandesAuChoix: 2,
         retraits: ['sans_sauce_fromagere', 'sans_frites', 'sans_oignon', 'sans_poivron', 'sans_bacon', 'sans_sauce_cheddar'],
         category: 'tacos',
         name: 'Tacos Royal',
@@ -460,7 +463,7 @@ const PRODUCTS = [
     // ==================== NAANS SPÉCIAUX ====================
     {
         id: 'naan_royal',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_sauce_cheddar', 'sans_oignon_frit'],
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon_cru', 'sans_sauce_cheddar', 'sans_oignon_frit'],
         category: 'naans',
         name: 'Naan Royal',
         badge: 'POPULAIRE',
@@ -491,7 +494,7 @@ const PRODUCTS = [
     },
     {
         id: 'naan_crispy',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_bacon', 'sans_oignon_frit', 'sans_sauce_algerienne'],
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon_cru', 'sans_bacon', 'sans_oignon_frit', 'sans_sauce_algerienne'],
         category: 'naans',
         name: 'Naan Crispy',
         description: 'Kebab, Tenders, Bacon, Oignons frits, Sauce Algérienne',
@@ -623,7 +626,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_crispy',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar', 'sans_bacon', 'sans_oignon_frit'],
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon_cru', 'sans_cheddar', 'sans_bacon', 'sans_oignon_frit'],
         category: 'burgers',
         name: 'Crispy Burger',
         description: 'Double Tenders, Bacon, Oignons frits, Crudités, Cheddar',

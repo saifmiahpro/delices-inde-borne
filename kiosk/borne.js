@@ -16,7 +16,7 @@
 const state = { prenom: '', mode: '', cart: [] };
 
 // Version affichée dans le menu admin (sert à vérifier qu'une mise à jour est bien arrivée)
-var VERSION_BORNE = '19/10/2026 (2)';
+var VERSION_BORNE = '19/10/2026 (3)';
 
 var B = (function () {
     'use strict';
@@ -155,14 +155,18 @@ var B = (function () {
     function gViande() {
         return { id: 'viande', titre: 'Votre viande', aide: 'Une au choix', min: 1, max: 1, options: optsDe(VIANDES) };
     }
-    // exclure : sauces déjà dans la recette (ex. la sauce fromagère des tacos)
+    // exclure : sauces déjà dans la recette (la sauce fromagère des tacos). Dans ce cas
+    // le « sans sauce » devient « Pas d'autre sauce » : la cuisine garde la fromagère
+    // (elle ne la retire que si « Sans Sauce Fromagère » est coché).
+    var PAS_AUTRE_SAUCE = { id: SANS_SAUCE.id, nom: 'Pas d\'autre sauce', exclusif: true };
     function gSauces(titre, exclure) {
         var liste = SAUCES.filter(function (s) { return !exclure || exclure.indexOf(s.id) < 0; });
+        var base = SAUCES_INCLUSES + ' offertes, puis +' + eur(PRIX_SAUCE_SUPP) + ' la sauce · ' + SAUCES_MAX + ' maximum';
         return {
-            id: 'sauces', titre: titre || 'Vos sauces',
-            aide: SAUCES_INCLUSES + ' offertes, puis +' + eur(PRIX_SAUCE_SUPP) + ' la sauce · ' + SAUCES_MAX + ' maximum',
+            id: 'sauces', titre: titre || (exclure ? 'Sauce en plus de la fromagère' : 'Vos sauces'),
+            aide: exclure ? 'La sauce fromagère est déjà dans le tacos · ' + base : base,
             min: 1, max: SAUCES_MAX, payantApres: SAUCES_INCLUSES, prixPayant: PRIX_SAUCE_SUPP,
-            options: [SANS_SAUCE].concat(optsDe(liste))
+            options: [exclure ? PAS_AUTRE_SAUCE : SANS_SAUCE].concat(optsDe(liste))
         };
     }
     function gSauceUnique() {
@@ -280,6 +284,7 @@ var B = (function () {
                     tailles.forEach(function (o) { if (o.id === un(sel, 'taille') && o.delta) extra = o.delta; });
                     return [
                         { id: 'taille', titre: 'Choisissez la taille', min: 1, max: 1, larges: true, vedette: true, options: tailles },
+                        p.viandesAuChoix ? gViandes(p.viandesAuChoix) : null,
                         gRetraits(p, RETRAITS_TACOS_IDS),
                         gViandesSupp(),
                         gFormule(p.price + extra),
@@ -288,7 +293,16 @@ var B = (function () {
                 },
                 base: function () { return p.price; },
                 ligne: function (sel, gs) {
-                    var d = [p.defaultIngredients].concat(nomsDe(gs, sel, 'retraits'));
+                    var recetteTxt = p.defaultIngredients;
+                    var d;
+                    if (p.viandesAuChoix) {
+                        // « 2 Viandes • Oignons… » : on imprime les viandes choisies à la place de « 2 Viandes »
+                        var reste = String(recetteTxt).split(' • ').slice(1).join(' • ');
+                        d = [nomsDe(gs, sel, 'viandes').join(', '), reste];
+                    } else {
+                        d = [recetteTxt];
+                    }
+                    d = d.concat(nomsDe(gs, sel, 'retraits'));
                     var vs = nomsDe(gs, sel, 'viandes_supp');
                     if (vs.length) d.push('+' + vs.join(', +'));
                     if (un(sel, 'formule') === 'menu') d.push(menuTexte(gs, sel));
