@@ -16,7 +16,7 @@
 const state = { prenom: '', mode: '', cart: [] };
 
 // Version affichée dans le menu admin (sert à vérifier qu'une mise à jour est bien arrivée)
-var VERSION_BORNE = '19/10/2026 (5)';
+var VERSION_BORNE = '19/10/2026 (6)';
 
 var B = (function () {
     'use strict';
