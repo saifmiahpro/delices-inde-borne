@@ -124,9 +124,39 @@ const RETRAITS_SANDWICH = [
     { id: 'sans_oignon', name: 'Sans Oignon' }
 ];
 
-// Éléments qu'on peut retirer - TACOS
+// Éléments qu'on peut retirer - TACOS (sauce fromagère et frites sont dans la recette)
 const RETRAITS_TACOS = [
-    { id: 'sans_sauce_fromagere', name: 'Sans Sauce Fromagère' }
+    { id: 'sans_sauce_fromagere', name: 'Sans Sauce Fromagère' },
+    { id: 'sans_frites', name: 'Sans Frites' }
+];
+
+// ============================================================
+//  INGRÉDIENTS QU'ON PEUT RETIRER (gratuit)
+//  Chaque produit liste ses retraits possibles dans « retraits » (voir plus bas),
+//  d'après sa recette. Imprimé en cuisine : « → Sans Oignon », etc.
+// ============================================================
+const RETRAITS = [
+    { id: 'sans_sauce_fromagere', name: 'Sans Sauce Fromagère' },
+    { id: 'sans_frites', name: 'Sans Frites' },
+    { id: 'sans_salade', name: 'Sans Salade' },
+    { id: 'sans_tomate', name: 'Sans Tomate' },
+    { id: 'sans_oignon', name: 'Sans Oignon' },
+    { id: 'sans_poivron', name: 'Sans Poivron' },
+    { id: 'sans_concombre', name: 'Sans Concombre' },
+    { id: 'sans_oignon_frit', name: 'Sans Oignons Frits' },
+    { id: 'sans_bacon', name: 'Sans Bacon' },
+    { id: 'sans_oeuf', name: 'Sans Œuf' },
+    { id: 'sans_cheddar', name: 'Sans Cheddar' },
+    { id: 'sans_chevre', name: 'Sans Chèvre' },
+    { id: 'sans_raclette', name: 'Sans Raclette' },
+    { id: 'sans_boursin', name: 'Sans Boursin' },
+    { id: 'sans_pomme_de_terre', name: 'Sans Pomme de terre' },
+    { id: 'sans_sauce_cheddar', name: 'Sans Sauce Cheddar' },
+    { id: 'sans_sauce_algerienne', name: 'Sans Sauce Algérienne' },
+    { id: 'sans_sauce_chili_thai', name: 'Sans Sauce Chili Thaï' },
+    { id: 'sans_sweet_chili', name: 'Sans Sweet Chili' },
+    { id: 'sans_sauce_curry', name: 'Sans Sauce Curry' },
+    { id: 'sans_sauce_piquante', name: 'Sans Sauce Piquante' }
 ];
 
 // Catégories
@@ -232,6 +262,7 @@ const PRODUCTS = [
     },
     {
         id: 'bowl_indien',
+        retraits: ['sans_oignon', 'sans_poivron', 'sans_concombre', 'sans_oeuf', 'sans_sauce_curry'],
         category: 'bowls',
         name: 'Indien Bowl',
         description: 'Chicken Tikka, oignon, poivron, concombre, œuf, sauce curry',
@@ -249,6 +280,7 @@ const PRODUCTS = [
     },
     {
         id: 'bowl_crispy',
+        retraits: ['sans_cheddar', 'sans_oignon_frit', 'sans_oeuf'],
         category: 'bowls',
         name: 'Crispy Bowl',
         description: 'Tenders, cheddar, oignons frits, œuf',
@@ -264,6 +296,7 @@ const PRODUCTS = [
     },
     {
         id: 'bowl_bangkok',
+        retraits: ['sans_sweet_chili', 'sans_oignon_frit'],
         category: 'bowls',
         name: 'Krousty Bangkok',
         description: 'Tenders, sweet chili, oignon frit',
@@ -279,6 +312,7 @@ const PRODUCTS = [
     },
     {
         id: 'bowl_delice',
+        retraits: ['sans_oignon_frit', 'sans_sauce_piquante'],
         category: 'bowls',
         name: 'Bowl Délice',
         description: 'Chicken Tikka, oignons frits, sauce extra piquante',
@@ -296,6 +330,7 @@ const PRODUCTS = [
     // ==================== SALADES ====================
     {
         id: 'salade_cesar',
+        retraits: ['sans_boursin', 'sans_oeuf'],
         category: 'salades',
         name: 'César',
         description: 'Poulet pané, légumes, boursin, œuf',
@@ -304,6 +339,7 @@ const PRODUCTS = [
     },
     {
         id: 'salade_nems',
+        retraits: ['sans_boursin', 'sans_oeuf'],
         category: 'salades',
         name: 'Salade Nems',
         description: 'Nems, légumes, boursin, œuf',
@@ -312,6 +348,7 @@ const PRODUCTS = [
     },
     {
         id: 'salade_indienne',
+        retraits: ['sans_boursin', 'sans_oeuf'],
         category: 'salades',
         name: 'Indienne',
         description: 'Chicken Tikka, légumes, boursin, œuf',
@@ -323,6 +360,7 @@ const PRODUCTS = [
     // TACOS CLASSIQUES
     {
         id: 'tacos_custom',
+        retraits: ['sans_sauce_fromagere', 'sans_frites'],
         category: 'tacos',
         name: 'Tacos',
         displayName: 'Compose ton Tacos',
@@ -344,6 +382,7 @@ const PRODUCTS = [
     // Upgrades: Large (+3€) ou XL (+6€)
     {
         id: 'tacos_spicy',
+        retraits: ['sans_sauce_fromagere', 'sans_frites', 'sans_sauce_chili_thai', 'sans_oignon_frit'],
         category: 'tacos',
         name: 'Tacos Spicy',
         badge: 'ÉPICÉ',
@@ -362,6 +401,7 @@ const PRODUCTS = [
     },
     {
         id: 'tacos_crispy',
+        retraits: ['sans_sauce_fromagere', 'sans_frites', 'sans_bacon', 'sans_oignon_frit', 'sans_sauce_algerienne'],
         category: 'tacos',
         name: 'Tacos Crispy',
         description: 'Chicken Tikka, Tenders, Bacon, Oignons frits, Sauce Algérienne',
@@ -379,6 +419,7 @@ const PRODUCTS = [
     },
     {
         id: 'tacos_chevre',
+        retraits: ['sans_sauce_fromagere', 'sans_frites', 'sans_oeuf', 'sans_chevre'],
         category: 'tacos',
         name: 'Tacos Chèvre',
         description: 'Tenders, Steak, Œuf, Chèvre',
@@ -396,6 +437,7 @@ const PRODUCTS = [
     },
     {
         id: 'tacos_royal',
+        retraits: ['sans_sauce_fromagere', 'sans_frites', 'sans_oignon', 'sans_poivron', 'sans_bacon', 'sans_sauce_cheddar'],
         category: 'tacos',
         name: 'Tacos Royal',
         badge: 'POPULAIRE',
@@ -418,6 +460,7 @@ const PRODUCTS = [
     // ==================== NAANS SPÉCIAUX ====================
     {
         id: 'naan_royal',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_sauce_cheddar', 'sans_oignon_frit'],
         category: 'naans',
         name: 'Naan Royal',
         badge: 'POPULAIRE',
@@ -434,6 +477,7 @@ const PRODUCTS = [
     },
     {
         id: 'naan_cheesy',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_raclette', 'sans_sauce_fromagere'],
         category: 'naans',
         name: 'Naan Cheesy',
         description: 'Steak, Cordon Bleu, Raclette, Sauce Fromagère',
@@ -447,6 +491,7 @@ const PRODUCTS = [
     },
     {
         id: 'naan_crispy',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_bacon', 'sans_oignon_frit', 'sans_sauce_algerienne'],
         category: 'naans',
         name: 'Naan Crispy',
         description: 'Kebab, Tenders, Bacon, Oignons frits, Sauce Algérienne',
@@ -460,6 +505,7 @@ const PRODUCTS = [
     },
     {
         id: 'naan_delice',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_bacon', 'sans_oeuf', 'sans_sweet_chili'],
         category: 'naans',
         name: 'Naan Délice',
         description: 'Kebab, Tenders, Bacon, Œuf, Sauce Sweet Chili',
@@ -476,6 +522,7 @@ const PRODUCTS = [
     // 1 viande au choix
     {
         id: 'sandwich_naan',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon'],
         category: 'sandwichs',
         name: 'Naan',
         displayName: 'Compose ton Sandwich',
@@ -491,6 +538,7 @@ const PRODUCTS = [
     },
     {
         id: 'sandwich_pain_rond',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon'],
         category: 'sandwichs',
         name: 'Pain Rond',
         description: '1 viande au choix',
@@ -502,6 +550,7 @@ const PRODUCTS = [
     },
     {
         id: 'sandwich_galette',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon'],
         category: 'sandwichs',
         name: 'Galette',
         description: '1 viande au choix',
@@ -515,6 +564,7 @@ const PRODUCTS = [
     // ==================== WRAPS ====================
     {
         id: 'wrap_classic',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_pomme_de_terre', 'sans_cheddar', 'sans_sauce_fromagere'],
         category: 'wraps',
         name: 'Wrap Classic',
         description: 'Viande au choix',
@@ -526,6 +576,7 @@ const PRODUCTS = [
     },
     {
         id: 'wrap_maxi',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_pomme_de_terre', 'sans_cheddar', 'sans_sauce_fromagere'],
         category: 'wraps',
         name: 'Wrap Maxi',
         description: 'Viande au choix - Grande taille',
@@ -539,6 +590,7 @@ const PRODUCTS = [
     // ==================== BURGERS ====================
     {
         id: 'burger_cheese',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar'],
         category: 'burgers',
         name: 'Cheese',
         description: '1 Steak, Crudités, Cheddar',
@@ -549,6 +601,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_double_cheese',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar'],
         category: 'burgers',
         name: 'Double Cheese',
         description: '2 Steaks, Crudités, Cheddar',
@@ -559,6 +612,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_chicken_cheese',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar', 'sans_pomme_de_terre'],
         category: 'burgers',
         name: 'Chicken Cheese',
         description: 'Poulet pané, Galette de pomme de terre, Crudités, Cheddar',
@@ -569,6 +623,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_crispy',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar', 'sans_bacon', 'sans_oignon_frit'],
         category: 'burgers',
         name: 'Crispy Burger',
         description: 'Double Tenders, Bacon, Oignons frits, Crudités, Cheddar',
@@ -579,6 +634,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_smash',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar'],
         category: 'burgers',
         name: 'Smash Burger',
         badge: 'POPULAIRE',
@@ -592,6 +648,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_delice',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar', 'sans_pomme_de_terre', 'sans_oeuf', 'sans_raclette', 'sans_bacon'],
         category: 'burgers',
         name: 'Délice Burger',
         description: 'Steak, Pomme de terre, Œuf, Raclette, Cheddar, Bacon, Crudités',
@@ -602,6 +659,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_delice_royal',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar', 'sans_pomme_de_terre'],
         category: 'burgers',
         name: 'Délice Royal',
         description: '1 Poulet pané, 1 Steak, Pomme de terre, Crudités, Cheddar',
@@ -793,6 +851,7 @@ const PRODUCTS = [
     // Accompagnées de crudités, pain rond ou naan, sauce au choix
     {
         id: 'assiette_simple',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_poivron'],
         category: 'assiettes',
         name: 'Assiette Simple',
         description: '1 viande au choix + Crudités + Pain + Sauce',
@@ -804,6 +863,7 @@ const PRODUCTS = [
     },
     {
         id: 'assiette_special_delice',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_poivron'],
         category: 'assiettes',
         name: 'Assiette Spécial Délice',
         description: '3 viandes au choix + Crudités + Pain + Sauce',
@@ -1136,6 +1196,7 @@ const PRODUCTS = [
     // Disponible en semaine jusqu'à 15h - Sur présentation carte étudiante
     {
         id: 'etudiant_tacos',
+        retraits: ['sans_sauce_fromagere', 'sans_frites'],
         category: 'menu_etudiant',
         name: 'Tacos Étudiant',
         description: 'Tacos + Frites + Boisson',
@@ -1177,6 +1238,7 @@ const PRODUCTS = [
     },
     {
         id: 'etudiant_galette',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon'],
         category: 'menu_etudiant',
         name: 'Galette Étudiant',
         description: '1 viande au choix + Frites + Boisson',
@@ -1189,6 +1251,7 @@ const PRODUCTS = [
     },
     {
         id: 'etudiant_cheeseburger',
+        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_cheddar'],
         category: 'menu_etudiant',
         name: 'Cheese Burger Étudiant',
         description: 'Cheese Burger + Frites + Boisson',

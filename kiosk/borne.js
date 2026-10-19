@@ -16,7 +16,7 @@
 const state = { prenom: '', mode: '', cart: [] };
 
 // Version affichée dans le menu admin (sert à vérifier qu'une mise à jour est bien arrivée)
-var VERSION_BORNE = '19/10/2026';
+var VERSION_BORNE = '19/10/2026 (2)';
 
 var B = (function () {
     'use strict';
@@ -155,19 +155,29 @@ var B = (function () {
     function gViande() {
         return { id: 'viande', titre: 'Votre viande', aide: 'Une au choix', min: 1, max: 1, options: optsDe(VIANDES) };
     }
-    function gSauces(titre) {
+    // exclure : sauces déjà dans la recette (ex. la sauce fromagère des tacos)
+    function gSauces(titre, exclure) {
+        var liste = SAUCES.filter(function (s) { return !exclure || exclure.indexOf(s.id) < 0; });
         return {
             id: 'sauces', titre: titre || 'Vos sauces',
             aide: SAUCES_INCLUSES + ' offertes, puis +' + eur(PRIX_SAUCE_SUPP) + ' la sauce · ' + SAUCES_MAX + ' maximum',
             min: 1, max: SAUCES_MAX, payantApres: SAUCES_INCLUSES, prixPayant: PRIX_SAUCE_SUPP,
-            options: [SANS_SAUCE].concat(optsDe(SAUCES))
+            options: [SANS_SAUCE].concat(optsDe(liste))
         };
     }
     function gSauceUnique() {
         return { id: 'sauce', titre: 'Votre sauce', aide: 'Une au choix', min: 1, max: 1, options: [SANS_SAUCE].concat(optsDe(SAUCES)) };
     }
-    function gRetraits(liste) {
-        return { id: 'retraits', titre: 'Retirer un ingrédient ?', aide: 'Facultatif', min: 0, max: liste.length, options: optsDe(liste) };
+    // Ingrédients que le client peut retirer : liste « retraits » du produit dans
+    // products.js (d'après sa recette), sinon la liste par défaut donnée ici.
+    var RETRAITS_TACOS_IDS = ['sans_sauce_fromagere', 'sans_frites'];
+    var RETRAITS_CRUDITES_IDS = ['sans_salade', 'sans_tomate', 'sans_oignon'];
+    function gRetraits(p, defaut) {
+        var liste = (p.retraits || defaut || []).map(function (id) {
+            return RETRAITS.find(function (r) { return r.id === id; });
+        }).filter(Boolean);
+        if (!liste.length) return null;
+        return { id: 'retraits', titre: 'Retirer un ingrédient ?', aide: 'Facultatif · gratuit', min: 0, max: liste.length, options: optsDe(liste) };
     }
     function gViandesSupp() {
         return { id: 'viandes_supp', titre: 'Une viande en plus ?', aide: 'Facultatif · +' + eur(1.5) + ' la viande', min: 0, max: VIANDES.length, options: optsDe(VIANDES, 1.5) };
@@ -214,6 +224,13 @@ var B = (function () {
     }
 
     function recette(p) {
+        var r = recetteBrute(p);
+        var groupes = r.groupes;
+        r.groupes = function (sel) { return groupes(sel).filter(Boolean); };
+        return r;
+    }
+
+    function recetteBrute(p) {
         var t = p.type;
 
         // ---- Tacos à composer ----
@@ -225,8 +242,8 @@ var B = (function () {
                     return [
                         gTaille(p),
                         gViandes(taille ? taille.meatCount : 0, 'Choisissez d\'abord la taille'),
-                        gSauces(),
-                        gRetraits(RETRAITS_TACOS),
+                        gSauces(null, ['fromagere']),
+                        gRetraits(p, RETRAITS_TACOS_IDS),
                         {
                             id: 'gratin', titre: 'Gratiner votre tacos ?', aide: 'Facultatif · +' + eur(grand ? 2.5 : 2) + (grand ? ' en grande taille' : ''),
                             min: 0, max: 1, options: optsDe(GRATINS, grand ? 2.5 : 2)
@@ -263,7 +280,7 @@ var B = (function () {
                     tailles.forEach(function (o) { if (o.id === un(sel, 'taille') && o.delta) extra = o.delta; });
                     return [
                         { id: 'taille', titre: 'Choisissez la taille', min: 1, max: 1, larges: true, vedette: true, options: tailles },
-                        gRetraits(RETRAITS_TACOS),
+                        gRetraits(p, RETRAITS_TACOS_IDS),
                         gViandesSupp(),
                         gFormule(p.price + extra),
                         gBoisson('boisson', null, un(sel, 'formule') === 'menu')
@@ -286,7 +303,7 @@ var B = (function () {
                 groupes: function (sel) {
                     var f = un(sel, 'formule');
                     return [
-                        gRetraits(RETRAITS_SANDWICH),
+                        gRetraits(p, RETRAITS_CRUDITES_IDS),
                         gViandesSupp(),
                         gSupplements(),
                         {
@@ -336,7 +353,7 @@ var B = (function () {
                         },
                         gViandes(mega ? 2 : 1),
                         gSauces(),
-                        gRetraits(RETRAITS_SANDWICH),
+                        gRetraits(p, RETRAITS_CRUDITES_IDS),
                         gViandesSupp(),
                         gSupplements(),
                         gFormule(mega ? 11 : 7),
@@ -366,11 +383,12 @@ var B = (function () {
                 groupes: function () {
                     var g = [gTaille(p)];
                     if (!p.isSpecial) g.push(gViande());
+                    g.push(gRetraits(p));
                     return g;
                 },
                 base: function (sel) { var s = tailleChoisie(p, sel); return s ? s.price : p.sizes[0].price; },
                 ligne: function (sel, gs) {
-                    return { name: p.name, details: [nomsDe(gs, sel, 'taille')[0], nomsDe(gs, sel, 'viande')[0], p.defaultIngredients] };
+                    return { name: p.name, details: [nomsDe(gs, sel, 'taille')[0], nomsDe(gs, sel, 'viande')[0], p.defaultIngredients].concat(nomsDe(gs, sel, 'retraits')) };
                 }
             };
         }
@@ -418,12 +436,13 @@ var B = (function () {
                             id: 'pain', titre: 'Votre pain', min: 1, max: 1,
                             options: [{ id: 'pain_rond', nom: 'Pain Rond' }, { id: 'naan_nature', nom: 'Naan Nature' }, { id: 'naan_fromage', nom: 'Naan Fromage', delta: 1 }]
                         },
+                        gRetraits(p),
                         gBoissonOption()
                     ];
                 },
                 base: function () { return p.price; },
                 ligne: function (sel, gs) {
-                    var d = [nb === 3 ? '3 Viandes' : '1 Viande', nomsDe(gs, sel, 'viandes').join(', '), texteSauce(gs, sel), nomsDe(gs, sel, 'pain')[0]];
+                    var d = [nb === 3 ? '3 Viandes' : '1 Viande', nomsDe(gs, sel, 'viandes').join(', '), texteSauce(gs, sel), nomsDe(gs, sel, 'pain')[0]].concat(nomsDe(gs, sel, 'retraits'));
                     var b = nomsDe(gs, sel, 'boisson')[0];
                     if (b) d.push('Boisson: ' + b);
                     return { name: p.name, details: d };
@@ -511,14 +530,15 @@ var B = (function () {
                     return [
                         gTaille(p),
                         gViandes(s ? s.meatCount : 0, 'Choisissez d\'abord la taille'),
-                        gSauces(),
+                        gSauces(null, ['fromagere']),
+                        gRetraits(p, RETRAITS_TACOS_IDS),
                         { id: 'gratin', titre: 'Gratiner votre tacos ?', aide: 'Facultatif · +' + eur(2), min: 0, max: 1, options: optsDe(GRATINS, 2) },
                         gBoisson('boisson')
                     ];
                 },
                 base: function (sel) { var s = tailleChoisie(p, sel); return s ? s.price : p.sizes[0].price; },
                 ligne: function (sel, gs) {
-                    var d = [nomsDe(gs, sel, 'viandes').join(', '), texteSauces(gs, sel)];
+                    var d = [nomsDe(gs, sel, 'viandes').join(', '), texteSauces(gs, sel)].concat(nomsDe(gs, sel, 'retraits'));
                     var gr = nomsDe(gs, sel, 'gratin')[0];
                     if (gr) d.push('Gratin ' + gr);
                     var bo = nomsDe(gs, sel, 'boisson')[0];
@@ -535,6 +555,7 @@ var B = (function () {
                     var g = [];
                     if (t !== 'etudiant_simple') g.push(gViande());
                     if (t === 'etudiant_sandwich') g.push(gSauces());
+                    g.push(gRetraits(p));
                     g.push(gBoisson('boisson'));
                     return g;
                 },
@@ -543,6 +564,7 @@ var B = (function () {
                     var d = [];
                     if (t !== 'etudiant_simple') d.push(nomsDe(gs, sel, 'viande')[0]);
                     if (t === 'etudiant_sandwich') d.push(texteSauces(gs, sel));
+                    d = d.concat(nomsDe(gs, sel, 'retraits'));
                     var bo = nomsDe(gs, sel, 'boisson')[0];
                     if (bo) d.push('Boisson: ' + bo);
                     return { name: p.name, details: d };
@@ -557,13 +579,14 @@ var B = (function () {
                     var g = [];
                     if (p.type === 'wrap' || p.type === 'panini') g.push(gViande());
                     if (p.category === 'burgers' || p.type === 'panini') g.push(gSauceUnique());
+                    g.push(gRetraits(p));
                     g.push(gFormule(p.price));
                     g.push(gBoisson('boisson', null, un(sel, 'formule') === 'menu'));
                     return g;
                 },
                 base: function () { return p.price; },
                 ligne: function (sel, gs) {
-                    var d = [nomsDe(gs, sel, 'viande')[0], texteSauce(gs, sel)];
+                    var d = [nomsDe(gs, sel, 'viande')[0], texteSauce(gs, sel)].concat(nomsDe(gs, sel, 'retraits'));
                     if (un(sel, 'formule') === 'menu') d.push(menuTexte(gs, sel));
                     return { name: p.name, details: d };
                 }
@@ -572,9 +595,9 @@ var B = (function () {
 
         // ---- Produit simple (salades, tex-mex, desserts, menus enfant, bouteilles...) ----
         return {
-            groupes: function () { return []; },
+            groupes: function () { return [gRetraits(p)]; },
             base: function () { return p.price; },
-            ligne: function () { return { name: p.name, details: [p.defaultIngredients || ''] }; }
+            ligne: function (sel, gs) { return { name: p.name, details: [p.defaultIngredients || ''].concat(nomsDe(gs, sel, 'retraits')) }; }
         };
     }
 
