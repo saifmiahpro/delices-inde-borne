@@ -384,16 +384,16 @@ const PRODUCTS = [
     // Upgrades: Large (+3€) ou XL (+6€)
     {
         id: 'tacos_spicy',
-        retraits: ['sans_sauce_fromagere', 'sans_frites', 'sans_sauce_chili_thai', 'sans_oignon_frit'],
+        retraits: ['sans_sauce_fromagere', 'sans_frites', 'sans_sauce_chili_thai', 'sans_cheddar', 'sans_oignon_frit'],
         category: 'tacos',
         name: 'Tacos Spicy',
         badge: 'ÉPICÉ',
-        description: 'Chicken Tikka, Kefta, Sauce Chili Thaï, Oignon frit',
+        description: 'Chicken Tikka, Kefta, Sauce Chili Thaï, Cheddar, Oignon frit',
         image: '../assets/tacos/tacos_spicy.png',
         type: 'tacos',
         hasBuilder: true,
         isSpecial: true,
-        defaultIngredients: 'Chicken Tikka, Kefta • Chili Thaï • Oignon Frit',
+        defaultIngredients: 'Chicken Tikka, Kefta • Chili Thaï • Cheddar • Oignon Frit',
         price: 9.90,
         menuPrice: 11.90,
         upgrades: [
