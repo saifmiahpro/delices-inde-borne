@@ -911,7 +911,9 @@ var B = (function () {
 
     function carteProduit(p, large) {
         var prix = p.sizes ? '<small>dès</small> ' + eur(Math.min.apply(null, p.sizes.map(function (s) { return s.price; }))) : eur(p.price);
-        var menu = p.menuPrice && p.price ? 'Menu<br>+' + eur(p.menuPrice - p.price) : '';
+        // « Menu +2 € » seulement si la fiche propose vraiment un menu (pas les assiettes)
+        var aUnMenu = recette(p).groupes({}).some(function (g) { return g.id === 'formule'; });
+        var menu = aUnMenu && p.menuPrice && p.price ? 'Menu<br>+' + eur(p.menuPrice - p.price) : '';
         var badge = '';
         if (p.badge) badge = '<div class="badge' + (p.badge === 'ÉPICÉ' ? '' : ' or') + '">' + esc(p.badge) + '</div>';
         var nom = esc(p.displayName || p.name);
