@@ -36,6 +36,8 @@ const SAUCES = [
 const SAUCES_INCLUSES = 2;      // nombre de sauces offertes
 const PRIX_SAUCE_SUPP = 0.50;   // prix de chaque sauce au-delà
 const SAUCES_MAX = 5;           // plafond absolu (évite les abus)
+// Viande en plus (tacos spéciaux, naans, sandwichs) : 1 € la viande (confirmé par Saïf le 20/10/2026)
+const PRIX_VIANDE_SUPP = 1.00;
 
 const BOISSONS_33 = [
     { id: 'coca_cola', name: 'Coca Cola' },
@@ -75,7 +77,9 @@ const BOUTEILLES_15L = [
 
 const PAINS = [
     { id: 'naan_nature', name: 'Naan Nature' },
-    { id: 'naan_fromage', name: 'Naan Fromage', extraPrice: 1.00 },
+    // Naan fromage : même prix que le naan nature dans un sandwich (Saïf, 20/10/2026).
+    // Seul, en accompagnement, il reste à 2,00 € (produit naan_fromage plus bas).
+    { id: 'naan_fromage', name: 'Naan Fromage' },
     { id: 'pain_rond', name: 'Pain Rond' },
     { id: 'galette', name: 'Galette' }
 ];
@@ -594,7 +598,7 @@ const PRODUCTS = [
     // ==================== BURGERS ====================
     {
         id: 'burger_cheese',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon'],
+        retraits: ['sans_salade', 'sans_oignon'],
         category: 'burgers',
         name: 'Cheese',
         description: '1 Steak, Crudités, Cheddar',
@@ -605,7 +609,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_double_cheese',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon'],
+        retraits: ['sans_salade', 'sans_oignon'],
         category: 'burgers',
         name: 'Double Cheese',
         description: '2 Steaks, Crudités, Cheddar',
@@ -616,7 +620,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_chicken_cheese',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_pomme_de_terre'],
+        retraits: ['sans_salade', 'sans_oignon', 'sans_pomme_de_terre'],
         category: 'burgers',
         name: 'Chicken Cheese',
         description: 'Poulet pané, Galette de pomme de terre, Crudités, Cheddar',
@@ -627,7 +631,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_crispy',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon_cru', 'sans_bacon', 'sans_oignon_frit'],
+        retraits: ['sans_salade', 'sans_oignon_cru', 'sans_bacon', 'sans_oignon_frit'],
         category: 'burgers',
         name: 'Crispy Burger',
         description: 'Double Tenders, Bacon, Oignons frits, Crudités, Cheddar',
@@ -652,7 +656,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_delice',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_pomme_de_terre', 'sans_oeuf', 'sans_raclette', 'sans_bacon'],
+        retraits: ['sans_salade', 'sans_oignon', 'sans_pomme_de_terre', 'sans_oeuf', 'sans_raclette', 'sans_bacon'],
         category: 'burgers',
         name: 'Délice Burger',
         description: 'Steak, Pomme de terre, Œuf, Raclette, Cheddar, Bacon, Crudités',
@@ -663,7 +667,7 @@ const PRODUCTS = [
     },
     {
         id: 'burger_delice_royal',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon', 'sans_pomme_de_terre'],
+        retraits: ['sans_salade', 'sans_oignon', 'sans_pomme_de_terre'],
         category: 'burgers',
         name: 'Délice Royal',
         description: '1 Poulet pané, 1 Steak, Pomme de terre, Crudités, Cheddar',
@@ -1255,7 +1259,7 @@ const PRODUCTS = [
     },
     {
         id: 'etudiant_cheeseburger',
-        retraits: ['sans_salade', 'sans_tomate', 'sans_oignon'],
+        retraits: ['sans_salade', 'sans_oignon'],
         category: 'menu_etudiant',
         name: 'Cheese Burger Étudiant',
         description: 'Cheese Burger + Frites + Boisson',

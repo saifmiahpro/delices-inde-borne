@@ -16,7 +16,7 @@
 const state = { prenom: '', mode: '', cart: [] };
 
 // Version affichée dans le menu admin (sert à vérifier qu'une mise à jour est bien arrivée)
-var VERSION_BORNE = '19/10/2026 (6)';
+var VERSION_BORNE = '20/10/2026';
 
 var B = (function () {
     'use strict';
@@ -184,7 +184,7 @@ var B = (function () {
         return { id: 'retraits', titre: 'Retirer un ingrédient ?', aide: 'Facultatif · gratuit', min: 0, max: liste.length, options: optsDe(liste) };
     }
     function gViandesSupp() {
-        return { id: 'viandes_supp', titre: 'Une viande en plus ?', aide: 'Facultatif · +' + eur(1.5) + ' la viande', min: 0, max: VIANDES.length, options: optsDe(VIANDES, 1.5) };
+        return { id: 'viandes_supp', titre: 'Une viande en plus ?', aide: 'Facultatif · +' + eur(PRIX_VIANDE_SUPP) + ' la viande', min: 0, max: VIANDES.length, options: optsDe(VIANDES, PRIX_VIANDE_SUPP) };
     }
     function gSupplements() {
         return {

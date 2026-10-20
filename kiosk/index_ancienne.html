@@ -3240,7 +3240,7 @@
                 // Viande supplémentaire
                 html += `<div class="step-title">Viande supplémentaire ?</div><div class="options-grid">`;
                 VIANDES.forEach(v => {
-                    html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.50€</span></div>`;
+                    html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.00€</span></div>`;
                 });
                 html += '</div>';
 
@@ -3352,7 +3352,7 @@
                 // Viande supplémentaire
                 html += `<div class="step-title">Viande supplémentaire ?</div><div class="options-grid">`;
                 VIANDES.forEach(v => {
-                    html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.50€</span></div>`;
+                    html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.00€</span></div>`;
                 });
                 html += '</div>';
 
@@ -3431,7 +3431,7 @@
             // Viande supplémentaire avec choix
             html += `<div class="step-title">Viande supplémentaire ?</div><div class="options-grid">`;
             VIANDES.forEach(v => {
-                html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.50€</span></div>`;
+                html += `<div class="option-btn" onclick="toggleViandeSupp('${v.id}', this)">+${v.name} <span class="option-price">+1.00€</span></div>`;
             });
             html += '</div>';
 
@@ -4101,7 +4101,7 @@
             } else {
                 element.classList.add('selected');
                 const viande = VIANDES.find(v => v.id === viandeId);
-                if (viande) state.builderSelections.viandesSupp.push({ ...viande, price: 1.50 });
+                if (viande) state.builderSelections.viandesSupp.push({ ...viande, price: 1.00 });
             }
             updateBuilderPrice();
         }
@@ -4222,10 +4222,10 @@
                 });
             }
 
-            // Add Viandes supplémentaires (+1.50€ chacune)
+            // Add Viandes supplémentaires (+1.00€ chacune, prix confirmé le 20/10/2026)
             if (sel.viandesSupp && sel.viandesSupp.length > 0) {
                 sel.viandesSupp.forEach(v => {
-                    price += 1.50;
+                    price += 1.00;
                 });
             }
 
