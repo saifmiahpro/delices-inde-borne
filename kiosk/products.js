@@ -39,6 +39,34 @@ const SAUCES_MAX = 5;           // plafond absolu (évite les abus)
 // Viande en plus (tacos spéciaux, naans, sandwichs) : 1 € la viande (confirmé par Saïf le 20/10/2026)
 const PRIX_VIANDE_SUPP = 1.00;
 
+// ============================================================
+//  HORAIRES DU MENU ÉTUDIANT  (demande de Mahmud, 25/11/2026)
+//  Du lundi au vendredi, jusqu'à 15h (heure de la borne).
+//  En dehors, la rubrique « Menu Étudiant » reste mais n'affiche qu'un bandeau :
+//  aucun menu étudiant ne peut plus être ajouté. Un menu étudiant déjà dans le
+//  panier avant l'heure reste dans la commande.
+//  Utilisé par borne.js ET par l'ancienne borne (index_ancienne.html).
+//  Si les horaires changent, changer aussi les textes affichés
+//  (chercher « lundi au vendredi » dans borne.js et index_ancienne.html).
+// ============================================================
+const ETUDIANT_JOURS = [1, 2, 3, 4, 5];   // 0 = dimanche, 1 = lundi … 5 = vendredi, 6 = samedi
+const ETUDIANT_HEURE_FIN = 15;            // dernière commande à 14h59
+
+// Heure de la borne (les tests peuvent imposer une date avec window.__BORNE_MAINTENANT)
+function maintenantBorne() {
+    var force = typeof window !== 'undefined' ? window.__BORNE_MAINTENANT : null;
+    return force ? new Date(force) : new Date();
+}
+// Le menu étudiant peut-il être commandé maintenant ?
+function etudiantDispo() {
+    var d = maintenantBorne();
+    return ETUDIANT_JOURS.indexOf(d.getDay()) >= 0 && d.getHours() < ETUDIANT_HEURE_FIN;
+}
+// Ce produit fait-il partie du menu étudiant ?
+function estMenuEtudiant(p) {
+    return !!p && (p.category === 'menu_etudiant' || /^etudiant_/.test(p.type || ''));
+}
+
 const BOISSONS_33 = [
     { id: 'coca_cola', name: 'Coca Cola' },
     { id: 'coca_cherry', name: 'Coca Cola Cherry' },
@@ -1201,7 +1229,8 @@ const PRODUCTS = [
     },
 
     // ==================== MENU ÉTUDIANT ====================
-    // Disponible en semaine jusqu'à 15h - Sur présentation carte étudiante
+    // Disponible du lundi au vendredi jusqu'à 15h - Sur présentation carte étudiante
+    // (horaires appliqués par la borne : ETUDIANT_JOURS / ETUDIANT_HEURE_FIN en haut du fichier)
     {
         id: 'etudiant_tacos',
         retraits: ['sans_sauce_fromagere', 'sans_frites'],

@@ -16,7 +16,7 @@
 const state = { prenom: '', mode: '', cart: [] };
 
 // Version affichée dans le menu admin (sert à vérifier qu'une mise à jour est bien arrivée)
-var VERSION_BORNE = '20/10/2026';
+var VERSION_BORNE = '25/11/2026';
 
 var B = (function () {
     'use strict';
@@ -35,6 +35,12 @@ var B = (function () {
     }
     function copie(o) { return JSON.parse(JSON.stringify(o)); }
     function produit(id) { return PRODUCTS.find(function (p) { return p.id === id; }); }
+
+    // Menu étudiant : du lundi au vendredi jusqu'à 15h (règle et horloge dans products.js).
+    // Après l'heure, aucun nouveau menu étudiant n'entre dans le panier ; ceux qui y
+    // sont déjà restent dans la commande (on peut les modifier ou les retirer).
+    var ETUDIANT_FERME = 'Menu étudiant : du lundi au vendredi, jusqu\'à 15h';
+    function disponible(p) { return !estMenuEtudiant(p) || etudiantDispo(); }
 
     // ------------------------------------------------------------------
     //  Icônes (SVG : Windows 7 n'affiche pas les emoji)
@@ -670,6 +676,8 @@ var B = (function () {
     function ouvrir(id, indexEdition) {
         var p = produit(id);
         if (!p) return;
+        // Menu étudiant après l'heure : pas de nouvel ajout (modifier un menu déjà au panier reste possible)
+        if (indexEdition == null && !disponible(p)) { refusEtudiant(true); return; }
         var rec = recette(p);
         var item = indexEdition != null ? state.cart[indexEdition] : null;
         fiche = {
@@ -701,7 +709,7 @@ var B = (function () {
         var html = '';
         if (f.rec.etudiant) {
             html += '<div class="bandeau" style="margin-top:1rem">' + ICONES.etudiant +
-                '<div><b>Menu étudiant</b><span>Sur présentation de la carte étudiante · en semaine jusqu\'à 15h</span></div></div>';
+                '<div><b>Menu étudiant</b><span>Sur présentation de la carte étudiante · du lundi au vendredi jusqu\'à 15h</span></div></div>';
         }
         if (!gs.length) {
             html += '<div class="bandeau" style="margin-top:1rem">' + ICONES.info +
@@ -834,8 +842,17 @@ var B = (function () {
     }
     function signaler(gid) { montrer(gid, true); }
 
+    // Après l'heure, un menu étudiant ne peut plus augmenter : au plus la quantité
+    // déjà dans le panier (modification), aucune pour un nouvel ajout.
+    function etudiantBloque(f, qte) {
+        if (disponible(f.p)) return false;
+        var l = f.indexEdition != null ? state.cart[f.indexEdition] : null;
+        return qte > (l ? l.quantity : 0);
+    }
+
     function quantite(d) {
         if (!fiche) return;
+        if (d > 0 && etudiantBloque(fiche, fiche.qte + d)) { toast(ETUDIANT_FERME); return; }
         fiche.qte = Math.max(1, Math.min(20, fiche.qte + d));
         dessinerPiedFiche();
     }
@@ -843,6 +860,19 @@ var B = (function () {
     function validerFiche() {
         var f = fiche;
         if (!f) return;
+        // Menu étudiant : 15h ont pu passer pendant que la fiche était ouverte
+        if (etudiantBloque(f, f.qte)) {
+            var avant = f.indexEdition != null ? state.cart[f.indexEdition] : null;
+            if (avant) {
+                f.qte = avant.quantity;
+                dessinerPiedFiche();
+                toast(ETUDIANT_FERME);
+            } else {
+                fermerFiche();
+                refusEtudiant(true);
+            }
+            return;
+        }
         var m = manquants(f);
         if (m.length) {
             f.essai = true;
@@ -931,31 +961,68 @@ var B = (function () {
             '<span class="pastille" data-p="' + p.id + '"></span></button>';
     }
 
+    // La carte est dessinée au démarrage ; on note si le menu étudiant était alors ouvert
+    // pour la redessiner quand il ouvre ou ferme (voir majCarteEtudiant).
+    var etudiantAffiche = null;
+
     function dessinerCarte() {
         var rail = '';
         var carte = '';
+        var ouvert = etudiantDispo();
+        etudiantAffiche = ouvert;
         CATEGORIES.forEach(function (c) {
-            var ps = produitsDe(c.id);
-            if (!ps.length) return;
+            var tous = produitsDe(c.id);
+            if (!tous.length) return;
+            // Après l'heure, les menus étudiants disparaissent de la carte (et de « Nos Offres ») ;
+            // leur rubrique reste, avec seulement le bandeau des horaires.
+            var ps = tous.filter(function (p) { return ouvert || !estMenuEtudiant(p); });
+            var ferme = c.id === 'menu_etudiant' && !ouvert;
             var v = VIGNETTES[c.id] || {};
             var vign = v.img ? '<img src="img/' + v.img + '.webp" alt="">' : ICONES[v.icone || 'assiette'];
             rail += '<button class="cat" data-c="' + c.id + '"><div class="vignette">' + vign + '</div><span class="nom-cat">' + esc(c.name) + '</span></button>';
 
-            carte += '<section class="section" id="sec-' + c.id + '" data-c="' + c.id + '">' +
-                '<div class="section-tete"><h2>' + esc(c.name) + '</h2><span>' + ps.length + ' produit' + (ps.length > 1 ? 's' : '') + '</span></div>';
-            if (c.id === 'menu_etudiant') {
-                carte += '<div class="bandeau">' + ICONES.etudiant + '<div><b>Réservé aux étudiants</b><span>Sur présentation de la carte étudiante · en semaine jusqu\'à 15h</span></div></div>';
+            // Rubrique fermée : gardée assez haute pour que le rail reste sur « Menu Étudiant »
+            // quand on la touche (sinon, en portrait, la rubrique suivante prend la main).
+            carte += '<section class="section" id="sec-' + c.id + '" data-c="' + c.id + '"' + (ferme ? ' style="min-height:20vh"' : '') + '>' +
+                '<div class="section-tete"><h2>' + esc(c.name) + '</h2><span>' +
+                (ps.length ? ps.length + ' produit' + (ps.length > 1 ? 's' : '') : 'Indisponible pour le moment') + '</span></div>';
+            if (ferme) {
+                carte += '<div class="bandeau etudiant-ferme">' + ICONES.horloge + '<div><b>' + esc(ETUDIANT_FERME) + '</b><span>Sur présentation de la carte étudiante</span></div></div>';
+            } else if (c.id === 'menu_etudiant') {
+                carte += '<div class="bandeau">' + ICONES.etudiant + '<div><b>Réservé aux étudiants</b><span>Sur présentation de la carte étudiante · du lundi au vendredi jusqu\'à 15h</span></div></div>';
             } else if (c.id === 'enfant') {
                 carte += '<div class="bandeau">' + ICONES.cadeau + '<div><b>Menu enfant 7,00 €</b><span>Frites + Capri-Sun + surprise Kinder inclus</span></div></div>';
             } else if (c.id === 'boxes') {
                 carte += '<div class="bandeau">' + ICONES.etoile + '<div><b>Le meilleur deal : 9,90 €</b><span>Ajoutez une canette pour seulement 1,00 €</span></div></div>';
             }
-            carte += '<div class="grille">';
-            ps.forEach(function (p, i) { carte += carteProduit(p, c.id === 'offres' && i === 0 && p.isCustom); });
-            carte += '</div></section>';
+            if (ps.length) {
+                carte += '<div class="grille">';
+                ps.forEach(function (p, i) { carte += carteProduit(p, c.id === 'offres' && i === 0 && p.isCustom); });
+                carte += '</div>';
+            }
+            carte += '</section>';
         });
         $('rail').innerHTML = rail;
         $('carte').innerHTML = carte;
+    }
+
+    // La borne tourne toute la journée : on redessine la carte quand le menu étudiant
+    // ouvre ou ferme (au début de chaque commande, ou quand un client touche un menu
+    // étudiant resté affiché après 15h).
+    function majCarteEtudiant() {
+        if (etudiantAffiche === etudiantDispo()) return false;
+        var c = $('carte');
+        var haut = c.scrollTop;
+        dessinerCarte();
+        espion();
+        majPastilles();
+        c.scrollTop = haut;
+        return true;
+    }
+    function refusEtudiant(montrerBandeau) {
+        toast(ETUDIANT_FERME);
+        majCarteEtudiant();
+        if (montrerBandeau && ecranCourant === 'app') allerA('menu_etudiant');
     }
 
     var espionCoupe = false;
@@ -982,9 +1049,11 @@ var B = (function () {
             rail.scrollTo({ top: Math.max(0, h), behavior: 'smooth' });
         }
     }
+    var obs = null;
     function espion() {
         if (typeof IntersectionObserver === 'undefined') return;
-        var obs = new IntersectionObserver(function (entrees) {
+        if (obs) obs.disconnect();   // carte redessinée : on suit les nouvelles sections
+        obs = new IntersectionObserver(function (entrees) {
             if (espionCoupe) return;
             var vues = entrees.filter(function (e) { return e.isIntersecting; })
                 .sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
@@ -1064,6 +1133,8 @@ var B = (function () {
     function qteLigne(i, d) {
         var l = state.cart[i];
         if (!l) return;
+        // Après l'heure, un menu étudiant déjà au panier peut diminuer, pas augmenter
+        if (d > 0 && l.product && !disponible(l.product)) { toast(ETUDIANT_FERME); return; }
         l.quantity += d;
         if (l.quantity <= 0) state.cart.splice(i, 1);
         if (l.quantity > 50) l.quantity = 50;
@@ -1095,7 +1166,8 @@ var B = (function () {
             return (l.product && l.product.category === 'boissons') || /MENU|Boisson|MÉGA XL/.test(l.details || '') || (l.product && /bucket|etudiant|enfant/.test(l.product.type || ''));
         });
         return SUGGESTIONS.filter(function (id) {
-            if (dans[id] || !produit(id)) return false;
+            var p = produit(id);
+            if (dans[id] || !p || !disponible(p)) return false;
             if (id === 'boisson_33' && aBoisson) return false;
             return true;
         }).slice(0, 6);
@@ -1121,6 +1193,7 @@ var B = (function () {
     function suggestion(id) {
         var p = produit(id);
         if (!p) return;
+        if (!disponible(p)) { toast(ETUDIANT_FERME); return; }
         if (recette(p).groupes({}).length) { ouvrir(id); return; }
         state.cart.push({ id: nouvelId(), product: p, name: p.name, price: p.price, quantity: 1, details: p.defaultIngredients || '', selections: {}, image: p.image });
         majPanier();
@@ -1224,6 +1297,7 @@ var B = (function () {
     function choisirMode(m) {
         state.mode = m;
         $('puce-mode').textContent = m === 'sur_place' ? 'SUR PLACE' : 'À EMPORTER';
+        majCarteEtudiant();   // le menu étudiant a pu ouvrir ou fermer depuis le client précédent
         afficher('app');
         $('carte').scrollTop = 0;
         activerCat(CATEGORIES[0].id);

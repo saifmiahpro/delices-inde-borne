@@ -2859,7 +2859,7 @@
                 if (cat.id === 'menu_etudiant') {
                     const banner = document.createElement('div');
                     banner.className = 'section-banner section-banner-etudiant';
-                    banner.innerHTML = '<div class="banner-title">MENU ÉTUDIANT</div><div class="banner-subtitle">Sur présentation de la carte étudiante &middot; En semaine jusqu\'à 15h</div>';
+                    banner.innerHTML = '<div class="banner-title">MENU ÉTUDIANT</div><div class="banner-subtitle">Sur présentation de la carte étudiante &middot; Du lundi au vendredi jusqu\'à 15h</div>';
                     section.appendChild(banner);
                 }
 
@@ -2970,7 +2970,19 @@
             scrollToCategorySection(categoryId);
         }
 
+        // Menu étudiant : du lundi au vendredi jusqu'à 15h (règle et horloge dans products.js).
+        // Après l'heure, plus de nouveau menu étudiant ; ceux déjà au panier restent.
+        // (Si products.js ne connaît pas la règle, rien n'est bloqué.)
+        function menuEtudiantFerme(product) {
+            return typeof etudiantDispo === 'function' && typeof estMenuEtudiant === 'function'
+                && estMenuEtudiant(product) && !etudiantDispo();
+        }
+        function refusMenuEtudiant() {
+            showToast('Menu étudiant : du lundi au vendredi, jusqu\'à 15h');
+        }
+
         function handleProductClick(product) {
+            if (menuEtudiantFerme(product)) { refusMenuEtudiant(); return; }
             state.currentProduct = product;
 
             if (product.hasBuilder) {
@@ -3102,12 +3114,23 @@
                     nextBtn.onclick = updateCartItemFromBuilder;
                 } else {
                     nextBtn.textContent = 'COMPLÉTER MA COMMANDE';
-                    nextBtn.onclick = addToCartFromBuilder;
+                    nextBtn.onclick = ajouterDepuisBuilder;
                 }
             } else {
                 nextBtn.textContent = 'SUIVANT';
                 nextBtn.onclick = nextBuilderStep;
             }
+        }
+
+        // « COMPLÉTER MA COMMANDE » : 15h ont pu passer pendant que la fenêtre d'un
+        // menu étudiant était ouverte → on ne l'ajoute pas.
+        function ajouterDepuisBuilder() {
+            if (menuEtudiantFerme(state.currentProduct)) {
+                closeBuilder();
+                refusMenuEtudiant();
+                return;
+            }
+            addToCartFromBuilder();
         }
 
         function nextBuilderStep() {
@@ -3809,7 +3832,7 @@
 
         // ==================== MENU ÉTUDIANT BUILDERS ====================
         function buildEtudiantTacosBuilder(content, product) {
-            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — En semaine jusqu'à 15h</div>`;
+            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — Du lundi au vendredi jusqu'à 15h</div>`;
             html += `<div class="step-title">Taille</div><div class="options-grid big">`;
             product.sizes.forEach((size, i) => {
                 html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('size', '${size.id}', this)" data-price="${size.price}">
@@ -3846,7 +3869,7 @@
         }
 
         function buildEtudiantSimpleBuilder(content, product) {
-            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — En semaine jusqu'à 15h</div>`;
+            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — Du lundi au vendredi jusqu'à 15h</div>`;
             html += `<div class="step-title">Choix de la boisson</div><div class="options-grid">
                 ${getBoissonsHtml()}
             </div>`;
@@ -3856,7 +3879,7 @@
         }
 
         function buildEtudiantPoutineBuilder(content, product) {
-            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — En semaine jusqu'à 15h</div>`;
+            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — Du lundi au vendredi jusqu'à 15h</div>`;
             html += `<div class="step-title">Viande</div><div class="options-grid">`;
             VIANDES.forEach((v, i) => {
                 html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
@@ -3872,7 +3895,7 @@
         }
 
         function buildEtudiantSandwichBuilder(content, product) {
-            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — En semaine jusqu'à 15h</div>`;
+            let html = `<div class="step-title" style="color:#FFD700;">⚠ Menu Étudiant — Du lundi au vendredi jusqu'à 15h</div>`;
             html += `<div class="step-title">Viande</div><div class="options-grid">`;
             VIANDES.forEach((v, i) => {
                 html += `<div class="option-btn ${i === 0 ? 'selected' : ''}" onclick="selectOption('meat', '${v.id}', this)">${v.name}</div>`;
@@ -4487,6 +4510,8 @@
 
         function updateQty(itemId, delta) {
             const item = state.cart.find(i => i.id === itemId);
+            // Après l'heure, un menu étudiant déjà au panier peut diminuer, pas augmenter
+            if (item && delta > 0 && menuEtudiantFerme(item.product)) { refusMenuEtudiant(); return; }
             if (item) {
                 item.quantity += delta;
                 if (item.quantity <= 0) removeFromCart(itemId);
