@@ -39,7 +39,7 @@ var B = (function () {
     // Menu étudiant : du lundi au vendredi jusqu'à 15h (règle et horloge dans products.js).
     // Après l'heure, aucun nouveau menu étudiant n'entre dans le panier ; ceux qui y
     // sont déjà restent dans la commande (on peut les modifier ou les retirer).
-    var ETUDIANT_FERME = 'Menu étudiant : du lundi au vendredi, jusqu\'à 15h';
+    var ETUDIANT_FERME = 'Menu étudiant : uniquement du lundi au vendredi, jusqu\'à 15h';
     function disponible(p) { return !estMenuEtudiant(p) || etudiantDispo(); }
 
     // ------------------------------------------------------------------
